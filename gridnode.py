@@ -1,5 +1,6 @@
 import pprint
 #hansschwanz
+#Hier steht nochwas
 
 # ein Knoten ist ein Netzelement an einem bestimmten Punkt im Netz
 class GridNode:
