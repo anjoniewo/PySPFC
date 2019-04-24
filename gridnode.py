@@ -3,6 +3,19 @@ import pprint
 #blabliblub
 # schnuchen kuchen
 
+
+
+
+
+
+
+
+
+Hier steht eine tolle Gswchichte
+def blasack():
+    juhiiii
+
+
 # ein Knoten ist ein Netzelement an einem bestimmten Punkt im Netz
 class GridNode:
 
