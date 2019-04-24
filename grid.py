@@ -2,6 +2,13 @@ from gridnode import GridNode
 from gridline import GridLine
 
 
+
+
+""""""
+hallo hallo hallo
+""""""
+
+
 # Klasse fuer ein elektrisches Netz
 class Grid:
 
