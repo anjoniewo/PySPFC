@@ -1,30 +1,4 @@
 import pprint
-#hansschwanz
-#blabliblub
-# schnuchen kuchen
-
-# hallihallo
-# hallihallo
-
-# blah
-#blah
-
-
-iQNMC
-cniocmc
-CMOC;
-
-
-
-DER FÜHRERschein
-
-def Blasefunction():
-    Kitzler
-
-
-Hier steht eine tolle Gswchichte
-def blasack():
-    juhiiii
 
 
 # ein Knoten ist ein Netzelement an einem bestimmten Punkt im Netz
