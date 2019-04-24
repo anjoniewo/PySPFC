@@ -28,7 +28,7 @@ class Grid:
     # Methode erstellt einen neuen Netzzweig und fuegt diese der Leitungsliste hinzu
     def create_grid_line(self, node_i, node_j, line_parameters):
         # Instanzierung eines neuen GridNode Objektes
-        line = GridLine(node_i, node_j, line_parameters, frequency)
+        line = GridLine(node_i, node_j, line_parameters)
         self.add_grid_line(line)
 
     # Methode fuegt der Leitungsliste einen Netzzweig hinzu
