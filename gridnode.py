@@ -11,6 +11,11 @@ import pprint
 
 
 
+
+def Blasefunction():
+    Kitzler
+
+
 Hier steht eine tolle Gswchichte
 def blasack():
     juhiiii
