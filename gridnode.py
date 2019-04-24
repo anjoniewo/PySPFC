@@ -16,6 +16,8 @@ CMOC;
 
 
 
+DER FÜHRERschein
+
 def Blasefunction():
     Kitzler
 
