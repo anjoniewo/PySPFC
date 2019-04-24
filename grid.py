@@ -1,7 +1,6 @@
 from gridnode import GridNode
 from gridline import GridLine
 
-#Hier wird stetig gearbeitet
 
 # Klasse fuer ein elektrisches Netz
 class Grid:
