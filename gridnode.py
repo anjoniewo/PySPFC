@@ -11,8 +11,6 @@ import pprint
 
 
 
-
-
 Hier steht eine tolle Gswchichte
 def blasack():
     juhiiii
