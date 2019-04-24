@@ -10,6 +10,10 @@ import pprint
 #blah
 
 
+iQNMC
+cniocmc
+CMOC;
+
 
 
 def Blasefunction():
