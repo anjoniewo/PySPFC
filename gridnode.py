@@ -3,6 +3,10 @@ import pprint
 #blabliblub
 # schnuchen kuchen
 
+
+
+global penis = "10000 meter"
+
 # ein Knoten ist ein Netzelement an einem bestimmten Punkt im Netz
 class GridNode:
 
