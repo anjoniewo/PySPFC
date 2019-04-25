@@ -32,6 +32,9 @@ def get_polar(real, imag):
     elif real < 0 and imag >= 0:
         phi = math.atan(imag / real) + math.pi
 
+    else:
+        ERROR = ""
+
     return { "magnitude" : r, "angle" : phi, "angleGrad" : (phi*180 / math.pi)}
 
 

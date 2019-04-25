@@ -63,10 +63,12 @@ class GridNode:
             # Spannungsbetrag
             self.node_voltage = node_parameters[2]
             self.theta = node_parameters[3]
+
         # P-U-Knoten
         elif self.typenumber == 2:
             self.active_injection_power = node_parameters[2]
             self.node_voltage = node_parameters[3]
+
         else:
             ERROR = ""
 

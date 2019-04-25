@@ -6,18 +6,16 @@ class Admittance:
 	def __init__(self, impedance):
 		
 		# Realteil der Admittanz
-		self.g
+		self.g = None
 		
 		# Imaginaerteil der Admittanz
-		self.b
+		self.b = None
 		
-		# falls Querbelaege nicht bekannt
-		if not impedance.get_magnitude():
-			self.g = None
-			self.b = None
-		else:
+		# Wenn Querbelaege bekannt
+		if impedance.get_magnitude():
 			# g und b der Admittanz berechnen
 			self.calculate_g_and_b(impedance)
+
 		
 	# Methode berechnet die Konduktanz sowie die Suszeptanz
 	def calculate_g_and_b(self, impedance):
