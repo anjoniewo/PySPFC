@@ -30,9 +30,9 @@ def get_polar(real, imag):
         phi = math.pi / 2
 
     elif real < 0 and imag >= 0:
-        phi = math.atan( imag / real ) + math.pi
+        phi = math.atan(imag / real) + math.pi
 
-    return { "magnitude" : r, "angle" : phi, "angleGrad" : (phi*180/math.pi)}
+    return { "magnitude" : r, "angle" : phi, "angleGrad" : (phi*180 / math.pi)}
 
 
 # Funktion gibt eine komplexe Zahl in euler'scher Darstellung zurueck
