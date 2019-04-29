@@ -1,4 +1,5 @@
 import math
+from loadflowreporter import LoadFlowReporter
 
 
 # Funktion gibt den Betrag einer komplexen Zahl zurueck
@@ -9,7 +10,7 @@ def get_complex_magnitude(real, imag):
 # Funktion gibt eine komplexe Zahl in kartesischen Koordinaten zurueck
 def get_cartesian(real, imag):
     return real + 1j * imag
-    
+
 
 # Funktion gibt eine komplexe Zahl in Polarkoordinaten zurueck
 def get_polar(real, imag):

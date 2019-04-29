@@ -1,4 +1,5 @@
 import math
+from loadflowreporter import LoadFlowReporter
 from impedance import Impedance
 from admittance import Admittance
 
@@ -25,10 +26,8 @@ class GridLine:
         # Knoten 2
         self.node_name_j = node_name_j
 
-
         # Laenge der Leitung
         self.length = None
-
 
         # resistiver Laengswiderstand
         self.resistance = None
@@ -42,7 +41,6 @@ class GridLine:
         # kapazitiver Querwiderstand
         self.capacitive_reactance = None
 
-
         # Laengsimpedanz der Leitung
         self.impedance = None
         
@@ -55,10 +53,8 @@ class GridLine:
         # Queradmittanz der Leitung
         self.transverse_admittance = None
 
-
         # Leitungsparameter setzen
         self.set_line_parameters(line_parameters)
-
 
     # Methode setzt die Leitungsbelaege (Ω/km) als Parameter
     def set_line_parameters(self, line_parameters):
@@ -66,22 +62,26 @@ class GridLine:
         # Leitungslaenge
         if line_parameters[0]:
             self.length = line_parameters[0]
-       
-        # resistiver Laengswiderstand
-        if line_parameters[1] and line_parameters[0]:
-            self.resistance = line_parameters[1] * self.length
 
-        # induktiver Laengswiderstand
-        if line_parameters[2] and line_parameters[0]:
-            self.inductive_reactance = (2 * math.pi * self.frequency * line_parameters[2]) * self.length
+            # resistiver Laengswiderstand
+            if line_parameters[1] >= 0:
+                self.resistance = line_parameters[1] * self.length
 
-        # resistiver Querwiderstand
-        if line_parameters[3] and line_parameters[0]:
-            self.transverse_resistance = line_parameters[3] * self.length
+            # induktiver Laengswiderstand
+            if line_parameters[2] > 0:
+                self.inductive_reactance = (2 * math.pi * self.frequency * line_parameters[2]) * self.length
 
-        # kapazitiver Querwiderstand
-        if line_parameters[4] and line_parameters[0]:
-            self.capacitive_reactance = (1 / (2 * math.pi * self.frequency * line_parameters[4])) * self.length
+            # resistiver Querwiderstand
+            if line_parameters[3] >= 0:
+                self.transverse_resistance = line_parameters[3] * self.length
+
+            # kapazitiver Querwiderstand
+            if line_parameters[4] > 0:
+                self.capacitive_reactance = (1 / (2 * math.pi * self.frequency * line_parameters[4])) * self.length
+
+        else:
+            LoadFlowReporter.error_report.append("Line-length: line_parameters[0] = 0")
+            print(LoadFlowReporter.error_report)
 
 
         # Laengsimpedanz der Leitung

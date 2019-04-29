@@ -1,3 +1,4 @@
+from loadflowreporter import LoadFlowReporter
 from gridnode import GridNode
 from gridline import GridLine
 
@@ -15,6 +16,9 @@ class Grid:
         self.grid_node_list = []
         self.grid_line_list = []
 
+        # Instanzierung der Reporter Klasse
+        self.load_flow_reporter = LoadFlowReporter()
+
 
     # Methode erstellt einen neuen Netzknoten und fuegt diesen der Knotenliste hinzu
     def create_grid_node(self, name, type, node_parameters):
@@ -22,11 +26,9 @@ class Grid:
         node = GridNode(name, type, node_parameters)
         self.add_grid_node(node)
 
-
     # Methode fuegt der Netzknotenliste einen Knoten hinzu
     def add_grid_node(self, grid_node):
         self.grid_node_list.append(grid_node)
-
 
     # Methode erstellt einen neuen Netzzweig und fuegt diese der Leitungsliste hinzu
     def create_grid_line(self, node_i, node_j, line_parameters):
@@ -34,12 +36,9 @@ class Grid:
         line = GridLine(self.frequency, node_i, node_j, line_parameters)
         self.add_grid_line(line)
 
-
     # Methode fuegt der Leitungsliste einen Netzzweig hinzu
     def add_grid_line(self, grid_line):
         self.grid_line_list.append(grid_line)
-
-    
 
     # Gibt alle Knoten des Netzes in der Konsole aus
     def print_grid_node_list(self):
