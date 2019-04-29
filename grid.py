@@ -1,6 +1,7 @@
 from loadflowreporter import LoadFlowReporter
 from gridnode import GridNode
 from gridline import GridLine
+from busadmittancematrix import BusAdmittanceMatrix
 
 
 # Klasse fuer ein elektrisches Netz
@@ -16,9 +17,11 @@ class Grid:
         self.grid_node_list = []
         self.grid_line_list = []
 
-        # Instanzierung der Reporter Klasse
+        # Instanzierung der LoadFlowReporter-Klasse
         self.load_flow_reporter = LoadFlowReporter()
 
+        # Instanzierung der BusAdmittanceMatrix-Klasse
+        self.bus_admittanz_matrix = BusAdmittanceMatrix()
 
     # Methode erstellt einen neuen Netzknoten und fuegt diesen der Knotenliste hinzu
     def create_grid_node(self, name, type, node_parameters):
@@ -48,3 +51,9 @@ class Grid:
         else:
             for i in range(0, len(self.grid_node_list)):
                 self.grid_node_list[i].info()
+
+    # Methode zur Berechnung der aktuellen Knotenadmittanz-Matrix
+    # Instanzierung der busadmittancematrix-Klasse
+    # Übergabeparameter: Knotenliste [grid_node_list], Admittanzenliste [grid_line_list]
+    def calc_bus_admittance_matrix(self):
+        self.bus_admittanz_matrix.calc_bus_admittance_matrix(self.grid_node_list, self.grid_line_list)
