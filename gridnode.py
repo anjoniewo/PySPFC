@@ -53,6 +53,10 @@ class GridNode:
     def set_node_parameters(self, node_parameters):
     
         # Fuer alle Knotentypen
+        # ***********************
+        # **** Lastparameter ****
+        # ***********************
+        # Wirkleistung in kW
         self.active_load_power = node_parameters[0]
         # Blindleistung in kVar
         self.reactive_load_power = node_parameters[1]

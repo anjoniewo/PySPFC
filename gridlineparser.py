@@ -9,7 +9,7 @@ class GridLineParser(GridElementParser):
 		
 		super(GridLineParser, self).__init__()
 		
-		self.line_parameters = []
+		self.gridlines = list()
 		
 		# Verzeichnis
 		root = "C:\\Users\\EUProjekt\\Desktop\\AnjoNie\\02_Projekte\\LoadFlowSimulationTool\\"
@@ -25,8 +25,7 @@ class GridLineParser(GridElementParser):
 	
 	def get_lines_from_csv_dictionary(self, frequency):
 		
-		parameter_list = []
-		gridline_list = []
+		parameter_list = list()
 		
 		list_of_keys = list(self.csv_dictionary.keys())
 		
@@ -53,7 +52,4 @@ class GridLineParser(GridElementParser):
 						parameter_list.append(float(self.csv_dictionary[key][i]))
 				
 				gridline = GridLine(frequency, node_i, node_j, parameter_list)
-				gridline_list.append(gridline)
-		
-
-lineparser = GridLineParser("lines", 50)
+				self.gridlines.append(gridline)

@@ -13,12 +13,11 @@ class Grid:
         self.frequency = frequency
         
         # Liste von Knoten und Liste von Leitungen
-        self.grid_node_list = []
-        self.grid_line_list = []
+        self.grid_node_list = list()
+        self.grid_line_list = list()
 
         # Instanzierung der Reporter Klasse
         self.load_flow_reporter = LoadFlowReporter()
-
 
     # Methode erstellt einen neuen Netzknoten und fuegt diesen der Knotenliste hinzu
     def create_grid_node(self, name, type, node_parameters):
