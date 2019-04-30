@@ -57,17 +57,21 @@ class GridNode:
         # **** Lastparameter ****
         # ***********************
         # Wirkleistung in kW
+        # Fuer alle Knotentypen (Last) Wirkleistung in kW
         self.active_load_power = node_parameters[0]
-        # Blindleistung in kVar
+
+        # Fuer alle Knotentypen (Last) Blindleistung in kVar
         self.reactive_load_power = node_parameters[1]
         
-        # Slack-Knoten
+        # Slack-Knoten (Referenzknoten)
+        # setzen von: Knotenspannung (node_voltage) in kV, Spannungswinkel (theta) in Bogenmaß
         if self.typenumber == 0:
             # Spannungsbetrag
             self.node_voltage = node_parameters[2]
             self.theta = node_parameters[3]
 
-        # P-U-Knoten
+        # P-U-Knoten (Einspeisung)
+        # setzen von : Wirkleistung in kW (active_injection_power), Knotenspannung (node_voltage) in kV
         elif self.typenumber == 2:
             self.active_injection_power = node_parameters[2]
             self.node_voltage = node_parameters[3]
