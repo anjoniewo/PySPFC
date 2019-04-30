@@ -52,22 +52,21 @@ class GridNode:
     # Methode setzt die Knotenparameter in Abhaengigkeit des Knotentyps
     def set_node_parameters(self, node_parameters):
     
-        # Fuer alle Knotentypen
-        # ***********************
-        # **** Lastparameter ****
-        # ***********************
-        # Wirkleistung in kW
+        # Fuer alle Knotentypen (Last) Wirkleistung in kW
         self.active_load_power = node_parameters[0]
-        # Blindleistung in kVar
+
+        # Fuer alle Knotentypen (Last) Blindleistung in kVar
         self.reactive_load_power = node_parameters[1]
         
-        # Slack-Knoten
+        # Slack-Knoten (Referenzknoten)
+        # setzen von: Knotenspannung (node_voltage) in kV, Spannungswinkel (theta) in Bogenmaß
         if self.typenumber == 0:
             # Spannungsbetrag
             self.node_voltage = node_parameters[2]
             self.theta = node_parameters[3]
 
-        # P-U-Knoten
+        # P-U-Knoten (Einspeisung)
+        # setzen von : Wirkleistung in kW (active_injection_power), Knotenspannung (node_voltage) in kV
         elif self.typenumber == 2:
             self.active_injection_power = node_parameters[2]
             self.node_voltage = node_parameters[3]
@@ -81,22 +80,4 @@ class GridNode:
         print("------------------------------------")
         print("Knotenbezeichnung: " + str(self.name))
         print("Knotentyp: " + str(self.grid_node_types[self.typenumber]))
-        print("")
-        
-        if self.active_injection_power:
-            print("Einspeisung:")
-            print("Wirkleistung P = " + str(self.active_injection_power) + " kW")
-            print("Blindleistung Q = " + str(self.reactive_injection_power) + " kVar")
-            print("")
-            
-        if self.active_load_power:
-            print("Last:")
-            print("Wirkleistung P = " + str(self.active_load_power) + " kW")
-            print("Blindleistung Q = " + str(self.reactive_load_power) + " kVar")
-            print("")
-            
-        print("")
-        
-        if self.node_voltage:
-            print("Spannung am Knoten: " + str(self.node_voltage))
-            print("Spannungswinkel: " + str(self.theta))
+        print("Einspeisung")
