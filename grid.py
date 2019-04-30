@@ -56,4 +56,7 @@ class Grid:
     # Instanzierung der busadmittancematrix-Klasse
     # Übergabeparameter: Knotenliste [grid_node_list], Admittanzenliste [grid_line_list]
     def calc_bus_admittance_matrix(self):
-        self.bus_admittanz_matrix.calc_bus_admittance_matrix(self.grid_node_list, self.grid_line_list)
+        self.bus_admittanz_matrix.calc_matrix(self.grid_node_list, self.grid_line_list)
+
+    def show_admittanz_matrix(self):
+        return self.bus_admittanz_matrix.matrix

@@ -28,6 +28,26 @@ class Admittance:
 		self.g = (impedance.r / ((impedance.r ** 2) + (impedance.x ** 2)))
 		self.b = - (impedance.x / ((impedance.r ** 2) + (impedance.x ** 2)))
 		
-	# Methode
+	# Methode gibt den Betrag der Admittanz wieder
 	def get_magnitude(self):
 		return get_complex_magnitude(self.g, self.b)
+
+	# Methode addiert aus einem übergebenen Admittance-Objekte deren Werte auf die Eigenen
+	def addition(self, admittance_obj):
+		self.g = self.g + admittance_obj.g
+		self.b = self.b + admittance_obj.b
+
+	# Methode subtrahiert aus einem übergebenen Admittance-Objekte deren Werte von den Eigenen
+	def subtraction(self, admittance_obj):
+		self.g = self.g - admittance_obj.g
+		self.b = self.b - admittance_obj.b
+
+	# Methode multipliziert aus einem übergebenen Admittance-Objekte deren Werte mit den Eigenen
+	def multiplication(self, admittance_obj):
+		self.g = self.g * admittance_obj.g - self.b * admittance_obj.b
+		self.b = self.g * admittance_obj.b + self.b * admittance_obj.g
+
+	# Methode dividiert aus einem übergebenen Admittance-Objekte deren Werte mit den Eigenen
+	def division(self, admittance_obj):
+		self.g = (self.g * admittance_obj.g + self.b * admittance_obj.b) / (admittance_obj.g ** 2 + admittance_obj.b ** 2)
+		self.b = (self.b * admittance_obj.g - self.g * admittance_obj.b) / (admittance_obj.g ** 2 + admittance_obj.b ** 2)
