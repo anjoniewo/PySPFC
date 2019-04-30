@@ -14,8 +14,8 @@ class Grid:
         self.frequency = frequency
         
         # Liste von Knoten und Liste von Leitungen
-        self.grid_node_list = []
-        self.grid_line_list = []
+        self.grid_node_list = list()
+        self.grid_line_list = list()
 
         # Instanzierung der LoadFlowReporter-Klasse
         self.load_flow_reporter = LoadFlowReporter()
@@ -51,6 +51,16 @@ class Grid:
         else:
             for i in range(0, len(self.grid_node_list)):
                 self.grid_node_list[i].info()
+
+        # Gibt alle Knoten des Netzes in der Konsole aus
+
+    def print_grid_line_list(self):
+        if not len(self.grid_line_list):
+            print("")
+            print("Keine Leitungen in Liste")
+        else:
+            for i in range(0, len(self.grid_line_list)):
+                self.grid_line_list[i].info()
 
     # Methode zur Berechnung der aktuellen Knotenadmittanz-Matrix
     # Instanzierung der busadmittancematrix-Klasse

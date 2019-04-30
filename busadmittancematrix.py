@@ -31,12 +31,12 @@ class BusAdmittanceMatrix:
                 # Prüfen ob Modus "alle Admittanzen" true ist und ob Queradmittanz in Gridline vorhanden
                 if all_admittances and grid_line.transverse_admittance:
 
-                   # Teile Gridline Queradmittanz durch 2, da pro Knoten nur halbe Queradmittanz berechnet werden darf
+                    # Teile Gridline Queradmittanz durch 2, da pro Knoten nur halbe Queradmittanz berechnet werden darf
                     grid_line.transverse_admittance.g = grid_line.transverse_admittance.g / 2
                     grid_line.transverse_admittance.b = grid_line.transverse_admittance.b / 2
 
-                   # Addiere Queradmittanz von Gridline zur Summenadmittanz
-                   sum_admittance.addition(grid_line.transverse_admittance)
+                    # Addiere Queradmittanz von Gridline zur Summenadmittanz
+                    sum_admittance.addition(grid_line.transverse_admittance)
 
         return sum_admittance
 
@@ -60,18 +60,18 @@ class BusAdmittanceMatrix:
                 else:
                     self.matrix[i][j] = self.matrix[j][i] = self.get_sum_of_grid_lines_on_node(grid_node_list[i].name, grid_line_list, False)
 
- """
-    # Methode zur Erzeugung der Knotenadimttanzmatrix auf Grundlage der Knoten und Zweige eines Netzes
-    def get_bus_admittance_matrix(self, gridnodes, gridlines):
-        Y = np.array()
-
-        for i in range(0, len(gridnodes)):
-            for j in range(0, len(gridnodes)):
-                Y[i][j] = 1
-
-    # Methode zur Konsolenausgabe der Matrix
-    def print_bus_admittance_matrix(self):
-        for i in range(0, self.rows):
-            for j in range(0, self.columns):
-                print("")
-    """
+ # """
+ #    # Methode zur Erzeugung der Knotenadimttanzmatrix auf Grundlage der Knoten und Zweige eines Netzes
+ #    def get_bus_admittance_matrix(self, gridnodes, gridlines):
+ #        Y = np.array()
+ #
+ #        for i in range(0, len(gridnodes)):
+ #            for j in range(0, len(gridnodes)):
+ #                Y[i][j] = 1
+ #
+ #    # Methode zur Konsolenausgabe der Matrix
+ #    def print_bus_admittance_matrix(self):
+ #        for i in range(0, self.rows):
+ #            for j in range(0, self.columns):
+ #                print("")
+ #    """
