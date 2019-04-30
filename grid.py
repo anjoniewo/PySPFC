@@ -47,3 +47,12 @@ class Grid:
         else:
             for i in range(0, len(self.grid_node_list)):
                 self.grid_node_list[i].info()
+
+    # Gibt alle Leitungen des Netzes in der Konsole aus
+    def print_grid_line_list(self):
+        if not len(self.grid_line_list):
+	        print("")
+	        print("Keine Leitungen in Liste")
+        else:
+	        for i in range(0, len(self.grid_line_list)):
+		        self.grid_line_list[i].info()

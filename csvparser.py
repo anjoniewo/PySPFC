@@ -2,8 +2,8 @@ import csv
 from collections import defaultdict
 
 
-# Parser-Klasse zum Einlesen der Netzdaten
-class GridElementParser:
+# CSV-Parser-Klasse zum Vererben
+class CSVParser:
 	
 	def __init__(self):
 		

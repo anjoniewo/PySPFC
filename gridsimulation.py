@@ -1,12 +1,11 @@
 from grid import Grid
-from gridlineparser import GridLineParser
-from gridnodeparser import GridNodeParser
+from gridparser import GridParser
 
 network = Grid()
 network.create_grid_node("K1", 1, [5, 2])
 network.create_grid_node("K2", 0, [25, 12, 400, 0])
 network.create_grid_node("K3", 2, [25, 12, 400, 1])
-network.print_grid_node_list()
+# network.print_grid_node_list()
 
 """ create_grid_line-Parameter (
         STRING Knotenname_1,
@@ -22,19 +21,19 @@ network.print_grid_node_list()
 """
 
 network.create_grid_line("K1","K2",[0.1, 0.206, 0.256, 0, 250])
-network.grid_line_list[0].info();
-
-grid_line_path = "lines"
-grid_node_path = "gridnodes"
+# network.grid_line_list[0].info()
 
 network = Grid()
 
 
 """ TEST TEST TEST """
-gridnodeparser = GridNodeParser(grid_node_path)
-gridlineparser = GridLineParser(grid_line_path, network.frequency)
+grid_line_path = "lines"
+grid_node_path = "gridnodes"
 
-network.grid_line_list = gridlineparser.gridlines
-network.grid_node_list = gridnodeparser.gridnodes
+gridparser = GridParser(network.frequency, grid_line_path, grid_node_path)
+
+network.grid_line_list = gridparser.grid_line_parser.gridlines
+network.grid_node_list = gridparser.grid_node_parser.gridnodes
 
 network.print_grid_node_list()
+network.print_grid_line_list()

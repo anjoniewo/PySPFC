@@ -1,9 +1,9 @@
-from gridelementparser import GridElementParser
+from csvparser import CSVParser
 from gridnode import GridNode
 
 
 # Parser-Klasse zum Einleser der Leitungsdaten
-class GridNodeParser(GridElementParser):
+class GridNodeParser(CSVParser):
 	
 	def __init__(self, file_path):
 		
@@ -44,9 +44,9 @@ class GridNodeParser(GridElementParser):
 						parameter_list.append(self.csv_dictionary[key][i])
 					elif key == "reactive_injection_power":
 						parameter_list.append(self.csv_dictionary[key][i])
-					elif key == "theta":
+					elif key == "theta in rad":
 						parameter_list.append(self.csv_dictionary[key][i])
-					elif key == "node_voltage":
+					elif key == "node_voltage in kV":
 						parameter_list.append(self.csv_dictionary[key][i])
 				
 				gridnode = GridNode(gridnode_name, type_number, self.get_node_parameters_by_type(type_number, parameter_list))

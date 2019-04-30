@@ -1,9 +1,9 @@
-from gridelementparser import GridElementParser
+from csvparser import CSVParser
 from gridline import GridLine
 
 
 # Parser-Klasse zum Einleser der Leitungsdaten
-class GridLineParser(GridElementParser):
+class GridLineParser(CSVParser):
 	
 	def __init__(self, file_path, frequency):
 		
