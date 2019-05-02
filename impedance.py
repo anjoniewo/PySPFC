@@ -7,10 +7,10 @@ class Impedance:
 	def __init__(self, r, x):
 
 		# Realteil der Impedanz
-		self.r = r if r is not None else 0
+		self.r = r
 
 		# Imaginaerteil der Impedanz
-		self.x = x if x is not None else 0
+		self.x = x
 
 	def get_magnitude(self):
 		return get_complex_magnitude(self.r, self.x)

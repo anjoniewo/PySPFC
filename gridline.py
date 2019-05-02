@@ -53,6 +53,9 @@ class GridLine:
         # Queradmittanz der Leitung
         self.transverse_admittance = None
 
+        # Queradmittanz der Leitung an einem Knoten,entspricht halben Queradmittanz-Wert der Leitung
+        self.transverse_admittance_on_node = None
+
         # Leitungsparameter setzen
         self.set_line_parameters(line_parameters)
 
@@ -100,11 +103,15 @@ class GridLine:
         if self.transverse_impedance is not None:
             self.transverse_admittance = Admittance(self.transverse_impedance)
 
+        # Knoten-Queradmittanz der Leitung bezogen auf einen Knoten, entspricht halben Queradmittanz-Wert
+        if self.transverse_admittance is not None:
+            self.transverse_admittance_on_node = self.transverse_admittance
+            self.transverse_admittance_on_node.g /= 2
+            self.transverse_admittance_on_node.b /= 2
 
     # Bildschirmausgabe der Leitungsparameter
     def info(self):
-        print("")
-        print("----------------------------------")
+        print("\n----------------------------------")
         print("LEITUNG/KABEL")
         print("Knoten 1: " + str(self.node_name_i))
         print("Knoten 2: " + str(self.node_name_j))

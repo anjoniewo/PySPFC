@@ -81,26 +81,20 @@ class GridNode:
 
     # Bildschirmausgabe der Knotenparameter
     def info(self):
-        print("")
-        print("------------------------------------")
+        print("\n------------------------------------")
         print("Knotenbezeichnung: " + str(self.name))
         print("Knotentyp: " + str(self.grid_node_types[self.typenumber]))
-        print("")
-        
+
         if self.active_injection_power:
-            print("Einspeisung:")
+            print("\nEinspeisung:")
             print("Wirkleistung P = " + str(self.active_injection_power) + " kW")
             print("Blindleistung Q = " + str(self.reactive_injection_power) + " kVar")
-            print("")
             
         if self.active_load_power:
-            print("Last:")
+            print("\nLast:")
             print("Wirkleistung P = " + str(self.active_load_power) + " kW")
             print("Blindleistung Q = " + str(self.reactive_load_power) + " kVar")
-            print("")
-            
-        print("")
-        
+
         if self.node_voltage:
-            print("Spannung am Knoten: " + str(self.node_voltage))
+            print("\nSpannung am Knoten: " + str(self.node_voltage))
             print("Spannungswinkel: " + str(self.theta))

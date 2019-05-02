@@ -46,8 +46,7 @@ class Grid:
     # Gibt alle Knoten des Netzes in der Konsole aus
     def print_grid_node_list(self):
         if not len(self.grid_node_list):
-            print("")
-            print("Keine Knoten in Liste")
+            print("\nKeine Knoten in Liste")
         else:
             for i in range(0, len(self.grid_node_list)):
                 self.grid_node_list[i].info()
@@ -56,17 +55,28 @@ class Grid:
 
     def print_grid_line_list(self):
         if not len(self.grid_line_list):
-            print("")
-            print("Keine Leitungen in Liste")
+            print("\nKeine Leitungen in Liste")
         else:
             for i in range(0, len(self.grid_line_list)):
                 self.grid_line_list[i].info()
 
     # Methode zur Berechnung der aktuellen Knotenadmittanz-Matrix
-    # Instanzierung der busadmittancematrix-Klasse
-    # Übergabeparameter: Knotenliste [grid_node_list], Admittanzenliste [grid_line_list]
+    # Übergabeparameter: Knotenliste [grid_node_list], Admittanzenliste (Gridline-Liste) [grid_line_list]
     def calc_bus_admittance_matrix(self):
         self.bus_admittanz_matrix.calc_matrix(self.grid_node_list, self.grid_line_list)
 
-    def show_admittanz_matrix(self):
+    # Methode gibt die aktuelle Knotenadmittanzmatrix zurück
+    def get_bus_admittanz_matrix(self):
         return self.bus_admittanz_matrix.matrix
+
+    # Methode gibt die aktuelle Knotenadmittanzmatrix zurück
+    def print_bus_admittanz_matrix(self):
+        result = ""
+        matrix = self.bus_admittanz_matrix.matrix
+        n = len(matrix)
+        for i in range(0, n):
+            for j in range(0, n):
+                # print("{0}".format(self.bus_admittanz_matrix.matrix[i][j])
+                if matrix[i][j].g is not None
+                    result += str(matrix[i][j].g)
+                print(matrix[i][j].g, matrix[i][j].b, "j" )
