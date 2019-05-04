@@ -11,6 +11,7 @@ class Impedance:
 
 		# Imaginaerteil der Impedanz
 		self.__x = x
+		self.haha
 
 	def get_magnitude(self):
 		return get_complex_magnitude(self.__r, self.__x)
