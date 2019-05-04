@@ -104,4 +104,4 @@ class GridNode:
             print("\nSpannung am Knoten: " + str(self.__node_voltage))
             print("Spannungswinkel: " + str(self.__theta))
 
-        return True
+        return str("")

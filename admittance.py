@@ -54,10 +54,24 @@ class Admittance:
         self.__g = self.__g + admittance_obj.__g
         self.__b = self.__b + admittance_obj.__b
 
+    # Methode ueberschreibt den "+" Operator fuer die Klasse Admittance
+    def __add__(self, admittance_obj):
+        self.__g = self.__g + admittance_obj.__g
+        self.__b = self.__b + admittance_obj.__b
+
+        return self
+
     # Methode subtrahiert aus einem übergebenen Admittance-Objekte deren Werte von den eigenen Werten
     def subtraction(self, admittance_obj):
         self.__g = self.__g - admittance_obj.__g
         self.__b = self.__b - admittance_obj.__b
+
+    # Methode ueberschreibt den "-" Operator fuer die Klasse Admittance
+    def __sub__(self, admittance_obj):
+        self.__g = self.__g - admittance_obj.__g
+        self.__b = self.__b - admittance_obj.__b
+
+        return self
 
     # Methode multipliziert aus einem übergebenen Admittance-Objekte deren Werte mit den eigenen Werten
     def multiplication(self, admittance_obj):
