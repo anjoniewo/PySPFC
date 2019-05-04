@@ -1,4 +1,4 @@
-from main.csvparser import CSVParser
+from main.parser.csvparser import CSVParser
 from main.gridline import GridLine
 
 
