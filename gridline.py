@@ -19,69 +19,82 @@ class GridLine:
     def __init__(self, frequency, node_name_i, node_name_j, line_parameters):
 
         # Frequenz
-        self.frequency = frequency
+        self.__frequency = frequency
 
         # Knoten 1
-        self.node_name_i = node_name_i
+        self.__node_name_i = node_name_i
 
         # Knoten 2
-        self.node_name_j = node_name_j
+        self.__node_name_j = node_name_j
 
         # Laenge der Leitung
-        self.length = None
+        self.__length = None
 
         # resistiver Laengswiderstand
-        self.resistance = None
+        self.__resistance = None
 
         # induktiver Laengswiderstand
-        self.inductive_reactance = None
+        self.__inductive_reactance = None
 
         # resistiver Querwiderstand
-        self.transverse_resistance = None
+        self.__transverse_resistance = None
         
         # kapazitiver Querwiderstand
-        self.capacitive_reactance = None
+        self.__capacitive_reactance = None
 
         # Laengsimpedanz der Leitung
-        self.impedance = None
+        self.__impedance = None
         
         # Laengsadmittanz der Leitung
-        self.admittance = None
+        self.__admittance = None
         
         # Querimpedanz der Leitung
-        self.transverse_impedance = None
+        self.__transverse_impedance = None
         
         # Queradmittanz der Leitung
-        self.transverse_admittance = None
+        self.__transverse_admittance = None
 
         # Queradmittanz der Leitung an einem Knoten,entspricht halben Queradmittanz-Wert der Leitung
-        self.transverse_admittance_on_node = None
+        self.__transverse_admittance_on_node = None
 
         # Leitungsparameter setzen
-        self.set_line_parameters(line_parameters)
+        self.__set_line_parameters(line_parameters)
+
+    # getter-Methoden
+    def get_node_name_i(self):
+        return self.__node_name_i
+
+    def get_node_name_j(self):
+        return self.__node_name_j
+
+    def get_admittance(self):
+        return self.__admittance
+
+    def get_transverse_admittance_on_node(self):
+        return self.__transverse_admittance_on_node
 
     # Methode setzt die Leitungsbelaege (Ω/km) als Parameter
-    def set_line_parameters(self, line_parameters):
+    def __set_line_parameters(self, line_parameters):
        
         # Leitungslaenge
         if line_parameters[0]:
-            self.length = line_parameters[0]
+            self.__length = line_parameters[0]
 
             # resistiver Laengswiderstand
             if line_parameters[1] >= 0:
-                self.resistance = line_parameters[1] * self.length
+                self.__resistance = line_parameters[1] * self.__length
 
             # induktiver Laengswiderstand
             if line_parameters[2] > 0:
-                self.inductive_reactance = (2 * math.pi * self.frequency * line_parameters[2]) * self.length
+                self.__inductive_reactance = (2 * math.pi * self.__frequency * line_parameters[2]) * self.__length
 
             # resistiver Querwiderstand
             if line_parameters[3] >= 0:
-                self.transverse_resistance = line_parameters[3] * self.length
+                self.__transverse_resistance = line_parameters[3] * self.__length
 
             # kapazitiver Querwiderstand
             if line_parameters[4] > 0:
-                self.capacitive_reactance = (1 / (2 * math.pi * self.frequency * line_parameters[4])) * self.length
+                self.__capacitive_reactance = (1 / (2 * math.pi * self.__frequency * line_parameters[4])) * self.__length
 
         else:
             LoadFlowReporter.error_report.append("Line-length: line_parameters[0] = 0")
@@ -89,39 +102,39 @@ class GridLine:
 
 
         # Laengsimpedanz der Leitung
-        if self.resistance or self.inductive_reactance:
-            self.impedance = Impedance(self.resistance, self.inductive_reactance)
+        if self.__resistance or self.__inductive_reactance:
+            self.__impedance = Impedance(self.__resistance, self.__inductive_reactance)
 
         # Laengsadmittanz der Leitung
-        if self.impedance is not None:
-            self.admittance = Admittance(self.impedance)
+        if self.__impedance is not None:
+            self.__admittance = Admittance(self.__impedance)
 
         # Querimpedanz der Leitung
-        if self.transverse_resistance or self.capacitive_reactance:
-            self.transverse_impedance = Impedance(self.transverse_resistance, self.capacitive_reactance)
+        if self.__transverse_resistance or self.__capacitive_reactance:
+            self.__transverse_impedance = Impedance(self.__transverse_resistance, self.__capacitive_reactance)
 
         # Queradmittanz der Leitung
-        if self.transverse_impedance is not None:
-            self.transverse_admittance = Admittance(self.transverse_impedance)
+        if self.__transverse_impedance is not None:
+            self.__transverse_admittance = Admittance(self.__transverse_impedance)
 
         # Knoten-Queradmittanz der Leitung bezogen auf einen Knoten, entspricht halben Queradmittanz-Wert
-        if self.transverse_admittance is not None:
-            self.transverse_admittance_on_node = self.transverse_admittance
-            self.transverse_admittance_on_node.set_g(self.transverse_admittance_on_node.get_g() / 2)
-            self.transverse_admittance_on_node.set_b(self.transverse_admittance_on_node.get_b() / 2)
+        if self.__transverse_admittance is not None:
+            self.__transverse_admittance_on_node = self.__transverse_admittance
+            self.__transverse_admittance_on_node.set_g(self.__transverse_admittance_on_node.get_g() / 2)
+            self.__transverse_admittance_on_node.set_b(self.__transverse_admittance_on_node.get_b() / 2)
 
     # Bildschirmausgabe der Leitungsparameter
     def info(self):
         print("\n----------------------------------")
         print("LEITUNG/KABEL")
-        print("Knoten 1: " + str(self.node_name_i))
-        print("Knoten 2: " + str(self.node_name_j))
-        print("Länge: " + str(self.length) + " km " + "--> " + str(self.length * 1000) + " m")
-        print("Längswiderstand: " + str(self.resistance) + " Ω")
-        print("induktiver Längswiderstand: " + str(self.inductive_reactance) + " Ω")
-        print("Querwiderstand: " + str(self.transverse_resistance))
-        print("kapazitiver Querwiderstand: " + str(self.capacitive_reactance) + " Ω")
-        print("Impedanz: " + str(self.impedance.get_magnitude()) + " Ω")
-        print("Admittanz: " + str(self.admittance.get_magnitude()) + " S")
-        print("Quer-Impedanz: " + str(self.transverse_impedance) + " Ω")
-        print("Quer-Admittanz: " + str(self.transverse_admittance) + " S")
+        print("Knoten 1: " + str(self.__node_name_i))
+        print("Knoten 2: " + str(self.__node_name_j))
+        print("Länge: " + str(self.__length) + " km " + "--> " + str(self.__length * 1000) + " m")
+        print("Längswiderstand: " + str(self.__resistance) + " Ω")
+        print("induktiver Längswiderstand: " + str(self.__inductive_reactance) + " Ω")
+        print("Querwiderstand: " + str(self.__transverse_resistance))
+        print("kapazitiver Querwiderstand: " + str(self.__capacitive_reactance) + " Ω")
+        print("Impedanz: " + str(self.__impedance.get_magnitude()) + " Ω")
+        print("Admittanz: " + str(self.__admittance.get_magnitude()) + " S")
+        print("Quer-Impedanz: " + str(self.__transverse_impedance) + " Ω")
+        print("Quer-Admittanz: " + str(self.__transverse_admittance) + " S")

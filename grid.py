@@ -77,6 +77,6 @@ class Grid:
         for i in range(0, n):
             for j in range(0, n):
                 # print("{0}".format(self.bus_admittanz_matrix.matrix[i][j])
-                if matrix[i][j].g is not None
-                    result += str(matrix[i][j].g)
-                print(matrix[i][j].g, matrix[i][j].b, "j" )
+                if matrix[i][j].get_g() is not None:
+                    result += str(matrix[i][j].get_g())
+                print(matrix[i][j].get_g(), matrix[i][j].get_b(), "j")

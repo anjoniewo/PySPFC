@@ -41,8 +41,8 @@ class Admittance:
 
     # Methode berechnet die Konduktanz sowie die Suszeptanz
     def calculate_g_and_b(self, impedance):
-        self.__g = (impedance.r / ((impedance.r ** 2) + (impedance.x ** 2)))
-        self.__b = - (impedance.x / ((impedance.r ** 2) + (impedance.x ** 2)))
+        self.__g = (impedance.get_r() / ((impedance.get_r() ** 2) + (impedance.get_x() ** 2)))
+        self.__b = - (impedance.get_x() / ((impedance.get_x() ** 2) + (impedance.get_x() ** 2)))
 
     # Methode gibt den Betrag der Admittanz wieder
     def get_magnitude(self):
@@ -52,7 +52,7 @@ class Admittance:
     def addition(self, admittance_obj):
 
         self.__g = self.__g + admittance_obj.__g
-        self.__b = self.b + admittance_obj.__b
+        self.__b = self.__b + admittance_obj.__b
 
     # Methode subtrahiert aus einem übergebenen Admittance-Objekte deren Werte von den eigenen Werten
     def subtraction(self, admittance_obj):

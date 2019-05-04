@@ -2,6 +2,7 @@ import numpy as np
 from impedance import Impedance
 from admittance import Admittance
 
+
 # Klasse fuer die Erstellung der Knotenadmittanzmatrix
 class BusAdmittanceMatrix:
 
@@ -25,16 +26,16 @@ class BusAdmittanceMatrix:
 
         for grid_line in self.grid_line_list:
 
-            if node_name == grid_line.node_name_i or node_name == grid_line.node_name_j:
+            if node_name == grid_line.get_node_name_i() or node_name == grid_line.get_node_name_j():
 
                 # Addiere Längsadmittanz von Gridline zur Summenadmittanz (für Diagonal- und Nichtdiagonal-Elemente der KAM)
-                sum_admittance.addition(grid_line.admittance)
+                sum_admittance.addition(grid_line.get_admittance())
 
                 # Prüfen ob Modus "alle Admittanzen" true ist und ob Queradmittanz in Gridline vorhanden
-                if get_all_admittances_on_node and grid_line.transverse_admittance_on_node:
+                if get_all_admittances_on_node and grid_line.get_transverse_admittance_on_node():
 
                     # Addiere Knoten-Queradmittanz von Gridline zur Summenadmittanz (nur für Nichtdiagonal-Elemente der KAM)
-                    sum_admittance.addition(grid_line.transverse_admittance_on_node)
+                    sum_admittance.addition(grid_line.get_transverse_admittance_on_node())
 
         return sum_admittance
 
@@ -55,16 +56,16 @@ class BusAdmittanceMatrix:
 
                 # Diagonalelemente der Matrix i=j
                 if(i == j):
-                    self.matrix[i][j] = self.get_sum_of_grid_lines_on_node(grid_node_list[i].name)
+                    self.matrix[i][j] = self.get_sum_of_grid_lines_on_node(grid_node_list[i].get_name())
 
                 # Nicht-Diagonalelemente der Matrix i≠j
                 else:
-                    admittance_elem = self.get_sum_of_grid_lines_on_node(grid_node_list[i].name, False)
+                    admittance_elem = self.get_sum_of_grid_lines_on_node(grid_node_list[i].get_name(), False)
 
-                    if admittance_elem.g is not None:
-                        admittance_elem.g *= -1
+                    if admittance_elem.get_g() is not None:
+                        admittance_elem.set_g(admittance_elem.get_g() * -1)
 
-                    if admittance_elem.b is not None:
-                        admittance_elem.b *= -1
+                    if admittance_elem.get_b() is not None:
+                        admittance_elem.set_b(admittance_elem.get_b() * -1)
 
                     self.matrix[i][j] = admittance_elem
