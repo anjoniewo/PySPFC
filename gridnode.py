@@ -85,7 +85,7 @@ class GridNode:
             ERROR = ""
 
     # Bildschirmausgabe der Knotenparameter
-    def info(self):
+    def __str__(self):
         print("\n------------------------------------")
         print("Knotenbezeichnung: " + str(self.__name))
         print("Knotentyp: " + str(self.__grid_node_types[self.__typenumber]))
@@ -103,3 +103,5 @@ class GridNode:
         if self.__node_voltage:
             print("\nSpannung am Knoten: " + str(self.__node_voltage))
             print("Spannungswinkel: " + str(self.__theta))
+
+        return True
