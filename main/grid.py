@@ -1,7 +1,7 @@
-from loadflowreporter import LoadFlowReporter
-from gridnode import GridNode
-from gridline import GridLine
-from busadmittancematrix import BusAdmittanceMatrix
+from main.loadflowreporter import LoadFlowReporter
+from main.gridnode import GridNode
+from main.gridline import GridLine
+from main.busadmittancematrix import BusAdmittanceMatrix
 
 
 # Klasse fuer ein elektrisches Netz

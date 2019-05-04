@@ -1,5 +1,5 @@
-from gridlineparser import GridLineParser
-from gridnodeparser import GridNodeParser
+from main.gridlineparser import GridLineParser
+from main.gridnodeparser import GridNodeParser
 
 
 class GridParser:

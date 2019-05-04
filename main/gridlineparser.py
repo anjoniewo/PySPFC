@@ -1,5 +1,5 @@
-from csvparser import CSVParser
-from gridline import GridLine
+from main.csvparser import CSVParser
+from main.gridline import GridLine
 
 
 # Parser-Klasse zum Einleser der Leitungsdaten

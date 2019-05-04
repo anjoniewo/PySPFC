@@ -1,6 +1,5 @@
 import numpy as np
-from impedance import Impedance
-from admittance import Admittance
+from main.admittance import Admittance
 
 
 # Klasse fuer die Erstellung der Knotenadmittanzmatrix

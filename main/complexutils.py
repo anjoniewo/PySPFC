@@ -1,5 +1,4 @@
 import math
-from loadflowreporter import LoadFlowReporter
 
 
 # Funktion gibt den Betrag einer komplexen Zahl zurueck

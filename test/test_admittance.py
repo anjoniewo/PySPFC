@@ -1,6 +1,6 @@
 from unittest import TestCase
-from admittance import Admittance
-from impedance import Impedance
+from main.admittance import Admittance
+from main.impedance import Impedance
 
 
 class TestAdmittance(TestCase):

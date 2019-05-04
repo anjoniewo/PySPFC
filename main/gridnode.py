@@ -1,6 +1,3 @@
-from loadflowreporter import LoadFlowReporter
-
-
 # ein Knoten ist ein Netzelement an einem bestimmten Punkt im Netz
 class GridNode:
 
