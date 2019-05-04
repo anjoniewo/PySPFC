@@ -3,6 +3,7 @@ from loadflowreporter import LoadFlowReporter
 from impedance import Impedance
 from admittance import Admittance
 
+
 # eine Leitung wird als Knotenverbindendes Netzelement definiert
 class GridLine:
 
@@ -106,8 +107,8 @@ class GridLine:
         # Knoten-Queradmittanz der Leitung bezogen auf einen Knoten, entspricht halben Queradmittanz-Wert
         if self.transverse_admittance is not None:
             self.transverse_admittance_on_node = self.transverse_admittance
-            self.transverse_admittance_on_node.g /= 2
-            self.transverse_admittance_on_node.b /= 2
+            self.transverse_admittance_on_node.set_g(self.transverse_admittance_on_node.get_g() / 2)
+            self.transverse_admittance_on_node.set_b(self.transverse_admittance_on_node.get_b() / 2)
 
     # Bildschirmausgabe der Leitungsparameter
     def info(self):

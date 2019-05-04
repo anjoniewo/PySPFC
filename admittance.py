@@ -10,47 +10,61 @@ class Admittance:
         # X = Re{Z}
         # Y = Im{Z}
         # G = X / (X^2 + Y^2)
-        self.g = None
+        self.__g = None
 
         # Imaginaerteil der Admittanz
         # X = Re{Z}
         # Y = Im{Z}
         # B = -Y / (X^2 + Y^2)
-        self.b = None
+        self.__b = None
 
         if impedance is None:
-            self.g = self.b = 0
+            self.__g = self.__b = 0
 
         elif impedance.get_magnitude():
             # g und b der Admittanz berechnen
             self.calculate_g_and_b(impedance)
 
+    # getter-Methoden
+    def get_g(self):
+        return self.__g
+
+    def get_b(self):
+        return self.__b
+
+    # setter-Methoden
+    def set_g(self, g):
+        self.__g = g
+
+    def set_b(self, b):
+        self.__b = b
+
     # Methode berechnet die Konduktanz sowie die Suszeptanz
     def calculate_g_and_b(self, impedance):
-        self.g = (impedance.r / ((impedance.r ** 2) + (impedance.x ** 2)))
-        self.b = - (impedance.x / ((impedance.r ** 2) + (impedance.x ** 2)))
+        self.__g = (impedance.r / ((impedance.r ** 2) + (impedance.x ** 2)))
+        self.__b = - (impedance.x / ((impedance.r ** 2) + (impedance.x ** 2)))
 
     # Methode gibt den Betrag der Admittanz wieder
     def get_magnitude(self):
-        return get_complex_magnitude(self.g, self.b)
+        return get_complex_magnitude(self.__g, self.__b)
 
     # Methode addiert aus einem übergebenen Admittance-Objekte deren Werte auf die eigenen Werte
     def addition(self, admittance_obj):
 
-        self.g = self.g + admittance_obj.g
-        self.b = self.b + admittance_obj.b
+        self.__g = self.__g + admittance_obj.__g
+        self.__b = self.b + admittance_obj.__b
 
     # Methode subtrahiert aus einem übergebenen Admittance-Objekte deren Werte von den eigenen Werten
     def subtraction(self, admittance_obj):
-        self.g = self.g - admittance_obj.g
-        self.b = self.b - admittance_obj.b
+        self.__g = self.__g - admittance_obj.__g
+        self.__b = self.__b - admittance_obj.__b
 
     # Methode multipliziert aus einem übergebenen Admittance-Objekte deren Werte mit den eigenen Werten
     def multiplication(self, admittance_obj):
-        self.g = self.g * admittance_obj.g - self.b * admittance_obj.b
-        self.b = self.g * admittance_obj.b + self.b * admittance_obj.g
+        self.__g = self.__g * admittance_obj.__g - self.__b * admittance_obj.__b
+        self.__b = self.__g * admittance_obj.__b + self.__b * admittance_obj.__g
 
     # Methode dividiert aus einem übergebenen Admittance-Objekte deren Werte mit den eigenen Werten
     def division(self, admittance_obj):
-        self.g = (self.g * admittance_obj.g + self.b * admittance_obj.b) / (admittance_obj.g ** 2 + admittance_obj.b ** 2)
-        self.b = (self.b * admittance_obj.g - self.g * admittance_obj.b) / (admittance_obj.g ** 2 + admittance_obj.b ** 2)
+        self.__g = (self.__g * admittance_obj.__g + self.__b * admittance_obj.__b) / (admittance_obj.__g ** 2 + admittance_obj.__b ** 2)
+        self.__b = (self.__b * admittance_obj.__g - self.__g * admittance_obj.__b) / (admittance_obj.__g ** 2 + admittance_obj.__b ** 2)
