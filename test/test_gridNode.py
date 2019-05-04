@@ -1,5 +1,5 @@
 from unittest import TestCase
-from main.gridnode import GridNode
+from main.grid.gridnode import GridNode
 
 
 class TestGridNode(TestCase):

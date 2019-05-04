@@ -1,6 +1,6 @@
 from main.loadflowreporter import LoadFlowReporter
-from main.gridnode import GridNode
-from main.gridline import GridLine
+from main.grid.gridnode import GridNode
+from main.grid.gridline import GridLine
 from main.busadmittancematrix import BusAdmittanceMatrix
 
 
