@@ -1,0 +1,7 @@
+node_i;node_j;length in km;resistance in Ohm/km;inductive_reactance in mH/km;transverse_resistance in  Ohm/km;capacative_reactance in  nF/km
+K0;K1;0.1;0.437;0.302;1;0.0000000102
+K1;K2;0.2;0.437;0.302;1;0.0000000102
+K2;K3;0.1;0.437;0.302;1;0.0000000102
+K3;K4;0.3;0.437;0.302;1;0.0000000102
+K4;K5;0.4;0.437;0.302;1;0.0000000102
+K5;K6;0.3;0.437;0.302;1;0.0000000102
