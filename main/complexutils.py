@@ -10,35 +10,35 @@ def calculate_complex_reciprocal(real, imaginary):
     return complex_reciprocal
 
 # Funktion gibt den Betrag einer komplexen Zahl zurueck
-def get_complex_magnitude(real, imag):
-    return math.sqrt((real ** 2) + (imag ** 2))
+def get_complex_magnitude(real, imaginary):
+    return math.sqrt((real ** 2) + (imaginary ** 2))
 
 
 # Funktion gibt eine komplexe Zahl in kartesischen Koordinaten zurueck
-def get_cartesian(real, imag):
-    return real + 1j * imag
+def get_cartesian(real, imaginary):
+    return real + 1j * imaginary
 
 
 # Funktion gibt eine komplexe Zahl in Polarkoordinaten zurueck
-def get_polar(real, imag):
+def get_polar(real, imaginary):
     # Bestimme Betrag der komplexen Zahl / Vektors
-    r = get_complex_magnitude(real, imag)
+    r = get_complex_magnitude(real, imaginary)
 
     # Bestimme Winkel phi in Bogenmaß anhand des Quadraten
-    if real < 0 and imag < 0:
-        phi = math.atan(imag / real) - math.pi
+    if real < 0 and imaginary < 0:
+        phi = math.atan(imaginary / real) - math.pi
 
-    elif real == 0 and imag < 0:
+    elif real == 0 and imaginary < 0:
         phi = -math.pi / 2
 
     elif real > 0:
-        phi = math.atan(imag / real)
+        phi = math.atan(imaginary / real)
 
-    elif real == 0 and imag > 0:
+    elif real == 0 and imaginary > 0:
         phi = math.pi / 2
 
-    elif real < 0 and imag >= 0:
-        phi = math.atan(imag / real) + math.pi
+    elif real < 0 and imaginary >= 0:
+        phi = math.atan(imaginary / real) + math.pi
 
     else:
         ERROR = ""
@@ -47,5 +47,5 @@ def get_polar(real, imag):
 
 
 # Funktion gibt eine komplexe Zahl in euler'scher Darstellung zurueck
-def get_euler(real, imag):
+def get_euler(real, imaginary):
     return 1
