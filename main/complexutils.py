@@ -1,5 +1,13 @@
 import math
 
+# Funktion gibt den Kehrwert einer komplexen Zahl als Dictionary zurück
+def calculate_complex_reciprocal(real, imaginary):
+    complex_reciprocal = {
+        "real": (real / ((real ** 2) + (imaginary ** 2))),
+        "imaginary": (- (imaginary / ((real ** 2) + (imaginary ** 2))))
+    }
+
+    return complex_reciprocal
 
 # Funktion gibt den Betrag einer komplexen Zahl zurueck
 def get_complex_magnitude(real, imag):
