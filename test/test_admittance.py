@@ -26,5 +26,24 @@ class TestAdmittance(TestCase):
         print("")
         print("G = " + str(admittance_1.get_g()))
         print("B = " + str(admittance_1.get_b()))
-
+        
+    def test_multiplication(self):
+        admittance_1 = Admittance(Impedance(5, 2))
+        admittance_2 = Admittance(Impedance(3, 6))
+    
+        admittance_1 *= admittance_2
+    
+        print("")
+        print("G = " + str(admittance_1.get_g()))
+        print("B = " + str(admittance_1.get_b()))
+        
+    def test_division(self):
+        admittance_1 = Admittance(Impedance(5, 2))
+        admittance_2 = Admittance(Impedance(3, 6))
+    
+        admittance_1 /= admittance_2
+    
+        print("")
+        print("G = " + str(admittance_1.get_g()))
+        print("B = " + str(admittance_1.get_b()))
 
