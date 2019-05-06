@@ -69,6 +69,9 @@ class GridLine:
 
     def get_admittance(self):
         return self.__admittance
+    
+    def get_frequency(self):
+        return self.__freqeuncy
 
     def get_transverse_admittance_on_node(self):
         return self.__transverse_admittance_on_node

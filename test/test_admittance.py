@@ -10,21 +10,21 @@ class TestAdmittance(TestCase):
         admittance_1 = Admittance(Impedance(5, 2))
         admittance_2 = Admittance(Impedance(3, 6))
 
-        admittance_3 = admittance_1 + admittance_2
+        admittance_1 += admittance_2
 
         print("")
-        print("G = " + str(admittance_3.get_g()))
-        print("B = " + str(admittance_3.get_b()))
+        print("G = " + str(admittance_1.get_g()))
+        print("B = " + str(admittance_1.get_b()))
 
     # Test fuer die Subtraktion zweier Admittanzen
     def test_subtraction(self):
         admittance_1 = Admittance(Impedance(5, 2))
         admittance_2 = Admittance(Impedance(3, 6))
 
-        admittance_3 = admittance_1 - admittance_2
+        admittance_1 -= admittance_2
 
         print("")
-        print("G = " + str(admittance_3.get_g()))
-        print("B = " + str(admittance_3.get_b()))
+        print("G = " + str(admittance_1.get_g()))
+        print("B = " + str(admittance_1.get_b()))
 
 
