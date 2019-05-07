@@ -9,10 +9,10 @@ class Grid:
 
     # Initialisierungskonstruktor
     def __init__(self, frequency=50, grid_node_list=list(), grid_line_list=list()):
-        
+
         # Netzfrequenz (default 50 Hz)
         self.__frequency = frequency
-        
+
         # Liste von Knoten und Liste von Leitungen
         self.__grid_node_list = grid_node_list
         self.__grid_line_list = grid_line_list
@@ -49,7 +49,7 @@ class Grid:
             print("\nKeine Knoten in Liste")
         else:
             for i in range(0, len(self.__grid_node_list)):
-                self.__grid_node_list[i].info()
+                print(self.__grid_node_list[i])
 
         # Gibt alle Knoten des Netzes in der Konsole aus
 
@@ -58,7 +58,7 @@ class Grid:
             print("\nKeine Leitungen in Liste")
         else:
             for i in range(0, len(self.__grid_line_list)):
-                self.__grid_line_list[i].info()
+                print(self.__grid_line_list[i])
 
     # Methode zur Berechnung der aktuellen Knotenadmittanz-Matrix
     # Übergabeparameter: Knotenliste [grid_node_list], Admittanzenliste (Gridline-Liste) [grid_line_list]
@@ -77,6 +77,15 @@ class Grid:
         for i in range(0, n):
             for j in range(0, n):
                 # print("{0}".format(self.bus_admittanz_matrix.matrix[i][j])
-                if matrix[i][j].get_g() is not None:
-                    result += str(matrix[i][j].get_g())
-                print(matrix[i][j].get_g(), matrix[i][j].get_b(), "j")
+                if matrix[i][j].get_real_part() is not None:
+                    result += str(matrix[i][j].get_real_part())
+
+        print(matrix[i][j].get_real_part(), matrix[i][j].get_imaginary_part(), "j")
+
+
+
+        # s = [[str(e) for e in row] for row in matrix]
+        # lens = [max(map(len, col)) for col in zip(*s)]
+        # fmt = '\t'.join('{{:{}}}'.format(x) for x in lens)
+        # table = [fmt.format(*row) for row in s]
+        # print('\n'.join(table))

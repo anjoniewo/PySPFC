@@ -9,10 +9,15 @@ class TestGridLine(TestCase):
     @staticmethod
     def test_create_line_parameters():
         gridline_parameters = list()
-        gridline_parameters.append(0.2)
-        gridline_parameters.append(0.05)
-        gridline_parameters.append(0.01)
+        # Länge
         gridline_parameters.append(1)
+        # resistiver Längswiderstand
+        gridline_parameters.append(1)
+        # induktiver Längswiderstand
+        gridline_parameters.append(1)
+        # resitiver Querwiderstand
+        gridline_parameters.append(1)
+        # kapazitiver Querwiderstand
         gridline_parameters.append(1)
 
         return gridline_parameters
