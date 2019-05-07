@@ -12,13 +12,15 @@ class GridLineParser(CSVParser):
         self.__gridlines = list()
 
         # Verzeichnis
-        root = "C:\\Users\\EUProjekt\\Desktop\\AnjoNie\\02_Projekte\\LoadFlowSimulationTool\\"
-
-        # Dateiname
-        file_path = root + str(file_path) + str(".csv")
+        file_path = "C:\\Users\\EUProjekt\\PycharmProjects\\LoadFlowToolProjekt\\test\\test_files\\lines.csv"
+        #file_path = "test\\test_files\\lines.csv"
 
         self.__read_line_parameters(file_path)
         self.__get_lines_from_csv_dictionary(frequency)
+        
+    #getter
+    def get_gridlines(self):
+        return self.__gridlines
 
     def __read_line_parameters(self, file_path):
         self.read_csv_to_dictionary(file_path)

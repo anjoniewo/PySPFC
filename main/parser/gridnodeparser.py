@@ -11,11 +11,16 @@ class GridNodeParser(CSVParser):
 
         self.__gridnodes = list()
 
-        file_path = "C:\\Users\\EUProjekt\\Desktop\\AnjoNie\\02_Projekte\\LoadFlowSimulationTool\\" + str(
-            file_path) + str(".csv")
+        # Verzeichnis
+        file_path = "C:\\Users\\EUProjekt\\PycharmProjects\\LoadFlowToolProjekt\\test\\test_files\\gridnodes.csv"
+        #file_path = "test\\test_files\\gridnodes.csv"
 
         self.__read_node_parameters(file_path)
         self.__get_nodes_from_csv_dictionary()
+        
+    # getter
+    def get_gridnodes(self):
+        return self.__gridnodes
 
     def __read_node_parameters(self, file_path):
         self.read_csv_to_dictionary(file_path)
@@ -51,7 +56,7 @@ class GridNodeParser(CSVParser):
 
                 gridnode = GridNode(gridnode_name, type_number,
                                     self.__get_node_parameters_by_type(type_number, parameter_list))
-                self._gridnodes.append(gridnode)
+                self.__gridnodes.append(gridnode)
 
     def __get_node_parameters_by_type(self, type_number, list_of_parameters):
 
