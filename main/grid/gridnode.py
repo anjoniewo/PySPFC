@@ -43,7 +43,7 @@ class GridNode:
         # ***** Knotenspannung *****
         # **************************
         self.__node_voltage = None
-        
+
         # Knotenparameter setzen
         self.set_node_parameters(node_parameters)
 
@@ -53,7 +53,7 @@ class GridNode:
 
     # Methode setzt die Knotenparameter in Abhaengigkeit des Knotentyps
     def set_node_parameters(self, node_parameters):
-    
+
         # Fuer alle Knotentypen
         # ***********************
         # **** Lastparameter ****
@@ -64,7 +64,7 @@ class GridNode:
 
         # Fuer alle Knotentypen (Last) Blindleistung in kVar
         self.__reactive_load_power = node_parameters[1]
-        
+
         # Slack-Knoten (Referenzknoten)
         # setzen von: Knotenspannung (node_voltage) in kV, Spannungswinkel (theta) in Bogenmaß
         if self.__typenumber == 0:
@@ -83,22 +83,23 @@ class GridNode:
 
     # Bildschirmausgabe der Knotenparameter
     def __str__(self):
-        print("\n------------------------------------")
-        print("Knotenbezeichnung: " + str(self.__name))
-        print("Knotentyp: " + str(self.__grid_node_types[self.__typenumber]))
+        result = ""
+        result += "\n\n------------------------------------"
+        result += "\nKnotenbezeichnung: " + str(self.__name)
+        result += "\nKnotentyp: " + str(self.__grid_node_types[self.__typenumber])
 
         if self.__active_injection_power:
-            print("\nEinspeisung:")
-            print("Wirkleistung P = " + str(self.__active_injection_power) + " kW")
-            print("Blindleistung Q = " + str(self.__reactive_injection_power) + " kVar")
-            
+            result += "\n\nEinspeisung:"
+            result += "\nWirkleistung P = " + str(self.__active_injection_power) + " kW"
+            result += "\nBlindleistung Q = " + str(self.__reactive_injection_power) + " kVar"
+
         if self.__active_load_power:
-            print("\nLast:")
-            print("Wirkleistung P = " + str(self.__active_load_power) + " kW")
-            print("Blindleistung Q = " + str(self.__reactive_load_power) + " kVar")
+            result += "\n\nLast:"
+            result += "\nWirkleistung P = " + str(self.__active_load_power) + " kW"
+            result += "\nBlindleistung Q = " + str(self.__reactive_load_power) + " kVar"
 
         if self.__node_voltage:
-            print("\nSpannung am Knoten: " + str(self.__node_voltage))
-            print("Spannungswinkel: " + str(self.__theta))
+            result += "\n\nSpannung am Knoten: " + str(self.__node_voltage)
+            result += "\nSpannungswinkel: " + str(self.__theta)
 
-        return str("")
+        return result
