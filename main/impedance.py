@@ -3,7 +3,7 @@ from main.complexutils import *
 
 class Impedance:
 
-    def __init__(self, r, x):
+    def __init__(self, r=0, x=0):
         # Realteil der Impedanz
         self.__r = r
 

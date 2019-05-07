@@ -5,8 +5,6 @@ class Admittance:
 
     def __init__(self, impedance=None, g=0, b=0):
 
-
-
         # Realteil der Admittanz
         # X = Re{Z}
         # Y = Im{Z}
@@ -79,14 +77,21 @@ class Admittance:
         return self
 
     # Methode multipliziert aus einem übergebenen Admittance-Objekte deren Werte mit den eigenen Werten
-    def __mul__(self, admittance_obj):
+    def __mul__(self, factor_obj):
+
         a = self.__g
         b = self.__b
-        c = admittance_obj.get_real_part()
-        d = admittance_obj.get_imaginary_part()
 
-        self.__g = a*c - b*d
-        self.__b = a*d + b*c
+        if type(factor_obj) == Admittance:
+            c = factor_obj.get_real_part()
+            d = factor_obj.get_imaginary_part()
+
+            self.__g = a * c - b * d
+            self.__b = a * d + b * c
+
+        else:
+            self.__g = a * factor_obj
+            self.__b = b * factor_obj
 
         return self
 
@@ -97,7 +102,7 @@ class Admittance:
         c = admittance_obj.get_real_part()
         d = admittance_obj.get_imaginary_part()
 
-        self.__g = (a*c + b*d) / (c**2 + d**2)
-        self.__b = (c*b - a*d) / (c**2 + d**2)
+        self.__g = (a * c + b * d) / (c ** 2 + d ** 2)
+        self.__b = (c * b - a * d) / (c ** 2 + d ** 2)
 
         return self
