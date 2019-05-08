@@ -70,8 +70,13 @@ class Grid:
 		self.__bus_admittanz_matrix.calc_matrix(self.__grid_node_list, self.__grid_line_list)
 	
 	# Methode gibt die aktuelle Knotenadmittanzmatrix zurück
-	def get_bus_admittanz_matrix(self):
+	def get_bus_admittance_matrix(self):
 		return self.__bus_admittanz_matrix.matrix
+	
+	# Inverse der Knotenadmittanzmatrix berechnen
+	def get_inverse_of_bus_admittance_matrix(self):
+		return self.__bus_admittanz_matrix.calc_inverse()
+		
 	
 	# Methode gibt die aktuelle Knotenadmittanzmatrix zurück
 	def print_bus_admittance_matrix(self):

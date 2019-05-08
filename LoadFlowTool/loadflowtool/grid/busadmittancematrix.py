@@ -54,7 +54,7 @@ class BusAdmittanceMatrix:
 	def calc_matrix(self, grid_node_list, grid_line_list):
 		
 		# quadratische Matrixdimension: nxn
-		n = len(grid_node_list)
+		n = len(grid_node_list) - 1
 		
 		# Erstellung eines nxn-dimensionalen Numpy-Arrays
 		self.matrix = np.ndarray(shape=(n, n), dtype=object)

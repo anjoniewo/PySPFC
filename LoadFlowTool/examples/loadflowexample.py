@@ -1,3 +1,4 @@
+from LoadFlowTool import loadflowtool
 from LoadFlowTool.loadflowtool.grid.grid import Grid
 from LoadFlowTool.loadflowtool.parser.gridparser import GridParser
 

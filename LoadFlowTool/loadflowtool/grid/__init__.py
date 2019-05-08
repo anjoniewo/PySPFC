@@ -1,3 +1,3 @@
-__all__ = ["admittance", "busadmittancematrix", "grid", "gridequations", "gridline", "gridnode", "impedance"]
+__all__ = ["admittance", "busadmittancematrix", "grid", "gridline", "gridnode", "impedance"]
 
-from . import admittance, busadmittancematrix, grid, gridequations, gridline, gridnode, impedance
+from . import admittance, busadmittancematrix, grid, gridline, gridnode, impedance
