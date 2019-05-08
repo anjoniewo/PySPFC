@@ -29,9 +29,10 @@ class BusAdmittanceMatrix:
 		
 		for grid_line in self.__grid_line_list:
 			
+			# echte Kopie der Leitungsadmittanz erzeugen
 			grid_line_admittance = copy.deepcopy(grid_line.get_admittance())
 			
-			# pruefen ob beide Knoten uebereinstimmen
+			# pruefen ob Leitung beide Knoten verbidnet
 			is_connecting_i_j = grid_line.get_node_name_i() == node_name_i and \
 			                    grid_line.get_node_name_j() == node_name_j or \
 			                    grid_line.get_node_name_i() == node_name_j and \
@@ -64,7 +65,8 @@ class BusAdmittanceMatrix:
 			
 			# Setzen der gefilterten Leitungsliste
 			grid_line_list_with_node_name_i = [grid_line for grid_line in grid_line_list if
-			                                   grid_line.get_node_name_i() == gridnode_name_i or grid_line.get_node_name_j() == gridnode_name_i]
+			                                   grid_line.get_node_name_i() == gridnode_name_i or
+			                                   grid_line.get_node_name_j() == gridnode_name_i]
 			
 			self.__grid_line_list = copy.deepcopy(grid_line_list_with_node_name_i)
 			

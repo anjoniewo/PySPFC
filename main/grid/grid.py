@@ -54,8 +54,8 @@ class Grid:
 		else:
 			for i in range(0, len(self.__grid_node_list)):
 				print(self.__grid_node_list[i])
-		
-		# Gibt alle Knoten des Netzes in der Konsole aus
+	
+	# Gibt alle Knoten des Netzes in der Konsole aus
 	
 	def print_grid_line_list(self):
 		if not len(self.__grid_line_list):
@@ -75,19 +75,23 @@ class Grid:
 	
 	# Methode gibt die aktuelle Knotenadmittanzmatrix zurück
 	def print_bus_admittanz_matrix(self):
-		# result = ""
+		result = ""
 		matrix = self.__bus_admittanz_matrix.matrix
-		# n = len(matrix)
-		# for i in range(0, n):
-		# 	for j in range(0, n):
-		# 		# print("{0}".format(self.bus_admittanz_matrix.matrix[i][j])
-		# 		if matrix[i][j].get_real_part() is not None:
-		# 			result += str(matrix[i][j].get_real_part())
-		#
-		# print(matrix[i][j].get_real_part(), matrix[i][j].get_imaginary_part(), "j")
+		n = len(matrix)
+		for i in range(0, n):
+			for j in range(0, n):
+				element = matrix[i][j]
+				if element.get_real_part() == 0 and element.get_imaginary_part() == 0:
+					result += "{0:^50}".format("0")
+				elif element.get_imaginary_part() < 0:
+					result += "{0:^50}".format(
+						str(element.get_real_part()) + " - j(" + str(element.get_imaginary_part() * -1) + ")")
+				else:
+					result += "{0:^50}".format(
+						str(element.get_real_part()) + " + j(" + str(element.get_imaginary_part()) + ")")
+			else:
+				result += "{0:^50}".format("0")
+			
+			result += "\n"
 		
-		s = [[str(e) for e in row] for row in matrix]
-		lens = [max(map(len, col)) for col in zip(*s)]
-		fmt = '\t'.join('{{:{}}}'.format(x) for x in lens)
-		table = [fmt.format(*row) for row in s]
-		print('\n'.join(table))
+		print(result)
