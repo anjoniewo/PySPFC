@@ -1,6 +1,6 @@
 from unittest import TestCase
-from main.admittance import Admittance
-from main.impedance import Impedance
+from LoadFlowTool.loadflowtool.grid.admittance import Admittance
+from LoadFlowTool.loadflowtool.grid.impedance import Impedance
 
 
 class TestAdmittance(TestCase):

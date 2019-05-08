@@ -1,6 +1,5 @@
-from main.grid.grid import *
-from main.parser.gridparser import GridParser
-
+from LoadFlowTool.loadflowtool.grid.grid import Grid
+from LoadFlowTool.loadflowtool.parser.gridparser import GridParser
 
 # Dateipfad fuer gridline-Datei
 gridline_path = "C:\\Users\\EUProjekt\\PycharmProjects\\LoadFlowToolProjekt\\test\\test_files\\lines.csv"
@@ -13,7 +12,7 @@ network = Grid(grid_line_list=gridparser.grid_line_parser.get_gridlines(),
                grid_node_list=gridparser.grid_node_parser.get_gridnodes())
 
 network.calc_bus_admittance_matrix()
-network.print_bus_admittanz_matrix()
+network.print_bus_admittance_matrix()
 
 """ create_grid_line-Parameter (
         STRING Knotenname_1,

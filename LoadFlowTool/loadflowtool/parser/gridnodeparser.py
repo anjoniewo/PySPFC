@@ -1,8 +1,7 @@
-from main.parser.csvparser import CSVParser
-from main.grid.gridnode import GridNode
-
-
 # Parser-Klasse zum Einleser der Leitungsdaten
+from LoadFlowTool.loadflowtool.parser.csvparser import CSVParser
+from LoadFlowTool.loadflowtool.grid.gridnode import GridNode
+
 class GridNodeParser(CSVParser):
 
     def __init__(self, file_path):

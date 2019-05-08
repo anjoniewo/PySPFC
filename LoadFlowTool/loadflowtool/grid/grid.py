@@ -1,7 +1,7 @@
-from main.loadflowreporter import LoadFlowReporter
-from main.grid.gridnode import GridNode
-from main.grid.gridline import GridLine
-from main.busadmittancematrix import BusAdmittanceMatrix
+from LoadFlowTool.loadflowtool.grid.busadmittancematrix import BusAdmittanceMatrix
+from LoadFlowTool.loadflowtool.grid.gridline import GridLine
+from LoadFlowTool.loadflowtool.grid.gridnode import GridNode
+from LoadFlowTool.loadflowtool.loadflow.loadflowreporter import LoadFlowReporter
 
 
 # Klasse fuer ein elektrisches Netz
@@ -74,7 +74,7 @@ class Grid:
 		return self.__bus_admittanz_matrix.matrix
 	
 	# Methode gibt die aktuelle Knotenadmittanzmatrix zurück
-	def print_bus_admittanz_matrix(self):
+	def print_bus_admittance_matrix(self):
 		result = ""
 		matrix = self.__bus_admittanz_matrix.matrix
 		n = len(matrix)
@@ -89,8 +89,6 @@ class Grid:
 				else:
 					result += "{0:^50}".format(
 						str(element.get_real_part()) + " + j(" + str(element.get_imaginary_part()) + ")")
-			else:
-				result += "{0:^50}".format("0")
 			
 			result += "\n"
 		

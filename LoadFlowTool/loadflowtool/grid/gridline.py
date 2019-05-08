@@ -1,7 +1,7 @@
 import math
-from main.loadflowreporter import LoadFlowReporter
-from main.impedance import Impedance
-from main.admittance import Admittance
+from LoadFlowTool.loadflowtool.loadflow.loadflowreporter import LoadFlowReporter
+from LoadFlowTool.loadflowtool.grid.impedance import Impedance
+from LoadFlowTool.loadflowtool.grid.admittance import Admittance
 
 
 # eine Leitung wird als Knotenverbindendes Netzelement definiert
