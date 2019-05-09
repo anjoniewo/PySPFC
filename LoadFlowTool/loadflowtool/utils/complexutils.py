@@ -1,13 +1,27 @@
 import math
 
+
 # Funktion gibt den Kehrwert einer komplexen Zahl als Dictionary zurück
 def calculate_complex_reciprocal(real, imaginary):
+    if real and imaginary:
+        real_result = (real / ((real ** 2) + (imaginary ** 2)))
+        imaginary_result = (- (imaginary / ((real ** 2) + (imaginary ** 2))))
+
+    elif real:
+        real_result = 1 / real
+        imaginary_result = imaginary
+
+    elif imaginary:
+        real_result = real
+        imaginary_result = - 1 / imaginary
+
     complex_reciprocal = {
-        "real": (real / ((real ** 2) + (imaginary ** 2))),
-        "imaginary": (- (imaginary / ((real ** 2) + (imaginary ** 2))))
+        "real": real_result,
+        "imaginary": imaginary_result
     }
 
     return complex_reciprocal
+
 
 # Funktion gibt den Betrag einer komplexen Zahl zurueck
 def get_complex_magnitude(real, imaginary):
@@ -43,7 +57,7 @@ def get_polar(real, imaginary):
     else:
         ERROR = ""
 
-    return { "magnitude" : r, "angle" : phi, "angleGrad" : (phi*180 / math.pi)}
+    return {"magnitude": r, "angle": phi, "angleGrad": (phi * 180 / math.pi)}
 
 
 # Funktion gibt eine komplexe Zahl in euler'scher Darstellung zurueck

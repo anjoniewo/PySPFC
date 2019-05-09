@@ -13,8 +13,8 @@ class GridLineParser(CSVParser):
 
         self.__read_line_parameters(file_path)
         self.__get_lines_from_csv_dictionary(frequency)
-        
-    #getter
+
+    # getter
     def get_gridlines(self):
         return self.__gridlines
 
@@ -45,9 +45,11 @@ class GridLineParser(CSVParser):
                     elif key == "inductive_reactance in mH/km":
                         parameter_list.append(float(self.csv_dictionary[key][i]))
                     elif key == "transverse_resistance in  Ohm/km":
-                        parameter_list.append(float(self.csv_dictionary[key][i]))
+                        parameter_list.append(
+                            None if not self.csv_dictionary[key][i] else float(self.csv_dictionary[key][i]))
                     elif key == "capacative_reactance in  nF/km":
-                        parameter_list.append(float(self.csv_dictionary[key][i]))
+                        parameter_list.append(
+                            None if not self.csv_dictionary[key][i] else float(self.csv_dictionary[key][i]))
 
                 gridline = GridLine(frequency, node_i, node_j, parameter_list)
                 self.__gridlines.append(gridline)

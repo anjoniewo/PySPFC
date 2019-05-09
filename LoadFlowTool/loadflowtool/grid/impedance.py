@@ -2,13 +2,29 @@ from LoadFlowTool.loadflowtool.utils.complexutils import *
 
 
 class Impedance:
+    # Parameter: r -> Realteil, x -> Imaginärteil, in_serie -> sind Real- und Imaginärteil in serie oder parallel [default: in serie]
+    def __init__(self, r, x, in_serie=True):
 
-    def __init__(self, r=0, x=0):
-        # Realteil der Impedanz
-        self.__r = r
+        self.__r = None
+        self.__x = None
 
-        # Imaginaerteil der Impedanz
-        self.__x = x
+        if in_serie:
+            # Realteil der Impedanz
+            self.__r = r
+            # Imaginaerteil der Impedanz
+            self.__x = x
+        else:
+            if not r and x:
+                self.__x = x
+
+            if r and not x:
+                self.__r = r
+
+            if r and x:
+                # Realteil der Impedanz
+                self.__r = (r * (x ** 2)) / (r ** 2 + x ** 2)
+                # Imaginaerteil der Impedanz
+                self.__x = ((r ** 2) * x) / (r ** 2 + x ** 2)
 
     # getter-Methoden
     def get_real_part(self):
