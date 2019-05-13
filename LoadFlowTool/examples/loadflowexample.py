@@ -19,6 +19,7 @@ network = Grid(grid_line_list=gridparser.grid_line_parser.get_gridlines(),
 
 network.calc_bus_admittance_matrix()
 network.print_bus_admittance_matrix()
+network.print_grid_node_list()
 
 """ create_grid_line-Parameter (
         STRING Knotenname_1,

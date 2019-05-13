@@ -99,7 +99,7 @@ class GridNode:
             result += "\nBlindleistung Q = " + str(self.__reactive_load_power) + " kVar"
 
         if self.__node_voltage:
-            result += "\n\nSpannung am Knoten: " + str(self.__node_voltage)
-            result += "\nSpannungswinkel: " + str(self.__theta)
+            result += "\n\nSpannung am Knoten: " + str(self.__node_voltage) + " kV"
+            result += "\nSpannungswinkel: " + str(self.__theta) + "°"
 
         return result
