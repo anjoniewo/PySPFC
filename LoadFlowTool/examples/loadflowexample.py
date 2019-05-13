@@ -1,10 +1,16 @@
+import os.path
 from LoadFlowTool.loadflowtool.grid.grid import Grid
 from LoadFlowTool.loadflowtool.parser.gridparser import GridParser
 
+# Erstelle Dateipfad zu grideline- und gridnode-Dateien
+current_file_path = os.path.abspath(os.path.dirname(__file__))
+csv_files_path = os.path.join(current_file_path, "..\\..\\test\\test_files\\")
+
 # Dateipfad fuer gridline-Datei
-gridline_path = "C:\\Users\\EUProjekt\\PycharmProjects\\LoadFlowToolProjekt\\test\\test_files\\lines.csv"
+gridline_path = os.path.join(csv_files_path, "lines.csv")
+
 # Dateipfad fuer gridnode-Datei
-gridnode_path = "C:\\Users\\EUProjekt\\PycharmProjects\\LoadFlowToolProjekt\\test\\test_files\\gridnodes.csv"
+gridnode_path = os.path.join(csv_files_path, "gridnodes.csv")
 
 gridparser = GridParser(frequency=50, gridline_file_path=gridline_path, gridnode_file_path=gridnode_path)
 

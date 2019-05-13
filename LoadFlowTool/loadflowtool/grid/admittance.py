@@ -50,41 +50,42 @@ class Admittance:
     def get_magnitude(self):
         return get_complex_magnitude(self.__g, self.__b)
 
-    # Methode addiert aus einem übergebenen Admittance-Objekte deren Werte auf die eigenen Werte
+    # (Operatorenueberladung) Methode addiert aus einem übergebenen Admittance-Objekte deren Werte auf die eigenen Werte
     # Methode ueberschreibt den "+" Operator fuer die Klasse Admittance
     def __add__(self, admittance_obj):
-        a = self.__g
-        b = self.__b
-        c = admittance_obj.get_real_part()
-        d = admittance_obj.get_imaginary_part()
+
+        a = self.__g if self.__g is not None else 0
+        b = self.__b if self.__b is not None else 0
+        c = admittance_obj.get_real_part() if admittance_obj.get_real_part() is not None else 0
+        d = admittance_obj.get_imaginary_part() if admittance_obj.get_imaginary_part() is not None else 0
 
         self.__g = a + c
         self.__b = b + d
 
         return self
 
-    # Methode subtrahiert aus einem übergebenen Admittance-Objekte deren Werte von den eigenen Werten
+    # (Operatorenueberladung) Methode subtrahiert aus einem übergebenen Admittance-Objekte deren Werte von den eigenen Werten
     # Methode ueberschreibt den "-" Operator fuer die Klasse Admittance
     def __sub__(self, admittance_obj):
-        a = self.__g
-        b = self.__b
-        c = admittance_obj.get_real_part()
-        d = admittance_obj.get_imaginary_part()
+        a = self.__g if self.__g is not None else 0
+        b = self.__b if self.__b is not None else 0
+        c = admittance_obj.get_real_part() if admittance_obj.get_real_part() is not None else 0
+        d = admittance_obj.get_imaginary_part() if admittance_obj.get_imaginary_part() is not None else 0
 
         self.__g = a - c
         self.__b = b - d
 
         return self
 
-    # Methode multipliziert aus einem übergebenen Admittance-Objekte deren Werte mit den eigenen Werten
+    # (Operatorenueberladung) Methode multipliziert aus einem übergebenen Admittance-Objekte deren Werte mit den eigenen Werten
     def __mul__(self, factor_obj):
 
-        a = self.__g
-        b = self.__b
+        a = self.__g if self.__g is not None else 0
+        b = self.__b if self.__b is not None else 0
 
         if type(factor_obj) == Admittance:
-            c = factor_obj.get_real_part()
-            d = factor_obj.get_imaginary_part()
+            c = factor_obj.get_real_part() if factor_obj.get_real_part() is not None else 0
+            d = factor_obj.get_imaginary_part() if factor_obj.get_imaginary_part() is not None else 0
 
             self.__g = a * c - b * d
             self.__b = a * d + b * c
@@ -95,12 +96,12 @@ class Admittance:
 
         return self
 
-    # Methode dividiert aus einem übergebenen Admittance-Objekte deren Werte mit den eigenen Werten
+    # (Operatorenueberladung) Methode dividiert aus einem übergebenen Admittance-Objekte deren Werte mit den eigenen Werten
     def __truediv__(self, admittance_obj):
-        a = self.__g
-        b = self.__b
-        c = admittance_obj.get_real_part()
-        d = admittance_obj.get_imaginary_part()
+        a = self.__g if self.__g is not None else 0
+        b = self.__b if self.__b is not None else 0
+        c = admittance_obj.get_real_part() if admittance_obj.get_real_part() is not None else 0
+        d = admittance_obj.get_imaginary_part() if admittance_obj.get_imaginary_part() is not None else 0
 
         self.__g = (a * c + b * d) / (c ** 2 + d ** 2)
         self.__b = (c * b - a * d) / (c ** 2 + d ** 2)
