@@ -115,7 +115,7 @@ class GridLine:
 
         # Querimpedanz der Leitung
         if self.__transverse_resistance or self.__capacitive_reactance:
-            self.__transverse_impedance = Impedance(self.__transverse_resistance, self.__capacitive_reactance, in_serie=False)
+            self.__transverse_impedance = Impedance(self.__transverse_resistance, self.__capacitive_reactance, in_series=False)
 
         # Queradmittanz der Leitung
         if self.__transverse_impedance is not None:
