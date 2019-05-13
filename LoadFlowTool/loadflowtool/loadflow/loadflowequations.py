@@ -24,4 +24,10 @@ class LoadFlowEquations:
 		B_ij = 0
 		P = 0
 		
-		P = E_i * (E_j * G_ij - F_j * B_ij) + F_i * (F_j * G_ij + E_j * B_ij)
+		# wirk
+		# for i in range(1, len(gridnodes)):
+		# 	for j in range(first_connected_node, last_connected_node):
+		#
+		# 	X += get_activeP_function_value(E_i, E_j, G)
+		#
+		# 	E_i * (E_j * G_ij - F_j * B_ij) + F_i * (F_j * G_ij + E_j * B_ij)
