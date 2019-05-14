@@ -1,3 +1,23 @@
+"""
+Quelle:  E. Handschin, "Elektrische Energieübertragunssysteme",
+         Teil 1: Stationärer Betriebszustand
+Kapitel: Stationäres Netzmodell
+Seite:   56
+
+-------------------------------------------------------------------------------
+Knotenart       | Typ |   Spezifizierte Groeße            | Unbekannte Groeße |
+-------------------------------------------------------------------------------
+Referenzknoten  |Slack|   U_1, δ_1, P_L1, Q_L1            |     P_G1, Q_G1    |
+-------------------------------------------------------------------------------
+Lastknoten      | P-Q |   P_Gi = 0, Q_Gi = 0, P_Li, Q_Li  |     U_i, δ_i      |
+-------------------------------------------------------------------------------
+Einspeisung     | P-U |   P_Gi, U_i, P_Li, Q_Li|Q_Gi, δ_i |     Q_Gi, δ_i     |
+-------------------------------------------------------------------------------
+
+
+"""
+
+
 # ein Knoten ist ein Netzelement an einem bestimmten Punkt im Netz
 class GridNode:
 
