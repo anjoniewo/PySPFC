@@ -1,6 +1,8 @@
 import os.path
 from LoadFlowTool.loadflowtool.grid.grid import Grid
 from LoadFlowTool.loadflowtool.parser.gridparser import GridParser
+from LoadFlowTool.loadflowtool.loadflow.jacobianmatrix import JacobianMatrix
+
 
 # Erstelle Dateipfad zu grideline- und gridnode-Dateien
 current_file_path = os.path.abspath(os.path.dirname(__file__))
@@ -18,8 +20,11 @@ network = Grid(grid_line_list=gridparser.grid_line_parser.get_gridlines(),
                grid_node_list=gridparser.grid_node_parser.get_gridnodes())
 
 network.calc_bus_admittance_matrix()
-network.print_bus_admittance_matrix()
-network.print_grid_node_list()
+# network.print_bus_admittance_matrix()
+# network.print_grid_node_list()
+
+jacobian = JacobianMatrix(gridparser.grid_node_parser.get_gridnodes(), network.get_bus_admittance_matrix())
+print("foo")
 
 """ create_grid_line-Parameter (
         STRING Knotenname_1,
