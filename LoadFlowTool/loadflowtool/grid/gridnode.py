@@ -71,6 +71,9 @@ class GridNode:
     def get_name(self):
         return self.__name
 
+    def get_type_number(self):
+        return self.__typenumber
+
     # Methode setzt die Knotenparameter in Abhaengigkeit des Knotentyps
     def set_node_parameters(self, node_parameters):
 

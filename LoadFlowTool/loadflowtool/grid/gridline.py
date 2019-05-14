@@ -89,8 +89,8 @@ class GridLine:
 			
 			# induktiver Laengswiderstand
 			if line_parameters[2] > 0:
-				self.__inductive_reactance = (2 * math.pi * self.__frequency * line_parameters[2]) * self.__length
-			# self.__inductive_reactance = line_parameters[2] * self.__length
+				# self.__inductive_reactance = (2 * math.pi * self.__frequency * line_parameters[2]) * self.__length
+				self.__inductive_reactance = line_parameters[2] * self.__length
 			
 			# resistiver Querwiderstand
 			if line_parameters[3]:
@@ -98,9 +98,9 @@ class GridLine:
 			
 			# kapazitiver Querwiderstand
 			if line_parameters[4]:
-				self.__capacitive_reactance = (1 / (
-						2 * math.pi * self.__frequency * line_parameters[4])) * self.__length
-		# self.__capacitive_reactance = line_parameters[4] * self.__length
+				# self.__capacitive_reactance = (1 / (
+				# 		2 * math.pi * self.__frequency * line_parameters[4])) * self.__length
+				self.__capacitive_reactance = line_parameters[4] * self.__length
 		
 		else:
 			LoadFlowReporter.error_report.append("Line-length: line_parameters[0] = 0")
