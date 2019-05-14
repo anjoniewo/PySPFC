@@ -66,7 +66,7 @@ class JacobianMatrix:
 
         for i in range(0, len(self.__grid_node_list)):
             self.__Fk_Ek_vector[i] = 0
-            self.__Fk_Ek_vector[i + ]
+            self.__Fk_Ek_vector[i + 1]
 
     # Methode bastelt J1
     def create_jacobian_J1(self):
