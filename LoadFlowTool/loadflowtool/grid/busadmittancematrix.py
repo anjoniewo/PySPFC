@@ -58,24 +58,23 @@ class BusAdmittanceMatrix:
     def calc_matrix(self, grid_node_list, grid_line_list):
 
         # quadratische Matrixdimension: nxn
-        n = len(grid_node_list)
+        number_of_grid_nodes = len(grid_node_list)
 
         # Erstellung eines nxn-dimensionalen Numpy-Arrays
-        self.matrix = np.ndarray(shape=(n, n), dtype=object)
+        self.matrix = np.ndarray(shape=(number_of_grid_nodes, number_of_grid_nodes), dtype=object)
 
-        for i in range(0, n):
-            # Knotenname speichern
-            gridnode_name_i = grid_node_list[i].get_name()
+        for index, grid_node in enumerate(grid_node_list):
 
             # Setzen der gefilterten Leitungsliste
-            grid_line_list_with_node_name_i = [grid_line for grid_line in grid_line_list if
-                                               grid_line.get_node_name_i() == gridnode_name_i or
-                                               grid_line.get_node_name_j() == gridnode_name_i]
+            grid_line_list_with_node_name = [grid_line for grid_line in grid_line_list if
+                                               grid_line.get_node_name_i() == grid_node.get_name() or
+                                               grid_line.get_node_name_j() == grid_node.get_name()]
 
-            self.__grid_line_list = copy.deepcopy(grid_line_list_with_node_name_i)
+            self.__grid_line_list = copy.deepcopy(grid_line_list_with_node_name)
 
-            for j in range(i, n):
+            for j in range(index, number_of_grid_nodes):
                 gridnode_name_j = grid_node_list[j].get_name()
 
-                self.matrix[i][j] = self.matrix[j][i] = self.__get_sum_of_grid_lines_on_node(gridnode_name_i,
-                                                                                             gridnode_name_j)
+                self.matrix[index][j] = self.matrix[j][index] = self.__get_sum_of_grid_lines_on_node(
+                    grid_node.get_name(),
+                    gridnode_name_j)
