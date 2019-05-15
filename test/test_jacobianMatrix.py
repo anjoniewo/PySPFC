@@ -2,7 +2,6 @@ from unittest import TestCase
 from LoadFlowTool.loadflowtool.grid.grid import Grid
 from LoadFlowTool.loadflowtool.grid.gridnode import GridNode
 from LoadFlowTool.loadflowtool.grid.gridline import GridLine
-from LoadFlowTool.loadflowtool.grid.busadmittancematrix import BusAdmittanceMatrix
 from LoadFlowTool.loadflowtool.loadflow.jacobianmatrix import JacobianMatrix
 from .test_gridNode import TestGridNode
 from .test_gridline import TestGridLine
