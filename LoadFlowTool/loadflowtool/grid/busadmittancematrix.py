@@ -63,7 +63,7 @@ class BusAdmittanceMatrix:
         # Erstellung eines nxn-dimensionalen Numpy-Arrays
         self.matrix = np.ndarray(shape=(number_of_grid_nodes, number_of_grid_nodes), dtype=object)
 
-        for index, grid_node in enumerate(grid_node_list):
+        for row, grid_node in enumerate(grid_node_list):
 
             # Setzen der gefilterten Leitungsliste
             grid_line_list_with_node_name = [grid_line for grid_line in grid_line_list if
@@ -72,9 +72,9 @@ class BusAdmittanceMatrix:
 
             self.__grid_line_list = copy.deepcopy(grid_line_list_with_node_name)
 
-            for j in range(index, number_of_grid_nodes):
-                gridnode_name_j = grid_node_list[j].get_name()
+            for column in range(row, number_of_grid_nodes):
+                gridnode_name_j = grid_node_list[column].get_name()
 
-                self.matrix[index][j] = self.matrix[j][index] = self.__get_sum_of_grid_lines_on_node(
+                self.matrix[row][column] = self.matrix[column][row] = self.__get_sum_of_grid_lines_on_node(
                     grid_node.get_name(),
                     gridnode_name_j)
