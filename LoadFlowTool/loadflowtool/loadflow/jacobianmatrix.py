@@ -34,11 +34,21 @@ class JacobianMatrix:
 
     def __init__(self, grid_node_list, bus_admittance_matrix):
 
+        # Liste der Netzknoten
         self.__grid_node_list = grid_node_list
+
+        # Anzahl an Netzknoten
         self.__number_of_nodes = len(self.__grid_node_list)
+
+        # Knotenadmittanzmatrix
         self.__bus_admittance_matrix = bus_admittance_matrix
-        self.__Fk_Ek_vector = self.init_Fk_Ek_vector()
+
+        # Spannungsvektor, in Real- und Imaginaerteil (Fk => Imaginaer und Ek => Real)
+        self.__Fk_Ek_vector = self.init_Fk_Ek_vector(E0=1)
+
+        # Untermatrizen der Jakobimatrix
         self.__J1, self.__J2, self.__J3, self.__J4, self.__J5, self.__J6, index_of_slack = self.__create_jacobian_sub_matrices()
+
         self.J = self.create_jacobian()
         self.Jk = self.create_sub_jacobian_Jk(index_of_slack)
 
@@ -145,7 +155,7 @@ class JacobianMatrix:
     # Diagonalelement berechnen
     def calculate_diag_elements(self, Ei, Fi, Gii, Bii, i):
 
-        sum_part_dPi_dFj = sum_part_dPi_dEj = sum_part_dQi_dFj = sum_part_dQi_Ej = 0
+        sum_part_dPi_dFi = sum_part_dPi_dEi = sum_part_dQi_dFi = sum_part_dQi_Ei = 0
 
         for j in range(0, self.__number_of_nodes):
             if j != i:
@@ -154,19 +164,19 @@ class JacobianMatrix:
                 Gij = self.__bus_admittance_matrix[i][j].get_real_part()
                 Bij = self.__bus_admittance_matrix[i][j].get_imaginary_part()
 
-                sum_part_dPi_dFj += (Fj * Gij + Ej * Bij)
-                sum_part_dPi_dEj += (Ej * Gij - Fj * Bij)
-                sum_part_dQi_dFj += (Ej * Gij - Fj * Bij)
-                sum_part_dQi_Ej += (Fj * Gij + Ej * Bij)
+                sum_part_dPi_dFi += (Fj * Gij + Ej * Bij)
+                sum_part_dPi_dEi += (Ej * Gij - Fj * Bij)
+                sum_part_dQi_dFi += (Ej * Gij - Fj * Bij)
+                sum_part_dQi_Ei += (Fj * Gij + Ej * Bij)
 
-        dPi_dFj = 2 * Fi * Gii + sum_part_dPi_dFj
-        dPi_dEj = 2 * Ei * Gii + sum_part_dPi_dEj
-        dQi_dFj = -2 * Fi * Bii + sum_part_dQi_dFj
-        dQi_Ej = -2 * Ei * Bii - sum_part_dQi_Ej
-        dUi2_dFj = 2 * Fi
-        dUi2_dEj = 2 * Ei
+        dPi_dFi = (2 * Fi * Gii) + sum_part_dPi_dFi
+        dPi_dEi = (2 * Ei * Gii) + sum_part_dPi_dEi
+        dQi_dFi = -2 * Fi * Bii + sum_part_dQi_dFi
+        dQi_Ei = -2 * Ei * Bii - sum_part_dQi_Ei
+        dUi2_dFi = 2 * Fi
+        dUi2_dEi = 2 * Ei
 
-        return dPi_dFj, dPi_dEj, dQi_dFj, dQi_Ej, dUi2_dFj, dUi2_dEj
+        return dPi_dFi, dPi_dEi, dQi_dFi, dQi_Ei, dUi2_dFi, dUi2_dEi
 
     # nicht Diagonalelement berechnen
     def calculate_not_diag_elements(self, Ei, Fi, Gij, Bij):
