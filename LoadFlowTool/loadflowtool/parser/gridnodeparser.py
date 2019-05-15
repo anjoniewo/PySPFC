@@ -2,6 +2,7 @@
 from LoadFlowTool.loadflowtool.parser.csvparser import CSVParser
 from LoadFlowTool.loadflowtool.grid.gridnode import GridNode
 
+
 class GridNodeParser(CSVParser):
 
     def __init__(self, file_path):
@@ -12,7 +13,7 @@ class GridNodeParser(CSVParser):
 
         self.__read_node_parameters(file_path)
         self.__get_nodes_from_csv_dictionary()
-        
+
     # getter
     def get_gridnodes(self):
         return self.__gridnodes
@@ -56,18 +57,23 @@ class GridNodeParser(CSVParser):
     def __get_node_parameters_by_type(self, type_number, list_of_parameters):
 
         grid_node_parameters = list()
-        grid_node_parameters.append(float(list_of_parameters[0]))
-        grid_node_parameters.append(float(list_of_parameters[1]))
+
+        active_load_power = float(list_of_parameters[0]) if list_of_parameters[0] else None
+        reactive_load_power = float(list_of_parameters[1]) if list_of_parameters[1] else None
+        grid_node_parameters.append(active_load_power)
+        grid_node_parameters.append(reactive_load_power)
 
         if type_number == 0:
-            # node_voltage
-            grid_node_parameters.append(float(list_of_parameters[5]))
-            # theta
-            grid_node_parameters.append(float(list_of_parameters[4]))
+            node_voltage = float(list_of_parameters[5]) if list_of_parameters[5] else None
+            grid_node_parameters.append(node_voltage)
+
+            theta = float(list_of_parameters[4]) if list_of_parameters[4] else None
+            grid_node_parameters.append(theta)
         elif type_number == 2:
-            # active_injection_power
-            grid_node_parameters.append(float(list_of_parameters[2]))
-            # node_voltage
-            grid_node_parameters.append(float(list_of_parameters[5]))
+            active_injection_power = float(list_of_parameters[2]) if list_of_parameters[2] else None
+            grid_node_parameters.append(active_injection_power)
+
+            node_voltage = float(list_of_parameters[5]) if list_of_parameters[5] else None
+            grid_node_parameters.append(node_voltage)
 
         return grid_node_parameters
