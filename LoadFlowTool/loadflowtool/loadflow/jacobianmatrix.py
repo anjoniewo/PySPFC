@@ -71,8 +71,9 @@ class JacobianMatrix:
         # gefilterte Liste mit Spannungsknoten
         list_of_voltage_nodes = [grid_node for grid_node in self.__grid_node_list if grid_node.get_type_number() == 2]
 
-        # Dimension der Teilmatrizen fuer Spannungsknoten
-        n_voltage = len(list_of_voltage_nodes)
+        # Dimension der Teilmatrizen fuer Spannungsknoten ( + 1 wegen Einspeisung am Slack)
+        n_voltage = len(list_of_voltage_nodes) + 1
+        self.__has_voltage_nodes = True if n_voltage > 1 else False
 
         # Initialisierung der Teilmatrizen
         J1, J2, J3, J4, J5, J6 = self.__init_sub_matrices(n, n_voltage)
@@ -127,20 +128,14 @@ class JacobianMatrix:
 
         J1 = np.ndarray(shape=(number_of_nodes, number_of_nodes), dtype=float)
         J2 = np.ndarray(shape=(number_of_nodes, number_of_nodes), dtype=float)
+        J3 = np.ndarray(shape=(number_of_nodes, number_of_nodes), dtype=float)
+        J4 = np.ndarray(shape=(number_of_nodes, number_of_nodes), dtype=float)
 
         # wenn Spannungsknoten existieren
         if number_of_voltage_nodes:
-            J3 = np.ndarray(
-                shape=(number_of_nodes - number_of_voltage_nodes, number_of_nodes),
-                dtype=float)
-            J4 = np.ndarray(
-                shape=(number_of_nodes - number_of_voltage_nodes, number_of_nodes),
-                dtype=float)
             J5 = np.ndarray(shape=(number_of_voltage_nodes, number_of_nodes), dtype=float)
             J6 = np.ndarray(shape=(number_of_voltage_nodes, number_of_nodes), dtype=float)
         else:
-            J3 = np.ndarray(shape=(number_of_nodes, number_of_nodes), dtype=float)
-            J4 = np.ndarray(shape=(number_of_nodes, number_of_nodes), dtype=float)
             J5 = None
             J6 = None
 
@@ -191,25 +186,36 @@ class JacobianMatrix:
     # Jakobi-Matrix mit Teilmatrizen J1 - J6 fuellen
     def create_jacobian(self):
 
+        voltage_node_indices = self.get_indices_of_voltage_nodes()
+
+        for index in voltage_node_indices:
+            self.__J3 = np.delete(self.__J3, index, 0)
+            self.__J4 = np.delete(self.__J4, index, 0)
+
         active_load_sub_jacobian = np.hstack((self.__J1, self.__J2))
         reactive_load_sub_jacobian = np.hstack((self.__J3, self.__J4))
 
         if (self.__J5 is not None) and (self.__J6 is not None):
             voltage_sub_jacobian = np.hstack((self.__J5, self.__J6))
-            J = np.vstack((active_load_sub_jacobian, reactive_load_sub_jacobian, voltage_sub_jacobian))
+            J = np.vstack((active_load_sub_jacobian, voltage_sub_jacobian, reactive_load_sub_jacobian))
         else:
             J = np.vstack((active_load_sub_jacobian, reactive_load_sub_jacobian))
 
-        det_of_J = np.linalg.det(J)
-
-        return J if det_of_J == 0.0 else None
+        return J
 
     # Unter-Jakobi-Matrix Jk erstellen in der die Zeilen und Spalten des Slacks nicht mehr enthalten sind
     def create_sub_jacobian_Jk(self, index_of_slack):
 
-        # Zeilen des Slack loeschen
-        Jk = np.delete(self.J, index_of_slack, 0)
-        Jk = np.delete(Jk, ((index_of_slack - 1) + self.__number_of_nodes), 0)
+        if self.__has_voltage_nodes:
+            # Zeilen des Slack loeschen
+            Jk = np.delete(self.J, index_of_slack, 0)
+            Jk = np.delete(Jk, ((index_of_slack - 1) + self.__number_of_nodes), 0)
+            Jk = np.delete(Jk, (len(Jk) - len(self.__J5)), 0)
+
+        else:
+            # Zeilen des Slack loeschen
+            Jk = np.delete(self.J, index_of_slack, 0)
+            Jk = np.delete(Jk, ((index_of_slack - 1) + self.__number_of_nodes), 0)
 
         # Spalten des Slack loeschen
         Jk = np.delete(Jk, index_of_slack, 1)
@@ -218,3 +224,17 @@ class JacobianMatrix:
         det_of_Jk = np.linalg.det(Jk)
 
         return Jk
+
+    def get_indices_of_voltage_nodes(self):
+
+        indices_of_voltage_nodes = list()
+
+        i = 0
+        for grid_node in self.__grid_node_list:
+            # fuer jeden Spannungsknoten
+            if grid_node.get_type_number() == 2:
+                indices_of_voltage_nodes.append(i)
+
+            i += 1
+
+        return indices_of_voltage_nodes
