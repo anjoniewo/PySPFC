@@ -35,7 +35,8 @@ class GridNode:
         # 0 = Slack-Knoten (Referenzknoten)
         # 1 = P-Q-Knoten (Lastknoten)
         # 2 = P-U-Knoten (Einspeisung)
-        self.__grid_node_types = {0: "Slack-Knoten", 1: "P-Q-Knoten", 2: "P-U-Knoten"}
+        self.__grid_node_types_index = {1: "Slack-Knoten", 2: "P-Q-Knoten", 3: "P-U-Knoten"}
+        self.__grid_node_types = {"slack": 1, "load": 2, "voltage": 3}
         self.__typenumber = typenumber
 
         # ***********************
@@ -74,6 +75,17 @@ class GridNode:
     def get_type_number(self):
         return self.__typenumber
 
+    def get_grid_node_type_index_of(self, node_type):
+        return self.__grid_node_types[node_type]
+
+    # Methode gibt den Betrag der Spannungsggroeße zurück
+    def get_node_voltage_magnitude(self):
+        return self.__node_voltage
+
+    # Methode gibt den Spannungswinkel in Bogenmaß zurück
+    def get_node_voltage_angle(self):
+        return self.__theta
+
     # Methode setzt die Knotenparameter in Abhaengigkeit des Knotentyps
     def set_node_parameters(self, node_parameters):
 
@@ -90,14 +102,14 @@ class GridNode:
 
         # Slack-Knoten (Referenzknoten)
         # setzen von: Knotenspannung (node_voltage) in kV, Spannungswinkel (theta) in Bogenmaß
-        if self.__typenumber == 0:
+        if self.__typenumber == self.get_grid_node_type_index_of("slack"):
             # Spannungsbetrag
-            self.__node_voltage = node_parameters[2]
-            self.__theta = node_parameters[3]
+            self.__node_voltage = node_parameters[5]
+            self.__theta = node_parameters[4]
 
         # P-U-Knoten (Einspeisung)
         # setzen von : Wirkleistung in kW (active_injection_power), Knotenspannung (node_voltage) in kV
-        elif self.__typenumber == 2:
+        elif self.__typenumber == self.get_grid_node_type_index_of("voltage"):
             self.__active_injection_power = node_parameters[2]
             self.__node_voltage = node_parameters[3]
 
@@ -109,7 +121,7 @@ class GridNode:
         result = ""
         result += "\n\n------------------------------------"
         result += "\nKnotenbezeichnung: " + str(self.__name)
-        result += "\nKnotentyp: " + str(self.__grid_node_types[self.__typenumber])
+        result += "\nKnotentyp: " + str(self.__grid_node_types_index[self.__typenumber])
 
         if self.__active_injection_power:
             result += "\n\nEinspeisung:"
