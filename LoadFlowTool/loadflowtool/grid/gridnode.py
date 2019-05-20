@@ -74,6 +74,18 @@ class GridNode:
 
     def get_type_number(self):
         return self.__typenumber
+    
+    def get_active_load_power(self):
+        return self.__active_load_power
+    
+    def get_reactive_load_power(self):
+        return self.__reactive_load_power
+    
+    def get_active_injection_power(self):
+        return self.__active_injection_power
+    
+    def get_reactive_injection_power(self):
+        return self.__reactive_injection_power
 
     def get_grid_node_type_index_of(self, node_type):
         return self.__grid_node_types[node_type]
@@ -111,7 +123,7 @@ class GridNode:
         # setzen von : Wirkleistung in kW (active_injection_power), Knotenspannung (node_voltage) in kV
         elif self.__typenumber == self.get_grid_node_type_index_of("voltage"):
             self.__active_injection_power = node_parameters[2]
-            self.__node_voltage = node_parameters[3]
+            self.__node_voltage = node_parameters[5]
 
         else:
             ERROR = ""

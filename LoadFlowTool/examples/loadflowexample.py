@@ -3,6 +3,7 @@ from LoadFlowTool.loadflowtool.grid.grid import Grid
 from LoadFlowTool.loadflowtool.parser.gridparser import GridParser
 from LoadFlowTool.loadflowtool.loadflow.jacobianmatrix import JacobianMatrix
 from LoadFlowTool.loadflowtool.utils.loadflowutils import print_matrix
+from LoadFlowTool.loadflowtool.loadflow.loadflow import do_loadflow
 
 import numpy as np
 
@@ -23,6 +24,8 @@ network = Grid(grid_line_list=gridparser.grid_line_parser.get_gridlines(),
 
 # network.print_bus_admittance_matrix()
 # network.print_grid_node_list()
+
+do_loadflow(network)
 
 invers_sub_jacobi = np.linalg.inv(network.jacobi_matrix.Jk)
 det_Jk = np.linalg.det(network.jacobi_matrix.Jk)

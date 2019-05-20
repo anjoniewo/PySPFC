@@ -30,8 +30,8 @@ class Grid:
 	def get_frequency(self):
 		return self.__frequency
 	
-	def get_bus_admittance_matrix(self):
-		return self.__bus_admittance_matrix
+	def get_grid_node_list(self):
+		return self.__grid_node_list
 	
 	# Methode erstellt einen neuen Netzknoten und fuegt diesen der Knotenliste hinzu
 	def create_grid_node(self, name, type, node_parameters):

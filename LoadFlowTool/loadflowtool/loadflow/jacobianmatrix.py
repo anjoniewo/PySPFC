@@ -53,10 +53,9 @@ class JacobianMatrix:
 		
 		# Jacobimatrix bei Initialiseirung mit Slack-Werten erstellen
 		self.J = self.create_jacobian(self.Fk_Ek_vector)
-		self.Jk = self.create_sub_jacobian_Jk(self.index_of_slack)
-		
-	# getter und setter
+		self.Jk = self.create_sub_jacobian_Jk()
 	
+	# getter und setter
 	
 	def init_Fk_Ek_vector(self):
 		
@@ -217,7 +216,7 @@ class JacobianMatrix:
 		
 		if (self.__J5 is not None) and (self.__J6 is not None):
 			voltage_sub_jacobian = np.hstack((self.__J5, self.__J6))
-			J = np.vstack((active_load_sub_jacobian, voltage_sub_jacobian, reactive_load_sub_jacobian))
+			J = np.vstack((active_load_sub_jacobian, reactive_load_sub_jacobian, voltage_sub_jacobian))
 		else:
 			J = np.vstack((active_load_sub_jacobian, reactive_load_sub_jacobian))
 		
@@ -225,7 +224,7 @@ class JacobianMatrix:
 	
 	# Unter-Jacobimatrix Jk erstellen in der die Zeilen und Spalten des Slacks nicht mehr enthalten sind und
 	# alle Blindleistungsgleichungen aller Spannungsknoten löschen
-	def create_sub_jacobian_Jk(self, index_of_slack):
+	def create_sub_jacobian_Jk(self):
 		
 		Jk = None
 		
@@ -234,24 +233,24 @@ class JacobianMatrix:
 			voltage_node_indices = self.get_indices_of_voltage_nodes()
 			j = 0
 			for index in voltage_node_indices:
-				index += (self.__number_of_nodes + len(voltage_node_indices) + 1 + j)
-				Jk = np.delete(self.J, index, 0)
+				Jk = np.delete(self.J, self.__number_of_nodes + index + j, 0)
+				# j -= 1, da sich durch das Loeschen einer Zeile die Anzahl an Zeilen verringert
 				j -= 1
 			
 			# Slack Zeilen und Spalten aus Jacobimatrix löschen
 			# Zeilen des Slack loeschen
-			Jk = np.delete(Jk, index_of_slack, 0)
-			Jk = np.delete(Jk, ((index_of_slack - 1) + self.__number_of_nodes), 0)
+			Jk = np.delete(Jk, self.index_of_slack, 0)
+			Jk = np.delete(Jk, ((self.index_of_slack - 1) + self.__number_of_nodes), 0)
 			Jk = np.delete(Jk, (len(Jk) - len(self.__J5)), 0)
 		
 		else:
 			# Zeilen des Slack loeschen
-			Jk = np.delete(self.J, index_of_slack, 0)
-			Jk = np.delete(Jk, ((index_of_slack - 1) + self.__number_of_nodes), 0)
+			Jk = np.delete(self.J, self.index_of_slack, 0)
+			Jk = np.delete(Jk, ((self.index_of_slack - 1) + self.__number_of_nodes), 0)
 		
 		# Spalten des Slack loeschen
-		Jk = np.delete(Jk, index_of_slack, 1)
-		Jk = np.delete(Jk, ((index_of_slack - 1) + self.__number_of_nodes), 1)
+		Jk = np.delete(Jk, self.index_of_slack, 1)
+		Jk = np.delete(Jk, ((self.index_of_slack - 1) + self.__number_of_nodes), 1)
 		
 		# det_of_Jk = np.linalg.det(Jk)
 		
