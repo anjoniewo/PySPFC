@@ -21,16 +21,13 @@ gridparser = GridParser(gridline_file_path=gridline_path, gridnode_file_path=gri
 network = Grid(grid_line_list=gridparser.grid_line_parser.get_gridlines(),
                grid_node_list=gridparser.grid_node_parser.get_gridnodes())
 
-network.calc_bus_admittance_matrix()
 # network.print_bus_admittance_matrix()
 # network.print_grid_node_list()
 
-jacobian = JacobianMatrix(gridparser.grid_node_parser.get_gridnodes(), network.get_bus_admittance_matrix())
-
-invers_sub_jacobi = np.linalg.inv(jacobian.Jk)
-det_Jk = np.linalg.det(jacobian.Jk)
+invers_sub_jacobi = np.linalg.inv(network.jacobi_matrix.Jk)
+det_Jk = np.linalg.det(network.jacobi_matrix.Jk)
 print('\nUnter-Jacobimatrix:')
-print_matrix(jacobian.Jk)
+print_matrix(network.jacobi_matrix.Jk)
 print('\ninverse Unter-Jacobimatrix:')
 print_matrix(invers_sub_jacobi)
 
