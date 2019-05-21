@@ -53,7 +53,7 @@ class JacobianMatrix:
 		
 		# Jacobimatrix bei Initialiseirung mit Slack-Werten erstellen
 		self.J = self.create_jacobian(self.Fk_Ek_vector)
-		self.Jk = self.create_sub_jacobian_Jk()
+		self.Jk = self.create_sub_jacobian_Jk(self.J)
 	
 	# getter und setter
 	
@@ -224,12 +224,10 @@ class JacobianMatrix:
 	
 	# Unter-Jacobimatrix Jk erstellen in der die Zeilen und Spalten des Slacks nicht mehr enthalten sind und
 	# alle Blindleistungsgleichungen aller Spannungsknoten löschen
-	def create_sub_jacobian_Jk(self):
-		
-		Jk = None
+	def create_sub_jacobian_Jk(self, jacobian_matrix):
 		
 		if self.__has_voltage_nodes:
-			Jk = self.J
+			Jk = jacobian_matrix
 			# Blindleistungs Zeilen der Spannungsknoten aus Jacobimatrix löschen
 			voltage_node_indices = self.get_indices_of_voltage_nodes()
 			j = 0
@@ -246,7 +244,7 @@ class JacobianMatrix:
 		
 		else:
 			# Zeilen des Slack loeschen
-			Jk = np.delete(self.J, self.index_of_slack, 0)
+			Jk = np.delete(jacobian_matrix, self.index_of_slack, 0)
 			Jk = np.delete(Jk, ((self.index_of_slack - 1) + self.__number_of_nodes), 0)
 			
 		# Zeilen des Slacks aus dem Fk_Ek_vector streichen
