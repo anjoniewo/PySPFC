@@ -31,22 +31,24 @@ import copy
 
 class LoadFlowEquations:
 	
-	def __init__(self, grid_node_list, bus_admittance_matrix, Fk_Ek_vector):
+	def __init__(self, grid_node_list, bus_admittance_matrix):
+		
 		self.__grid_node_list = copy.deepcopy(grid_node_list)
 		
-		self.__active_load_equations = list()
+		self.number_of_nodes = len(grid_node_list)
 		
-		self.__reactive_load_equations = list()
+		self.__bus_admittance_matrix = bus_admittance_matrix
 	
 	# Lastflussgleichung - Wirkleistung
-	def calculate_active_power(self, bus_admittance_matrix, Fk_Ek_vector, grid_node_index):
-		Ei = Fk_Ek_vector[len(self.__grid_node_list) + grid_node_index]
+	def calculate_active_power(self, Fk_Ek_vector, grid_node_index):
+		
+		Ei = Fk_Ek_vector[self.number_of_nodes + grid_node_index]
 		Fi = Fk_Ek_vector[grid_node_index]
 		Pi = 0
-		for j in range(0, len(self.__grid_node_list)):
-			Ej = Fk_Ek_vector[len(self.__grid_node_list) + j]
+		for j in range(0, self.number_of_nodes):
+			Ej = Fk_Ek_vector[self.number_of_nodes + j]
 			Fj = Fk_Ek_vector[j]
-			Yij = bus_admittance_matrix[grid_node_index][j]
+			Yij = self.__bus_admittance_matrix[grid_node_index][j]
 			Gij = Yij.get_real_part()
 			Bij = Yij.get_imaginary_part()
 			
@@ -54,14 +56,15 @@ class LoadFlowEquations:
 		return Pi
 	
 	# Lastflussgleichung - Blindleistung
-	def calculate_reactive_power(self, bus_admittance_matrix, Fk_Ek_vector, grid_node_index):
-		Ei = Fk_Ek_vector[len(self.__grid_node_list) + grid_node_index]
+	def calculate_reactive_power(self, Fk_Ek_vector, grid_node_index):
+		
+		Ei = Fk_Ek_vector[self.number_of_nodes + grid_node_index]
 		Fi = Fk_Ek_vector[grid_node_index]
 		Qi = 0
-		for j in range(0, len(self.__grid_node_list)):
-			Ej = Fk_Ek_vector[len(self.__grid_node_list) + j]
+		for j in range(0, self.number_of_nodes):
+			Ej = Fk_Ek_vector[self.number_of_nodes + j]
 			Fj = Fk_Ek_vector[j]
-			Yij = bus_admittance_matrix[grid_node_index][j]
+			Yij = self.__bus_admittance_matrix[grid_node_index][j]
 			Gij = Yij.get_real_part()
 			Bij = Yij.get_imaginary_part()
 			
@@ -70,6 +73,6 @@ class LoadFlowEquations:
 	
 	# Knotenspannung berechnen
 	def calculate_node_voltage(self, Fk_Ek_vector, grid_node_index):
-		Ei = Fk_Ek_vector[len(self.__grid_node_list) + grid_node_index]
+		Ei = Fk_Ek_vector[self.number_of_nodes + grid_node_index]
 		Fi = Fk_Ek_vector[grid_node_index]
 		return Ei ** 2 + Fi ** 2

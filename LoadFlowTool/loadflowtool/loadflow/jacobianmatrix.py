@@ -49,7 +49,7 @@ class JacobianMatrix:
 		                            grid_node.get_type_number() == self.__grid_node_list[
 			                            index].get_grid_node_type_index_of("slack")), None)
 		
-		self.Fk_Ek_vector = self.init_Fk_Ek_vector()
+		self.Fk_Ek_vector = self.sub_Fk_Ek_vector = self.init_Fk_Ek_vector()
 		
 		# Jacobimatrix bei Initialiseirung mit Slack-Werten erstellen
 		self.J = self.create_jacobian(self.Fk_Ek_vector)
@@ -98,22 +98,22 @@ class JacobianMatrix:
 		
 		self.calculate_jacobian_matrix()
 		# Fuelle Jacobi-Teilmatrizen
-		for i in range(0, self.__number_of_nodes):
+		for index, grid_node in enumerate(self.__grid_node_list):
 			
-			Fi = Fk_Ek_vector[i]
-			Ei = Fk_Ek_vector[i + self.__number_of_nodes]
+			Fi = Fk_Ek_vector[index]
+			Ei = Fk_Ek_vector[index + self.__number_of_nodes]
 			
 			for j in range(0, self.__number_of_nodes):
 				
 				# Admittanz aus Knotenadmittanzmatrix speichern
-				Yij = self.__bus_admittance_matrix[i][j]
+				Yij = self.__bus_admittance_matrix[index][j]
 				Gij = Yij.get_real_part()
 				Bij = Yij.get_imaginary_part()
 				
 				# Diagonalelemente von J1, J2, J3, J4, J5, und J6
-				if i == j:
+				if index == j:
 					dPi_dFj, dPi_dEj, dQi_dFj, dQi_dEj, dUi2_dFj, dUi2_dEj = self.__calculate_diag_elements(Ei, Fi, Gij,
-					                                                                                        Bij, i)
+					                                                                                        Bij, index)
 				
 				# nicht Diagonalelemente von J1, J2, J3, J4, J5, und J6
 				else:
@@ -122,20 +122,20 @@ class JacobianMatrix:
 					                                                                                            Bij)
 				
 				# dim(J1, J2) = Anzahl der Knoten. Hier muss nicht auf den Wert der Laufvariablen i geachtet werden.
-				J1[i][j] = dPi_dFj
-				J2[i][j] = dPi_dEj
+				J1[index][j] = dPi_dFj
+				J2[index][j] = dPi_dEj
 				
 				# wenn es Spannungsknoten gibt gilt: dim(J1, J2) = dim(J3, J4) + dim(J5, J6)
 				if (J5 is not None) and (J6 is not None):
-					if i < len(J3):
-						J3[i][j] = dQi_dFj
-						J4[i][j] = dQi_dEj
-					if i < len(J5):
-						J5[i][j] = dUi2_dFj
-						J6[i][j] = dUi2_dEj
+					if index < len(J3):
+						J3[index][j] = dQi_dFj
+						J4[index][j] = dQi_dEj
+					if index < len(J5):
+						J5[index][j] = dUi2_dFj
+						J6[index][j] = dUi2_dEj
 				else:
-					J3[i][j] = dQi_dFj
-					J4[i][j] = dQi_dEj
+					J3[index][j] = dQi_dFj
+					J4[index][j] = dQi_dEj
 		
 		return J1, J2, J3, J4, J5, J6
 	
@@ -229,11 +229,12 @@ class JacobianMatrix:
 		Jk = None
 		
 		if self.__has_voltage_nodes:
+			Jk = self.J
 			# Blindleistungs Zeilen der Spannungsknoten aus Jacobimatrix löschen
 			voltage_node_indices = self.get_indices_of_voltage_nodes()
 			j = 0
 			for index in voltage_node_indices:
-				Jk = np.delete(self.J, self.__number_of_nodes + index + j, 0)
+				Jk = np.delete(Jk, self.__number_of_nodes + index + j, 0)
 				# j -= 1, da sich durch das Loeschen einer Zeile die Anzahl an Zeilen verringert
 				j -= 1
 			
@@ -247,6 +248,10 @@ class JacobianMatrix:
 			# Zeilen des Slack loeschen
 			Jk = np.delete(self.J, self.index_of_slack, 0)
 			Jk = np.delete(Jk, ((self.index_of_slack - 1) + self.__number_of_nodes), 0)
+			
+		# Zeilen des Slacks aus dem Fk_Ek_vector streichen
+		self.sub_Fk_Ek_vector = np.delete(self.Fk_Ek_vector, self.index_of_slack, 0)
+		self.sub_Fk_Ek_vector = np.delete(self.sub_Fk_Ek_vector, ((self.index_of_slack - 1) + self.__number_of_nodes), 0)
 		
 		# Spalten des Slack loeschen
 		Jk = np.delete(Jk, self.index_of_slack, 1)
