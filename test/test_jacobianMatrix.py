@@ -36,7 +36,6 @@ class TestJacobianMatrix(TestCase):
     def test_create_jacobi_matrix(self):
         grid_node_list, grid_line_list = self.create_test_data()
         grid = Grid(grid_node_list, grid_line_list)
-        grid.calc_bus_admittance_matrix()
 
         jacobi = JacobianMatrix(grid_node_list, grid.get_bus_admittance_matrix())
         invers_sub_jacobi = np.linalg.inv(jacobi.Jk)
