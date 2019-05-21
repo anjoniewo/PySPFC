@@ -8,12 +8,13 @@ from LoadFlowTool.loadflowtool.loadflow.loadflow import do_loadflow
 import numpy as np
 
 # Erstelle Dateipfad zu grideline- und gridnode-Dateien
+
 # WINDOWS
 current_file_path = os.path.abspath(os.path.dirname(__file__))
 csv_files_path = os.path.join(current_file_path, "..\\..\\test\\test_files\\")
 
 # MAC
-csv_files_path = os.path.join("", "../../test/test_files/")
+# csv_files_path = os.path.join(os.path.dirname(__file__), "../../test/test_files/")
 
 # Dateipfad fuer gridline-Datei
 gridline_path = os.path.join(csv_files_path, "lines.csv")
