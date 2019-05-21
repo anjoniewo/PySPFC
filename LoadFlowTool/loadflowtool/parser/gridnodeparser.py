@@ -14,7 +14,12 @@ class GridNodeParser(CSVParser):
         self.__read_node_parameters(file_path)
         self.__get_nodes_from_csv_dictionary()
 
+        # self.__grid_node_types = {"slack": 1, "load": 2, "voltage": 3}
+
     # getter
+    # def get_grid_node_type_index_of(self, node_type):
+    #     return self.__grid_node_types[node_type]
+
     def get_gridnodes(self):
         return self.__gridnodes
 
@@ -56,24 +61,51 @@ class GridNodeParser(CSVParser):
 
     def __get_node_parameters_by_type(self, type_number, list_of_parameters):
 
+        # list_of_parameters
+        # [0] : active_load_power
+        # [1] : reactive_load_power
+        # [2] : active_injection_power
+        # [3] : reactive_injection_power
+        # [4] : theta
+        # [5] : node_voltage
+
+        # Konvertiere explizit Eingabeparameter String => Float
+        for i in range(0, len(list_of_parameters)):
+            if type(list_of_parameters[i]) == str and len(list_of_parameters[i]):
+                list_of_parameters[i] = float(list_of_parameters[i])
+
         grid_node_parameters = list()
-
-        active_load_power = float(list_of_parameters[0]) if list_of_parameters[0] else None
-        reactive_load_power = float(list_of_parameters[1]) if list_of_parameters[1] else None
-        grid_node_parameters.append(active_load_power)
-        grid_node_parameters.append(reactive_load_power)
-
-        if type_number == 0:
-            node_voltage = float(list_of_parameters[5]) if list_of_parameters[5] else None
-            grid_node_parameters.append(node_voltage)
-
-            theta = float(list_of_parameters[4]) if list_of_parameters[4] else None
-            grid_node_parameters.append(theta)
-        elif type_number == 2:
-            active_injection_power = float(list_of_parameters[2]) if list_of_parameters[2] else None
-            grid_node_parameters.append(active_injection_power)
-
-            node_voltage = float(list_of_parameters[5]) if list_of_parameters[5] else None
-            grid_node_parameters.append(node_voltage)
+        # active_load_power
+        grid_node_parameters.append(list_of_parameters[0])
+        # reactive_load_power
+        grid_node_parameters.append(list_of_parameters[1])
+        # active_injection_power
+        grid_node_parameters.append(list_of_parameters[2])
+        # reactive_injection_power
+        grid_node_parameters.append(list_of_parameters[3])
+        # theta in rad
+        grid_node_parameters.append(list_of_parameters[4])
+        # node_voltage
+        grid_node_parameters.append(list_of_parameters[5])
 
         return grid_node_parameters
+
+        # active_load_power = float(list_of_parameters[0]) if list_of_parameters[0] else None
+        # reactive_load_power = float(list_of_parameters[1]) if list_of_parameters[1] else None
+        # grid_node_parameters.append(active_load_power)
+        # grid_node_parameters.append(reactive_load_power)
+        #
+        # # if type_number == self.get_grid_node_type_index_of("slack"):
+        # if type_number == 1:
+        #     node_voltage = float(list_of_parameters[5]) if list_of_parameters[5] else None
+        #     grid_node_parameters.append(node_voltage)
+        #
+        #     theta = float(list_of_parameters[4]) if list_of_parameters[4] else None
+        #     grid_node_parameters.append(theta)
+        # # elif type_number == self.get_grid_node_type_index_of("voltage"):
+        # elif type_number == 3:
+        #     active_injection_power = float(list_of_parameters[2]) if list_of_parameters[2] else None
+        #     grid_node_parameters.append(active_injection_power)
+        #
+        #     node_voltage = float(list_of_parameters[5]) if list_of_parameters[5] else None
+        #     grid_node_parameters.append(node_voltage)

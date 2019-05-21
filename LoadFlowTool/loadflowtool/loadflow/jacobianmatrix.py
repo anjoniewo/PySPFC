@@ -1,14 +1,17 @@
+from LoadFlowTool.loadflowtool.utils.complexutils import get_cartesian_from_euler
+import numpy as np
+
 """
 Quelle:  E. Handschin, "Elektrische Energieübertragunssysteme",
          Teil 1: Stationärer Betriebszustand
 Kapitel: Lastflussberechnung - Newton-Raphson-Verfahren
 Seiten:  80
 
-Aus der Jakobimatrix J werden die Gleichungen des Slackknotens gestrichen:
+Aus der Jacobimatrix J werden die Gleichungen des Slackknotens gestrichen:
 
 => dim(J) = (m, m) -> dim(Jk) = (m-2, m-2)
 
-Aufbau der Jakobimatrix J:
+Aufbau der Jacobimatrix J:
                              |                     |                    |     | ΔF1 |     |  ΔP1  |
                              |                     |                    |     |  .  |     |   .   |
                              |    Jk1 = δPi/δFj    |   Jk2 = δPi/δEj    |     |  .  |     |   .   |
@@ -27,7 +30,6 @@ Aufbau der Jakobimatrix J:
                              |                     |                    |     |  .  |     |   .   |
                              |                     |                    |     | ΔEn |     | ΔUn^2 |
 """
-import numpy as np
 
 
 class JacobianMatrix:
@@ -44,15 +46,15 @@ class JacobianMatrix:
         self.__bus_admittance_matrix = bus_admittance_matrix
 
         # Spannungsvektor, in Real- und Imaginaerteil (Fk => Imaginaer und Ek => Real)
-        self.__Fk_Ek_vector = self.init_Fk_Ek_vector(E0=1)
+        self.__Fk_Ek_vector = None
 
-        # Untermatrizen der Jakobimatrix
+        # Untermatrizen der Jacobimatrix
         self.__J1, self.__J2, self.__J3, self.__J4, self.__J5, self.__J6, index_of_slack = self.__create_jacobian_sub_matrices()
 
         self.J = self.create_jacobian()
         self.Jk = self.create_sub_jacobian_Jk(index_of_slack)
 
-    def init_Fk_Ek_vector(self, F0=0, E0=230):
+    def init_Fk_Ek_vector(self, F0, E0):
 
         init_vector = np.zeros(2 * self.__number_of_nodes)
 
@@ -62,16 +64,17 @@ class JacobianMatrix:
 
         return init_vector
 
-    # Berechnung der Teilmatrizen der Jakobimatrix (J1, J2, J3, J4, J5 und J6)
+    # Berechnung der Teilmatrizen der Jacobimatrix (J1, J2, J3, J4, J5 und J6)
     def __create_jacobian_sub_matrices(self):
 
-        # quadratische Matrixdimension: NxN
+        # quadratische Matrixdimension: nxn
         n = self.__number_of_nodes
 
         # gefilterte Liste mit Spannungsknoten
-        list_of_voltage_nodes = [grid_node for grid_node in self.__grid_node_list if grid_node.get_type_number() == 2]
+        list_of_voltage_nodes = [grid_node for grid_node in self.__grid_node_list if
+                                 grid_node.get_type_number() == grid_node.get_grid_node_type_index_of("voltage")]
 
-        # Dimension der Teilmatrizen fuer Spannungsknoten ( + 1 wegen Einspeisung am Slack)
+        # Dimension der Jacobi Teilmatrizen fuer Spannungsknoten ( + 1 wegen Einspeisung am Slack)
         n_voltage = len(list_of_voltage_nodes) + 1
         self.__has_voltage_nodes = True if n_voltage > 1 else False
 
@@ -79,12 +82,26 @@ class JacobianMatrix:
         J1, J2, J3, J4, J5, J6 = self.__init_sub_matrices(n, n_voltage)
 
         index_of_slack = None
-
         for i in range(0, self.__number_of_nodes):
             if index_of_slack is None:
-                index_of_slack = i if self.__grid_node_list[i].get_type_number() == 0 else None
+                index_of_slack = i if self.__grid_node_list[i].get_type_number() == self.__grid_node_list[
+                    i].get_grid_node_type_index_of("slack") else None
+            else:
+                break
+
+        # Initialisiere Loesungsvektor Fk_Ek(__Fk_Ek_vector) mit Slackknoten-Spannungsstartwerten
+        # Spannungsvektor, in Real- und Imaginaerteil (Fk(Fi_init) => Imaginaer und Ek(Ei_init) => Real)
+        Ei_init, Fi_init = get_cartesian_from_euler(
+            self.__grid_node_list[index_of_slack].get_node_voltage_magnitude(),
+            self.__grid_node_list[index_of_slack].get_node_voltage_angle())
+        self.__Fk_Ek_vector = self.init_Fk_Ek_vector(F0=Fi_init, E0=Ei_init)
+
+        # Fuelle Jacobi-Teilmatrizen
+        for i in range(0, self.__number_of_nodes):
+
             Fi = self.__Fk_Ek_vector[i]
             Ei = self.__Fk_Ek_vector[i + self.__number_of_nodes]
+
             for j in range(0, self.__number_of_nodes):
 
                 # Admittanz aus Knotenadmittanzmatrix speichern
@@ -121,11 +138,10 @@ class JacobianMatrix:
 
         return J1, J2, J3, J4, J5, J6, index_of_slack
 
-    # Initialisierung der Teilmatrizen
+    # Initialisierung der Jacobi-Teilmatrizen
     def __init_sub_matrices(self, number_of_nodes, number_of_voltage_nodes):
 
         # Erstellung der nxn-dimensionalen Numpy-Arrays
-
         J1 = np.ndarray(shape=(number_of_nodes, number_of_nodes), dtype=float)
         J2 = np.ndarray(shape=(number_of_nodes, number_of_nodes), dtype=float)
         J3 = np.ndarray(shape=(number_of_nodes, number_of_nodes), dtype=float)
@@ -142,7 +158,7 @@ class JacobianMatrix:
         return J1, J2, J3, J4, J5, J6
 
     """
-        Berechnungsmethoden fuer die Elemente der Teiljakobimatrizen J1, J2, J3, J4, J5 und J6
+        Berechnungsmethoden fuer die Elemente der Jacobi-Teilmatrizen J1, J2, J3, J4, J5 und J6
     """
 
     # -------------------------------------------------------------------------------------------------------------------
@@ -173,7 +189,7 @@ class JacobianMatrix:
 
         return dPi_dFi, dPi_dEi, dQi_dFi, dQi_Ei, dUi2_dFi, dUi2_dEi
 
-    # nicht Diagonalelement berechnen
+    # "nicht"-Diagonalelemente berechnen
     def calculate_not_diag_elements(self, Ei, Fi, Gij, Bij):
         dPi_dFj = ((-1 * Ei) * Bij) + (Fi * Gij)
         dPi_dEj = (Ei * Gij) + (Fi * Bij)
@@ -183,14 +199,15 @@ class JacobianMatrix:
         dUi2_dEj = 0
         return dPi_dFj, dPi_dEj, dQi_dFj, dQi_Ej, dUi2_dFj, dUi2_dEj
 
-    # Jakobi-Matrix mit Teilmatrizen J1 - J6 fuellen
+    # Jacobimatrix mit Teilmatrizen J1 - J6 fuellen
     def create_jacobian(self):
 
         voltage_node_indices = self.get_indices_of_voltage_nodes()
 
-        for index in voltage_node_indices:
-            self.__J3 = np.delete(self.__J3, index, 0)
-            self.__J4 = np.delete(self.__J4, index, 0)
+        # #Nicht löschen, wegen späterer Berechnung von Blindleistungsgrenzen an Spannungsknoten
+        # for index in voltage_node_indices:
+        #    self.__J3 = np.delete(self.__J3, index, 0)
+        #    self.__J4 = np.delete(self.__J4, index, 0)
 
         active_load_sub_jacobian = np.hstack((self.__J1, self.__J2))
         reactive_load_sub_jacobian = np.hstack((self.__J3, self.__J4))
@@ -203,12 +220,24 @@ class JacobianMatrix:
 
         return J
 
-    # Unter-Jakobi-Matrix Jk erstellen in der die Zeilen und Spalten des Slacks nicht mehr enthalten sind
+    # Unter-Jacobimatrix Jk erstellen in der die Zeilen und Spalten des Slacks nicht mehr enthalten sind und
+    # alle Blindleistungsgleichungen aller Spannungsknoten löschen
     def create_sub_jacobian_Jk(self, index_of_slack):
 
+        Jk = None
+
         if self.__has_voltage_nodes:
+            # Blindleistungs Zeilen der Spannungsknoten aus Jacobimatrix löschen
+            voltage_node_indices = self.get_indices_of_voltage_nodes()
+            j = 0
+            for index in voltage_node_indices:
+                index += (self.__number_of_nodes + len(voltage_node_indices) + 1 + j)
+                Jk = np.delete(self.J, index, 0)
+                j -= 1
+
+            # Slack Zeilen und Spalten aus Jacobimatrix löschen
             # Zeilen des Slack loeschen
-            Jk = np.delete(self.J, index_of_slack, 0)
+            Jk = np.delete(Jk, index_of_slack, 0)
             Jk = np.delete(Jk, ((index_of_slack - 1) + self.__number_of_nodes), 0)
             Jk = np.delete(Jk, (len(Jk) - len(self.__J5)), 0)
 
@@ -221,7 +250,7 @@ class JacobianMatrix:
         Jk = np.delete(Jk, index_of_slack, 1)
         Jk = np.delete(Jk, ((index_of_slack - 1) + self.__number_of_nodes), 1)
 
-        det_of_Jk = np.linalg.det(Jk)
+        # det_of_Jk = np.linalg.det(Jk)
 
         return Jk
 
@@ -232,7 +261,7 @@ class JacobianMatrix:
         i = 0
         for grid_node in self.__grid_node_list:
             # fuer jeden Spannungsknoten
-            if grid_node.get_type_number() == 2:
+            if grid_node.get_type_number() == grid_node.get_grid_node_type_index_of("voltage"):
                 indices_of_voltage_nodes.append(i)
 
             i += 1

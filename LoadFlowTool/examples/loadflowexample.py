@@ -2,7 +2,9 @@ import os.path
 from LoadFlowTool.loadflowtool.grid.grid import Grid
 from LoadFlowTool.loadflowtool.parser.gridparser import GridParser
 from LoadFlowTool.loadflowtool.loadflow.jacobianmatrix import JacobianMatrix
+from LoadFlowTool.loadflowtool.utils.loadflowutils import print_matrix
 
+import numpy as np
 
 # Erstelle Dateipfad zu grideline- und gridnode-Dateien
 current_file_path = os.path.abspath(os.path.dirname(__file__))
@@ -14,7 +16,7 @@ gridline_path = os.path.join(csv_files_path, "lines.csv")
 # Dateipfad fuer gridnode-Datei
 gridnode_path = os.path.join(csv_files_path, "gridnodes.csv")
 
-gridparser = GridParser(frequency=50, gridline_file_path=gridline_path, gridnode_file_path=gridnode_path)
+gridparser = GridParser(gridline_file_path=gridline_path, gridnode_file_path=gridnode_path, frequency=50)
 
 network = Grid(grid_line_list=gridparser.grid_line_parser.get_gridlines(),
                grid_node_list=gridparser.grid_node_parser.get_gridnodes())
@@ -24,7 +26,16 @@ network.calc_bus_admittance_matrix()
 # network.print_grid_node_list()
 
 jacobian = JacobianMatrix(gridparser.grid_node_parser.get_gridnodes(), network.get_bus_admittance_matrix())
-print("foo")
+
+invers_sub_jacobi = np.linalg.inv(jacobian.Jk)
+det_Jk = np.linalg.det(jacobian.Jk)
+print('\nUnter-Jacobimatrix:')
+print_matrix(jacobian.Jk)
+print('\ninverse Unter-Jacobimatrix:')
+print_matrix(invers_sub_jacobi)
+
+assert det_Jk, 12000
+
 
 """ create_grid_line-Parameter (
         STRING Knotenname_1,

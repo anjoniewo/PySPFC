@@ -33,6 +33,15 @@ def get_cartesian(real, imaginary):
     return real + 1j * imaginary
 
 
+# Funktion gibt den Real- und Imaginärteil einer in euler'scher Form vorliegenden Zahl zurueck
+# magnitude: Betrag, angle: Winkel in Bogenmaß
+def get_cartesian_from_euler(magnitude, angle):
+
+    real = magnitude * math.cos(angle)
+    imaginary = magnitude * math.sin(angle)
+    return real, imaginary
+
+
 # Funktion gibt eine komplexe Zahl in Polarkoordinaten zurueck
 def get_polar(real, imaginary):
     # Bestimme Betrag der komplexen Zahl / Vektors

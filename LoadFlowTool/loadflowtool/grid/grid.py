@@ -8,7 +8,7 @@ from LoadFlowTool.loadflowtool.loadflow.loadflowreporter import LoadFlowReporter
 class Grid:
 
     # Initialisierungskonstruktor
-    def __init__(self, frequency=50, grid_node_list=list(), grid_line_list=list()):
+    def __init__(self, grid_node_list=list(), grid_line_list=list(), frequency=50):
 
         # Netzfrequenz (default 50 Hz)
         self.__frequency = frequency
@@ -79,6 +79,8 @@ class Grid:
     # Inverse der Knotenadmittanzmatrix berechnen
     def get_inverse_of_bus_admittance_matrix(self):
         return self.__bus_admittanz_matrix.calc_inverse()
+
+
 
     # Methode gibt die aktuelle Knotenadmittanzmatrix zurück
     def print_bus_admittance_matrix(self):
