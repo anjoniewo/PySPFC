@@ -7,11 +7,13 @@ import copy
 class BusAdmittanceMatrix:
 
     # Initialisierungskonstruktor
-    def __init__(self):
+    def __init__(self, grid_node_list, grid_line_list):
         self.matrix = None
 
         # Gridlineliste (Leitungsliste)
-        self.__grid_line_list = list()
+        self.__grid_line_list = grid_line_list
+        
+        self.calc_matrix(grid_node_list, self.__grid_line_list)
 
     # Methode zur Aufsummierung aller Admittanzen an einem Knoten
     # Parameter:
