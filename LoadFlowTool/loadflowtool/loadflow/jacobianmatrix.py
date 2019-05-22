@@ -123,6 +123,7 @@ class JacobianMatrix:
 			elif is_voltage_node:
 				
 				p_value = grid_node.get_active_injection_power() - grid_node.get_active_load_power()
+				q_value = None
 				v_value = grid_node.get_node_voltage_magnitude() ** 2
 				
 				node_name_and_p_value = (grid_node.get_name(), grid_node_type, index, "P", p_value)
@@ -135,8 +136,8 @@ class JacobianMatrix:
 			
 			elif is_load_node:
 				
-				p_value = grid_node.get_active_load_power()
-				q_value = grid_node.get_reactive_load_power()
+				p_value = -1 * grid_node.get_active_load_power()
+				q_value = -1 * grid_node.get_reactive_load_power()
 				
 				node_name_and_p_value = (grid_node.get_name(), grid_node_type, index, "P", p_value)
 				node_name_and_q_value = (grid_node.get_name(), grid_node_type, index, "Q", q_value)
