@@ -34,7 +34,7 @@ Aufbau der Jacobimatrix J:
 
 class JacobianMatrix:
 	
-	def __init__(self, grid_node_list, bus_admittance_matrix):
+	def __init__(self, grid_node_list, voltage_node_list, bus_admittance_matrix):
 		
 		# Liste der Netzknoten
 		self.__grid_node_list = grid_node_list
@@ -42,9 +42,11 @@ class JacobianMatrix:
 		# Anzahl an Netzknoten
 		self.__number_of_nodes = len(self.__grid_node_list)
 		
-		# Anzahl Spannungsknoten
-		self.__list_of_voltage_nodes = [grid_node for grid_node in self.__grid_node_list if
-		                         grid_node.get_type_number() == grid_node.get_grid_node_type_index_of("voltage")]
+		# Liste der Spannungsknoten
+		self.__list_of_voltage_nodes = voltage_node_list
+		
+		# Anzahl der Spannungsknoten
+		self.__number_of_voltage_nodes = len(self.__list_of_voltage_nodes)
 		
 		# Knotenadmittanzmatrix
 		self.__bus_admittance_matrix = bus_admittance_matrix
@@ -55,11 +57,18 @@ class JacobianMatrix:
 		
 		self.Fk_Ek_vector = self.sub_Fk_Ek_vector = self.init_Fk_Ek_vector()
 		
+		self.p_q_v_info_vector = self.create_p_q_v_info_vector()
+		
+		# wird bei der Erstellung der SubJacobi Jk geändert
+		self.sub_p_q_v_info_vector = self.p_q_v_info_vector
+		
 		# Jacobimatrix bei Initialiseirung mit Slack-Werten erstellen
 		self.J = self.create_jacobian(self.Fk_Ek_vector)
 		self.Jk = self.create_sub_jacobian_Jk(self.J)
 	
 	# getter und setter
+	def get_number_of_voltage_nodes(self):
+		return self.__number_of_voltage_nodes
 	
 	def init_Fk_Ek_vector(self):
 		
@@ -80,6 +89,69 @@ class JacobianMatrix:
 		
 		return init_vector
 	
+	def create_p_q_v_info_vector(self):
+		p_values = list()
+		q_values = list()
+		v_values = list()
+		
+		for index, grid_node in enumerate(self.__grid_node_list):
+			grid_node_number = grid_node.get_type_number()
+			grid_node_type = grid_node.grid_node_types_index[grid_node_number]
+			
+			is_slack_node = grid_node_type == "slack"
+			is_voltage_node = grid_node_type == "voltage"
+			is_load_node = grid_node_type == "load"
+			
+			if is_slack_node:
+				p_value = None
+				q_value = None
+				v_value = grid_node.get_node_voltage_magnitude() ** 2
+				
+				# node_name_and_x_value[0] = Knotenname
+				# node_name_and_x_value[1] = Knotentyp
+				# node_name_and_x_value[2] = Knotenindex
+				# node_name_and_x_value[3] = Elektrische Groeße
+				# node_name_and_x_value[4] = Wert der elektrischen Groeße
+				node_name_and_p_value = (grid_node.get_name(), grid_node_type, index, "P", p_value)
+				node_name_and_q_value = (grid_node.get_name(), grid_node_type, index, "Q", q_value)
+				node_name_and_v_value = (grid_node.get_name(), grid_node_type, index, "U", v_value)
+				
+				p_values.append(node_name_and_p_value)
+				q_values.append(node_name_and_q_value)
+				v_values.append(node_name_and_v_value)
+			
+			elif is_voltage_node:
+				
+				p_value = grid_node.get_active_injection_power() - grid_node.get_active_load_power()
+				v_value = grid_node.get_node_voltage_magnitude() ** 2
+				
+				node_name_and_p_value = (grid_node.get_name(), grid_node_type, index, "P", p_value)
+				node_name_and_q_value = (grid_node.get_name(), grid_node_type, index, "Q", q_value)
+				node_name_and_v_value = (grid_node.get_name(), grid_node_type, index, "U", v_value)
+				
+				p_values.append(node_name_and_p_value)
+				q_values.append(node_name_and_q_value)
+				v_values.append(node_name_and_v_value)
+			
+			elif is_load_node:
+				
+				p_value = grid_node.get_active_load_power()
+				q_value = grid_node.get_reactive_load_power()
+				
+				node_name_and_p_value = (grid_node.get_name(), grid_node_type, index, "P", p_value)
+				node_name_and_q_value = (grid_node.get_name(), grid_node_type, index, "Q", q_value)
+				
+				p_values.append(node_name_and_p_value)
+				q_values.append(node_name_and_q_value)
+		
+		p_info_vector = np.array(p_values, dtype=object)
+		q_info_vector = np.array(q_values, dtype=object)
+		v_info_vector = np.array(v_values, dtype=object)
+		
+		p_q_v_info_vector = np.concatenate((p_info_vector, q_info_vector, v_info_vector), axis=0)
+		
+		return p_q_v_info_vector
+	
 	"""
 		Berechnung der Teilmatrizen der Jacobimatrix (J1, J2, J3, J4, J5 und J6)
 		Fk_Ek_vector = Voltage vector (Fk = angle at Node k, Ek = magnitude of voltage k)
@@ -87,15 +159,10 @@ class JacobianMatrix:
 	
 	def create_jacobian_sub_matrices(self, Fk_Ek_vector):
 		
-		# quadratische Matrixdimension: nxn
-		n = self.__number_of_nodes
-		
-		# Dimension der Jacobi Teilmatrizen fuer Spannungsknoten ( + 1 wegen Einspeisung am Slack)
-		n_voltage = len(self.__list_of_voltage_nodes) + 1
-		self.__has_voltage_nodes = True if n_voltage > 1 else False
+		self.__has_voltage_nodes = True if self.__number_of_voltage_nodes > 1 else False
 		
 		# Initialisierung der Teilmatrizen
-		J1, J2, J3, J4, J5, J6 = self.__init_sub_matrices(n, n_voltage)
+		J1, J2, J3, J4, J5, J6 = self.__init_sub_matrices(self.__number_of_nodes, self.__number_of_voltage_nodes + 1)
 		
 		self.calculate_jacobian_matrix()
 		# Fuelle Jacobi-Teilmatrizen
@@ -227,35 +294,28 @@ class JacobianMatrix:
 	# alle Blindleistungsgleichungen aller Spannungsknoten löschen
 	def create_sub_jacobian_Jk(self, jacobian_matrix):
 		
-		if self.__has_voltage_nodes:
-			Jk = jacobian_matrix
-			# Blindleistungs Zeilen der Spannungsknoten aus Jacobimatrix löschen
-			voltage_node_indices = self.get_indices_of_voltage_nodes()
-			j = 0
-			for index in voltage_node_indices:
-				Jk = np.delete(Jk, self.__number_of_nodes + index + j, 0)
-				# j -= 1, da sich durch das Loeschen einer Zeile die Anzahl an Zeilen verringert
-				j -= 1
+		columns_to_delete = list()
+		rows_to_delete = list()
+		
+		for index, item in enumerate(self.p_q_v_info_vector):
+			# item[0] = Knotenname
+			# item[1] = Knotentyp
+			# item[2] = Knotenindex
+			# item[3] = Elektrische Groeße
+			# item[4] = Wert der elektrischen Groeße
+			grid_node_type = item[1]
+			value_type = item[3]
 			
-			# Slack Zeilen und Spalten aus Jacobimatrix löschen
-			# Zeilen des Slack loeschen
-			Jk = np.delete(Jk, self.index_of_slack, 0)
-			Jk = np.delete(Jk, ((self.index_of_slack - 1) + self.__number_of_nodes), 0)
-			Jk = np.delete(Jk, (len(Jk) - len(self.__J5)), 0)
+			if grid_node_type == "slack":
+				columns_to_delete.append(index)
+				rows_to_delete.append(index)
+			elif grid_node_type == "voltage" and value_type == "Q":
+				rows_to_delete.append(index)
 		
-		else:
-			# Zeilen des Slack loeschen
-			Jk = np.delete(jacobian_matrix, self.index_of_slack, 0)
-			Jk = np.delete(Jk, ((self.index_of_slack - 1) + self.__number_of_nodes), 0)
-		
-		# Zeilen des Slacks aus dem Fk_Ek_vector streichen
-		self.sub_Fk_Ek_vector = self.get_sub_Fk_Ek_vector(self.Fk_Ek_vector)
-		
-		# Spalten des Slack loeschen
-		Jk = np.delete(Jk, self.index_of_slack, 1)
-		Jk = np.delete(Jk, ((self.index_of_slack - 1) + self.__number_of_nodes), 1)
-		
-		# det_of_Jk = np.linalg.det(Jk)
+		# Zeilen und Spalten loeschen
+		self.sub_p_q_v_info_vector = np.delete(self.p_q_v_info_vector, rows_to_delete, 0)
+		Jk = np.delete(jacobian_matrix, rows_to_delete, 0)
+		Jk = np.delete(Jk, columns_to_delete, 1)
 		
 		return Jk
 	

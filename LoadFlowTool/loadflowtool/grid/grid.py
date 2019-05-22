@@ -16,6 +16,8 @@ class Grid:
 		
 		# Liste von Knoten und Liste von Leitungen
 		self.__grid_node_list = grid_node_list
+		self.__voltage_node_list = [grid_node for grid_node in self.__grid_node_list if
+		                            grid_node.get_type_number() == grid_node.get_grid_node_type_index_of("voltage")]
 		self.__grid_line_list = grid_line_list
 		
 		# Instanzierung der LoadFlowReporter-Klasse
@@ -24,7 +26,8 @@ class Grid:
 		# Instanzierung der BusAdmittanceMatrix-Klasse
 		self.bus_admittance_matrix = BusAdmittanceMatrix(self.__grid_node_list, self.__grid_line_list)
 		
-		self.jacobi_matrix = JacobianMatrix(self.__grid_node_list, self.bus_admittance_matrix.matrix)
+		self.jacobi_matrix = JacobianMatrix(self.__grid_node_list, self.__voltage_node_list,
+		                                    self.bus_admittance_matrix.matrix)
 	
 	# getter
 	def get_frequency(self):

@@ -72,7 +72,8 @@ class LoadFlowEquations:
 		return Qi
 	
 	# Knotenspannung berechnen
-	def calculate_node_voltage(self, Fk_Ek_vector, grid_node_index, number_of_voltage_nodes):
-		Ei = Fk_Ek_vector[self.number_of_nodes + grid_node_index + number_of_voltage_nodes]
+	def calculate_node_voltage(self, Fk_Ek_vector, grid_node_index):
+		
+		Ei = Fk_Ek_vector[self.number_of_nodes + grid_node_index]
 		Fi = Fk_Ek_vector[grid_node_index]
 		return Ei ** 2 + Fi ** 2
