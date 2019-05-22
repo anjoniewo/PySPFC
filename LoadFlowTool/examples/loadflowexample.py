@@ -19,8 +19,7 @@ gridparser = GridParser(gridline_file_path=gridline_path, gridnode_file_path=gri
 network = Grid(grid_line_list=gridparser.grid_line_parser.get_gridlines(),
                grid_node_list=gridparser.grid_node_parser.get_gridnodes())
 
-# network.print_bus_admittance_matrix()
-# network.print_grid_node_list()
+network.print_bus_admittance_matrix()
 
 # Lastflussberechnung für das eingelesene durchführen
 do_loadflow(network)

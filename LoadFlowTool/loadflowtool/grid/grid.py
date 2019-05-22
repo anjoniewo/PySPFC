@@ -84,7 +84,7 @@ class Grid:
 	# Methode gibt die aktuelle Knotenadmittanzmatrix zurück
 	def print_bus_admittance_matrix(self):
 		result = ""
-		matrix = self.__bus_admittance_matrix.matrix
+		matrix = self.bus_admittance_matrix.matrix
 		n = len(matrix)
 		for i in range(0, n):
 			for j in range(0, n):
@@ -99,5 +99,5 @@ class Grid:
 						str(element.get_real_part()) + " + j(" + str(element.get_imaginary_part()) + ")")
 			
 			result += "\n"
-		
+		print("")
 		print(result)
