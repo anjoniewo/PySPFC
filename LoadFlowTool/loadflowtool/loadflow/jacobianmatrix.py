@@ -42,6 +42,10 @@ class JacobianMatrix:
 		# Anzahl an Netzknoten
 		self.__number_of_nodes = len(self.__grid_node_list)
 		
+		# Anzahl Spannungsknoten
+		self.__list_of_voltage_nodes = [grid_node for grid_node in self.__grid_node_list if
+		                         grid_node.get_type_number() == grid_node.get_grid_node_type_index_of("voltage")]
+		
 		# Knotenadmittanzmatrix
 		self.__bus_admittance_matrix = bus_admittance_matrix
 		
@@ -67,9 +71,10 @@ class JacobianMatrix:
 		Ei_init, Fi_init = get_cartesian_from_euler(slack_node.get_node_voltage_magnitude(),
 		                                            slack_node.get_node_voltage_angle())
 		
-		init_vector = np.ndarray(shape=(self.__number_of_nodes * 2), dtype=float)
+		init_vector_shape = self.__number_of_nodes * 2
+		init_vector = np.ndarray(shape=(init_vector_shape), dtype=float)
 		
-		for i in range(0, self.__number_of_nodes):
+		for i in range(self.__number_of_nodes):
 			init_vector[i] = Fi_init
 			init_vector[i + self.__number_of_nodes] = Ei_init
 		
@@ -85,12 +90,8 @@ class JacobianMatrix:
 		# quadratische Matrixdimension: nxn
 		n = self.__number_of_nodes
 		
-		# gefilterte Liste mit Spannungsknoten
-		list_of_voltage_nodes = [grid_node for grid_node in self.__grid_node_list if
-		                         grid_node.get_type_number() == grid_node.get_grid_node_type_index_of("voltage")]
-		
 		# Dimension der Jacobi Teilmatrizen fuer Spannungsknoten ( + 1 wegen Einspeisung am Slack)
-		n_voltage = len(list_of_voltage_nodes) + 1
+		n_voltage = len(self.__list_of_voltage_nodes) + 1
 		self.__has_voltage_nodes = True if n_voltage > 1 else False
 		
 		# Initialisierung der Teilmatrizen
@@ -103,7 +104,7 @@ class JacobianMatrix:
 			Fi = Fk_Ek_vector[index]
 			Ei = Fk_Ek_vector[index + self.__number_of_nodes]
 			
-			for j in range(0, self.__number_of_nodes):
+			for j in range(self.__number_of_nodes):
 				
 				# Admittanz aus Knotenadmittanzmatrix speichern
 				Yij = self.__bus_admittance_matrix[index][j]
@@ -246,10 +247,9 @@ class JacobianMatrix:
 			# Zeilen des Slack loeschen
 			Jk = np.delete(jacobian_matrix, self.index_of_slack, 0)
 			Jk = np.delete(Jk, ((self.index_of_slack - 1) + self.__number_of_nodes), 0)
-			
+		
 		# Zeilen des Slacks aus dem Fk_Ek_vector streichen
-		self.sub_Fk_Ek_vector = np.delete(self.Fk_Ek_vector, self.index_of_slack, 0)
-		self.sub_Fk_Ek_vector = np.delete(self.sub_Fk_Ek_vector, ((self.index_of_slack - 1) + self.__number_of_nodes), 0)
+		self.sub_Fk_Ek_vector = self.get_sub_Fk_Ek_vector(self.Fk_Ek_vector)
 		
 		# Spalten des Slack loeschen
 		Jk = np.delete(Jk, self.index_of_slack, 1)
@@ -269,3 +269,10 @@ class JacobianMatrix:
 				indices_of_voltage_nodes.append(index)
 		
 		return indices_of_voltage_nodes
+	
+	def get_sub_Fk_Ek_vector(self, Fk_Ek_vector):
+		sub_Fk_Ek_vector = np.delete(Fk_Ek_vector, self.index_of_slack, 0)
+		sub_Fk_Ek_vector = np.delete(sub_Fk_Ek_vector, ((self.index_of_slack - 1) + self.__number_of_nodes),
+		                             0)
+		
+		return sub_Fk_Ek_vector

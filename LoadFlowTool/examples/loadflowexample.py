@@ -1,19 +1,9 @@
 import os.path
 from LoadFlowTool.loadflowtool.grid.grid import Grid
 from LoadFlowTool.loadflowtool.parser.gridparser import GridParser
-from LoadFlowTool.loadflowtool.loadflow.jacobianmatrix import JacobianMatrix
-from LoadFlowTool.loadflowtool.utils.loadflowutils import print_matrix
 from LoadFlowTool.loadflowtool.loadflow.loadflow import do_loadflow
 
-import numpy as np
-
 # Erstelle Dateipfad zu grideline- und gridnode-Dateien
-
-# WINDOWS
-current_file_path = os.path.abspath(os.path.dirname(__file__))
-csv_files_path = os.path.join(current_file_path, "..\\..\\test\\test_files\\")
-
-# MAC
 csv_files_path = os.path.join(os.path.dirname(__file__), "../../test/test_files/")
 
 # Dateipfad fuer gridline-Datei
