@@ -89,8 +89,8 @@ class GridLine:
 
             # induktiver Laengswiderstand
             if line_parameters[2] > 0:
-                self.__inductive_reactance = (2 * math.pi * self.__frequency * line_parameters[2]) * self.__length
-                # self.__inductive_reactance = line_parameters[2] * self.__length
+                # self.__inductive_reactance = (2 * math.pi * self.__frequency * line_parameters[2]) * self.__length
+                self.__inductive_reactance = line_parameters[2] * self.__length
 
             # resistiver Querwiderstand
             if line_parameters[3]:
@@ -98,8 +98,9 @@ class GridLine:
 
             # kapazitiver Querwiderstand
             if line_parameters[4]:
-                self.__capacitive_reactance = (1 / (2 * math.pi * self.__frequency * line_parameters[4])) * self.__length
-                # self.__capacitive_reactance = line_parameters[4] * self.__length
+                # self.__capacitive_reactance = (1 / (
+                # 		2 * math.pi * self.__frequency * line_parameters[4])) * self.__length
+                self.__capacitive_reactance = line_parameters[4] * self.__length
 
         else:
             LoadFlowReporter.error_report.append("Line-length: line_parameters[0] = 0")
@@ -115,7 +116,8 @@ class GridLine:
 
         # Querimpedanz der Leitung
         if self.__transverse_resistance or self.__capacitive_reactance:
-            self.__transverse_impedance = Impedance(self.__transverse_resistance, self.__capacitive_reactance, in_series=False)
+            self.__transverse_impedance = Impedance(self.__transverse_resistance, self.__capacitive_reactance,
+                                                    in_series=False)
 
         # Queradmittanz der Leitung
         if self.__transverse_impedance is not None:
@@ -124,8 +126,10 @@ class GridLine:
         # Knoten-Queradmittanz der Leitung bezogen auf einen Knoten, entspricht halben Queradmittanz-Wert
         if self.__transverse_admittance is not None:
             self.__transverse_admittance_on_node = Admittance(
-                g=((self.__transverse_admittance.get_real_part() / 2) if self.__transverse_admittance.get_real_part() else None),
-                b=((self.__transverse_admittance.get_imaginary_part() / 2)) if self.__transverse_admittance.get_imaginary_part() else None)
+                g=((
+                           self.__transverse_admittance.get_real_part() / 2) if self.__transverse_admittance.get_real_part() else None),
+                b=((
+                        self.__transverse_admittance.get_imaginary_part() / 2)) if self.__transverse_admittance.get_imaginary_part() else None)
 
     # Bildschirmausgabe der Leitungsparameter
     def __str__(self):
