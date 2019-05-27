@@ -1,7 +1,7 @@
 import numpy as np
 
 from .loadflowequations import *
-
+from LoadFlowTool.loadflowtool.utils.complexutils import get_polar
 
 def do_loadflow(grid):
     jacobi_matrix = grid.jacobi_matrix
@@ -12,6 +12,7 @@ def do_loadflow(grid):
     p_q_v_info_vector = jacobi_matrix.p_q_v_info_vector
     sub_p_q_v_info_vector = jacobi_matrix.sub_p_q_v_info_vector
 
+    number_of_nodes = len(grid.get_grid_node_list())
     number_of_nodes_without_slack = len(grid.get_grid_node_list()) - 1
 
     # LÖSCHEN
@@ -32,7 +33,7 @@ def do_loadflow(grid):
 
     p_q_v_vector = calculate_p_q_v_vector(loadflowequations, p_q_v_info_vector, Fk_Ek_vector, initial=False)
 
-    loadflow_result = create_result_info_vector(p_q_v_info_vector, p_q_v_vector, Fk_Ek_vector)
+    loadflow_result = create_result_info_vector(p_q_v_info_vector, p_q_v_vector, Fk_Ek_vector, number_of_nodes)
 
     return loadflow_result
 
@@ -110,7 +111,7 @@ def calculate_p_q_v_vector(loadflowequations, p_q_v_info_vector, Fk_Ek_vector, i
     return p_q_v_iteration_vector
 
 
-def create_result_info_vector(p_q_v_info_vector, p_q_v_vector, Fk_Ek_vector):
+def create_result_info_vector(p_q_v_info_vector, p_q_v_vector, Fk_Ek_vector, number_of_nodes):
     result_info_vector = {}
 
     for index, item in enumerate(p_q_v_info_vector):
@@ -128,17 +129,19 @@ def create_result_info_vector(p_q_v_info_vector, p_q_v_vector, Fk_Ek_vector):
         # Dictionary anlegen wenn Key nicht vorhanden
         if not(str(item[0]) in result_info_vector):
             result_info_vector[str(item[0])] = {}
+            result_info_vector[str(item[0])]["Nodetyp"] = item[1]
 
-        if item[1] == "P":
+        if item[3] == "P":
             result_info_vector[str(item[0])]["P_load"] = item[4]
             result_info_vector[str(item[0])]["P_insection"] = item[4]
 
-        if item[1] == "Q":
+        if item[3] == "Q":
             result_info_vector[str(item[0])]["Q_load"] = item[4]
             result_info_vector[str(item[0])]["Q_insection"] = item[4]
 
-        if item[1] == "U":
-            result_info_vector[str(item[0])]["U_magnitude"] = item[4]
-            result_info_vector[str(item[0])]["U_angle"] = Fk_Ek_vector
+        if item[3] == "U":
+            u_result = get_polar(Fk_Ek_vector[item[2]], Fk_Ek_vector[item[2] + number_of_nodes])
+            result_info_vector[str(item[0])]["U_magnitude"] = u_result["magnitude"]
+            result_info_vector[str(item[0])]["U_angle"] = u_result["angleGrad"]
 
     return result_info_vector
