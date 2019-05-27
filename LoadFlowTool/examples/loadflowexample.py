@@ -25,4 +25,4 @@ network = Grid(grid_node_list=gridparser.grid_node_parser.get_gridnodes(),
 loadflow = LoadFlow(network)
 
 # Zeige Ergebnisse der Lastflussberechnung
-print(loadflow.loadflow_result)
+print(loadflow)

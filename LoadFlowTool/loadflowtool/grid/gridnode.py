@@ -4,20 +4,22 @@ Quelle:  E. Handschin, "Elektrische Energieübertragunssysteme",
 Kapitel: Stationäres Netzmodell
 Seite:   56
 
--------------------------------------------------------------------------------
-Knotenart       | Typ |   Spezifizierte Groeße            | Unbekannte Groeße |
--------------------------------------------------------------------------------
-Referenzknoten  |Slack|   U_1, δ_1, P_L1, Q_L1            |     P_G1, Q_G1    |
--------------------------------------------------------------------------------
-Lastknoten      | P-Q |   P_Gi = 0, Q_Gi = 0, P_Li, Q_Li  |     U_i, δ_i      |
--------------------------------------------------------------------------------
-Einspeisung     | P-U |   P_Gi, U_i, P_Li, Q_Li           |     Q_Gi, δ_i     |
--------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------
+Knotenart       | Typ |   Spezifizierte Groeße            | Unbekannte Groeße | Typnumber |
+-------------------------------------------------------------------------------------------
+Referenzknoten  |Slack|   U_1, δ_1, P_L1, Q_L1            |     P_G1, Q_G1    |     1     |
+-------------------------------------------------------------------------------------------
+Lastknoten      | P-Q |   P_Gi = 0, Q_Gi = 0, P_Li, Q_Li  |     U_i, δ_i      |     2     |
+-------------------------------------------------------------------------------------------
+Einspeisung     | P-U |   P_Gi, U_i, P_Li, Q_Li           |     Q_Gi, δ_i     |     3     |
+-------------------------------------------------------------------------------------------
 
 """
 
-
 # ein Knoten ist ein Netzelement an einem bestimmten Punkt im Netz
+import math
+
+
 class GridNode:
 	
 	# Initialisierungs-Konstruktor
@@ -34,8 +36,8 @@ class GridNode:
 		# 0 = Slack-Knoten (Referenzknoten)
 		# 1 = P-Q-Knoten (Lastknoten)
 		# 2 = P-U-Knoten (Einspeisung)
-		self.grid_node_types_index = {1: "slack", 2: "load", 3: "voltage"}
-		self.__grid_node_types = {"slack": 1, "load": 2, "voltage": 3}
+		self.types_index = {1: "slack", 2: "load", 3: "voltage"}
+		self.__types = {"slack": 1, "load": 2, "voltage": 3}
 		self.__typenumber = typenumber
 		
 		# ***********************
@@ -81,28 +83,32 @@ class GridNode:
 	def get_type_number(self):
 		return self.__typenumber
 	
-	def get_active_load_power(self):
+	def get_p_load(self):
 		return self.__p_load
 	
-	def get_reactive_load_power(self):
+	def get_q_load(self):
 		return self.__q_load
 	
-	def get_active_injection_power(self):
+	def get_p_injection(self):
 		return self.__p_injection
 	
-	def get_reactive_injection_power(self):
+	def get_q_injection(self):
 		return self.__q_injection
 	
 	def get_grid_node_type_index_of(self, node_type):
-		return self.__grid_node_types[node_type]
+		return self.__types[node_type]
 	
 	# Methode gibt den Betrag der Spannungsggroeße zurück
 	def get_node_voltage_magnitude(self):
 		return self.__node_voltage
 	
 	# Methode gibt den Spannungswinkel in Bogenmaß zurück
-	def get_node_voltage_angle(self):
+	def get_node_voltage_angle_in_rad(self):
 		return self.__theta
+	
+	# Methode gibt den Spannungswinkel in Bogenmaß zurück
+	def get_node_voltage_angle_in_grad(self):
+		return self.__theta * (180 / math.pi)
 	
 	# Methode setzt die Knotenparameter in Abhaengigkeit des Knotentyps
 	def set_node_parameters(self, node_parameters):
@@ -142,7 +148,7 @@ class GridNode:
 		result = ""
 		result += "\n\n------------------------------------"
 		result += "\nKnotenbezeichnung: " + str(self.__name)
-		result += "\nKnotentyp: " + str(self.grid_node_types_index[self.__typenumber])
+		result += "\nKnotentyp: " + str(self.types_index[self.__typenumber])
 		
 		if self.__p_injection:
 			result += "\n\nEinspeisung:"

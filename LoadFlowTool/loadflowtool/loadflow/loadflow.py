@@ -7,6 +7,9 @@ from LoadFlowTool.loadflowtool.utils.complexutils import get_polar
 class LoadFlow:
 	
 	def __init__(self, grid):
+		
+		self.__grid_node_list = grid.get_grid_node_list()
+		
 		self.jacobian_matrix = grid.jacobi_matrix
 		
 		self.loadflow_result = None
@@ -22,20 +25,20 @@ class LoadFlow:
 		p_q_v_info_vector = self.jacobian_matrix.p_q_v_info_vector
 		sub_p_q_v_info_vector = self.jacobian_matrix.sub_p_q_v_info_vector
 		
-		number_of_nodes = len(grid.get_grid_node_list())
-		number_of_nodes_without_slack = len(grid.get_grid_node_list()) - 1
+		number_of_nodes = len(self.__grid_node_list)
+		number_of_nodes_without_slack = number_of_nodes - 1
 		
 		loadflowequations = LoadFlowEquations(grid.get_grid_node_list(), grid.get_bus_admittance_matrix())
 		
 		sub_p_q_v_vector = self.calculate_p_q_v_vector(loadflowequations, sub_p_q_v_info_vector, Fk_Ek_vector,
 		                                               initial=True)
 		
-		Fk_Ek_vector, sub_Fk_Ek_vector, iterations = self.do_iterations(loadflowequations=loadflowequations,
-		                                                                number_of_nodes_without_slack=number_of_nodes_without_slack,
-		                                                                Fk_Ek_vector=Fk_Ek_vector,
-		                                                                sub_Fk_Ek_vector=sub_Fk_Ek_vector,
-		                                                                sub_p_q_v_info_vector=sub_p_q_v_info_vector,
-		                                                                sub_p_q_v_vector=sub_p_q_v_vector)
+		Fk_Ek_vector, sub_Fk_Ek_vector, self.iterations = self.do_iterations(loadflowequations=loadflowequations,
+		                                                                     number_of_nodes_without_slack=number_of_nodes_without_slack,
+		                                                                     Fk_Ek_vector=Fk_Ek_vector,
+		                                                                     sub_Fk_Ek_vector=sub_Fk_Ek_vector,
+		                                                                     sub_p_q_v_info_vector=sub_p_q_v_info_vector,
+		                                                                     sub_p_q_v_vector=sub_p_q_v_vector)
 		
 		p_q_v_vector = self.calculate_p_q_v_vector(loadflowequations, p_q_v_info_vector, Fk_Ek_vector, initial=False)
 		
@@ -48,11 +51,12 @@ class LoadFlow:
 		inverse_sub_jacobian = np.linalg.inv(sub_jacobian_Jk)
 		
 		reached_convergence_limit = False
+		reached_max_iteration = False
 		iteration = 0
 		MAX_ITERATIONS = 50
-		CONVERGENCE_ACCURACY = 10e-3 * np.sqrt(len(sub_p_q_v_info_vector))
+		self.CONVERGENCE_ACCURACY = 10e-6 * np.sqrt(len(sub_p_q_v_info_vector))
 		
-		while not reached_convergence_limit or iteration == MAX_ITERATIONS:
+		while (not reached_convergence_limit) and (not reached_max_iteration):
 			Fk_Ek_vector, delta_p_q_v_vector = self.do_iteration(inverse_sub_jacobian, loadflowequations,
 			                                                     number_of_nodes_without_slack,
 			                                                     Fk_Ek_vector, sub_Fk_Ek_vector, sub_p_q_v_info_vector,
@@ -65,8 +69,9 @@ class LoadFlow:
 			inverse_sub_jacobian = np.linalg.inv(new_sub_jacobian)
 			
 			iteration += 1
+			reached_max_iteration = True if iteration == MAX_ITERATIONS else False
 			vector_norm = np.linalg.norm(delta_p_q_v_vector)
-			reached_convergence_limit = True if vector_norm < CONVERGENCE_ACCURACY else False
+			reached_convergence_limit = True if vector_norm < self.CONVERGENCE_ACCURACY else False
 		
 		return Fk_Ek_vector, sub_Fk_Ek_vector, iteration
 	
@@ -130,10 +135,14 @@ class LoadFlow:
 		
 		for index, item in enumerate(p_q_v_info_vector):
 			
+			grid_node_name = item[0]
+			grid_node = [grid_node for grid_node in self.__grid_node_list if grid_node.get_name() == grid_node_name][0]
+			type_number = grid_node.get_type_number()
+			
 			# item[0] = Knotenname
 			# item[1] = Knotentyp
 			# item[2] = Knotenindex
-			# item[3] = Elektrische Groeße
+			# item[3] = Elektrische Groeße ("P", "Q" oder "U")
 			# item[4] = Wert der elektrischen Groeße
 			
 			value = p_q_v_vector[index]
@@ -145,17 +154,120 @@ class LoadFlow:
 				result_info_vector[str(item[0])] = {}
 				result_info_vector[str(item[0])]["Nodetyp"] = item[1]
 			
-			if item[3] == "P":
-				result_info_vector[str(item[0])]["P_load"] = item[4]
-				result_info_vector[str(item[0])]["P_injection"] = item[4]
+			if grid_node.types_index[type_number] == "slack":
+				if item[3] == "P":
+					p_gross = item[4]
+					p_load = grid_node.get_p_load()
+					
+					result_info_vector[str(item[0])]["P_load"] = p_load
+					result_info_vector[str(item[0])]["P_injection"] = p_gross + p_load
+				
+				elif item[3] == "Q":
+					q_gross = item[4]
+					
+					q_load = grid_node.get_q_load()
+					result_info_vector[str(item[0])]["Q_load"] = q_load
+					result_info_vector[str(item[0])]["Q_injection"] = q_gross + q_load
+				
+				elif item[3] == "U":
+					result_info_vector[str(item[0])]["U_magnitude"] = grid_node.get_node_voltage_magnitude()
+					result_info_vector[str(item[0])]["U_angle"] = grid_node.get_node_voltage_angle_in_rad()
 			
-			if item[3] == "Q":
-				result_info_vector[str(item[0])]["Q_load"] = item[4]
-				result_info_vector[str(item[0])]["Q_injection"] = item[4]
-			
-			if item[3] == "U":
+			elif grid_node.types_index[type_number] == "load":
 				u_result = get_polar(real=Fk_Ek_vector[item[2] + number_of_nodes], imaginary=Fk_Ek_vector[item[2]])
 				result_info_vector[str(item[0])]["U_magnitude"] = u_result["magnitude"]
 				result_info_vector[str(item[0])]["U_angle"] = u_result["angleGrad"]
+				
+				if item[3] == "P":
+					p_load = grid_node.get_p_load()
+					result_info_vector[str(item[0])]["P_load"] = p_load
+					result_info_vector[str(item[0])]["P_injection"] = 0
+				
+				elif item[3] == "Q":
+					q_load = grid_node.get_q_load()
+					result_info_vector[str(item[0])]["Q_load"] = q_load
+					result_info_vector[str(item[0])]["Q_injection"] = 0
+			
+			elif grid_node.types_index[type_number] == "voltage":
+				if item[3] == "P":
+					p_load = grid_node.get_p_load()
+					p_injection = grid_node.get_p_injection()
+					result_info_vector[str(item[0])]["P_load"] = p_load
+					result_info_vector[str(item[0])]["P_injection"] = p_injection
+				
+				elif item[3] == "Q":
+					q_load = grid_node.get_q_load()
+					q_injection = q_gross - q_load
+					result_info_vector[str(item[0])]["Q_load"] = q_load
+					result_info_vector[str(item[0])]["Q_injection"] = q_injection
+				
+				elif item[3] == "U":
+					u_result = get_polar(real=Fk_Ek_vector[item[2] + number_of_nodes], imaginary=Fk_Ek_vector[item[2]])
+					result_info_vector[str(item[0])]["U_magnitude"] = u_result["magnitude"]
+					result_info_vector[str(item[0])]["U_angle"] = u_result["angleGrad"]
 		
 		return result_info_vector
+	
+	def __str__(self):
+		result = str("\n")
+		result += str(
+			"Die angebenen Werte (in p.u.) beziehen sich auf die Bezugsgroeßen U_nom = 400 V und S_nom = 220 MVA\n\n")
+		for i in range(105):
+			result += str("-")
+		result += str("\n")
+		result += str("|")
+		result += str("{:^10}".format("Knoten"))
+		result += str("|")
+		result += str("{:^30}".format("Einspeisung"))
+		result += str("|")
+		result += str("{:^30}".format("Last"))
+		result += str("|")
+		result += str("{:^30}".format("Spannung"))
+		result += str("|\n")
+		result += str("|")
+		result += str("{:^10}".format("Name"))
+		result += str("|")
+		result += str("{:^15}".format("P_G"))
+		result += str("{:^15}".format("Q_G"))
+		result += str("|")
+		result += str("{:^15}".format("P_L"))
+		result += str("{:^15}".format("Q_L"))
+		result += str("|")
+		result += str("{:^15}".format("U_mag"))
+		result += str("{:^15}".format("θ"))
+		result += str("|\n")
+		for i in range(105):
+			result += str("-")
+		result += str("\n")
+		
+		for key in self.loadflow_result:
+			grid_node_name = key
+			p_injection = self.loadflow_result[key]["P_injection"]
+			q_injection = self.loadflow_result[key]["Q_injection"]
+			p_load = self.loadflow_result[key]["P_load"]
+			q_load = self.loadflow_result[key]["Q_load"]
+			u_mag = self.loadflow_result[key]["U_magnitude"]
+			theta = self.loadflow_result[key]["U_angle"]
+			
+			result += str("|")
+			result += str("{:^10}".format(str(grid_node_name)))
+			result += str("|")
+			result += str("{:^15}".format(str(round(float(p_injection), 3))))
+			result += str("{:^15}".format(str(round(float(q_injection), 3))))
+			result += str("|")
+			result += str("{:^15}".format(str(round(float(p_load), 3))))
+			result += str("{:^15}".format(str(round(float(q_load), 3))))
+			result += str("|")
+			result += str("{:^15}".format(str(round(float(u_mag), 3))))
+			result += str("{:^15}".format(str(round(float(theta), 3)) + str("°")))
+			result += str("|\n")
+		
+		for i in range(105):
+			result += str("-")
+		
+		result += str("\n\n")
+		
+		result += str(
+			"Die Konvergenzgrenze von Δx = " + str(self.CONVERGENCE_ACCURACY) + " wurde nach " + str(
+				self.iterations) + " Iterationen erreicht.")
+		return result

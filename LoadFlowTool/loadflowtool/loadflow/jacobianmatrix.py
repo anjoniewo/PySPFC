@@ -78,7 +78,7 @@ class JacobianMatrix:
 		slack_node = self.__grid_node_list[self.index_of_slack]
 		
 		Ei_init, Fi_init = get_cartesian_from_euler(slack_node.get_node_voltage_magnitude(),
-		                                            slack_node.get_node_voltage_angle())
+		                                            slack_node.get_node_voltage_angle_in_rad())
 		
 		init_vector_shape = self.__number_of_nodes * 2
 		init_vector = np.ndarray(shape=(init_vector_shape), dtype=float)
@@ -95,8 +95,8 @@ class JacobianMatrix:
 		v_values = list()
 		
 		for index, grid_node in enumerate(self.__grid_node_list):
-			grid_node_number = grid_node.get_type_number()
-			grid_node_type = grid_node.grid_node_types_index[grid_node_number]
+			type_number = grid_node.get_type_number()
+			grid_node_type = grid_node.types_index[type_number]
 			
 			is_slack_node = grid_node_type == "slack"
 			is_voltage_node = grid_node_type == "voltage"
@@ -122,7 +122,7 @@ class JacobianMatrix:
 			
 			elif is_voltage_node:
 				
-				p_value = grid_node.get_active_injection_power() - grid_node.get_active_load_power()
+				p_value = grid_node.get_p_injection() - grid_node.get_p_load()
 				q_value = None
 				v_value = grid_node.get_node_voltage_magnitude() ** 2
 				
@@ -136,8 +136,8 @@ class JacobianMatrix:
 			
 			elif is_load_node:
 				
-				p_value = -1 * grid_node.get_active_load_power()
-				q_value = -1 * grid_node.get_reactive_load_power()
+				p_value = -1 * grid_node.get_p_load()
+				q_value = -1 * grid_node.get_q_load()
 				
 				node_name_and_p_value = (grid_node.get_name(), grid_node_type, index, "P", p_value)
 				node_name_and_q_value = (grid_node.get_name(), grid_node_type, index, "Q", q_value)
