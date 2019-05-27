@@ -1,7 +1,7 @@
 import os.path
 from LoadFlowTool.loadflowtool.grid.grid import Grid
 from LoadFlowTool.loadflowtool.parser.gridparser import GridParser
-from LoadFlowTool.loadflowtool.loadflow.loadflow import do_loadflow
+from LoadFlowTool.loadflowtool.loadflow.loadflow import LoadFlow
 
 # Erstelle Dateipfad zu grideline- und gridnode-Dateien
 csv_files_path = os.path.join(os.path.dirname(__file__), "../../test/test_files/")
@@ -22,7 +22,7 @@ network = Grid(grid_node_list=gridparser.grid_node_parser.get_gridnodes(),
 # network.print_bus_admittance_matrix()
 
 # Lastflussberechnung für das eingelesene durchführen
-loadflow_result = do_loadflow(network)
+loadflow = LoadFlow(network)
 
 # Zeige Ergebnisse der Lastflussberechnung
-print(loadflow_result)
+print(loadflow.loadflow_result)

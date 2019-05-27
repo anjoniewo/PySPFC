@@ -42,17 +42,24 @@ class GridNode:
 		# **** Lastparameter ****
 		# ***********************
 		# Wirkleistung in kW
-		self.__active_load_power = None
+		self.__p_load = None
 		# Blindleistung in kVar
-		self.__reactive_load_power = None
+		self.__q_load = None
 		
 		# ***********************
 		# ***** Einspeisung *****
 		# ***********************
 		# Wirkleistung in kW
-		self.__active_injection_power = None
+		self.__p_injection = None
 		# Blindleistung in kVar
-		self.__reactive_injection_power = None
+		self.__q_injection = None
+		
+		# Leistungsgrenzen eines Knotens wenn Einspeiser am Knoten
+		self.__p_min = None
+		self.__p_max = None
+		
+		self.__q_min = None
+		self.__q_max = None
 		
 		# ***************************
 		# ***** Spannungswinkel *****
@@ -75,16 +82,16 @@ class GridNode:
 		return self.__typenumber
 	
 	def get_active_load_power(self):
-		return self.__active_load_power
+		return self.__p_load
 	
 	def get_reactive_load_power(self):
-		return self.__reactive_load_power
+		return self.__q_load
 	
 	def get_active_injection_power(self):
-		return self.__active_injection_power
+		return self.__p_injection
 	
 	def get_reactive_injection_power(self):
-		return self.__reactive_injection_power
+		return self.__q_injection
 	
 	def get_grid_node_type_index_of(self, node_type):
 		return self.__grid_node_types[node_type]
@@ -106,10 +113,10 @@ class GridNode:
 		# ***********************
 		# Wirkleistung in kW
 		# Fuer alle Knotentypen (Last) Wirkleistung in kW
-		self.__active_load_power = node_parameters[0]
+		self.__p_load = node_parameters[0]
 		
 		# Fuer alle Knotentypen (Last) Blindleistung in kVar
-		self.__reactive_load_power = node_parameters[1]
+		self.__q_load = node_parameters[1]
 		
 		# Slack-Knoten (Referenzknoten)
 		# setzen von: Knotenspannung (node_voltage) in kV, Spannungswinkel (theta) in Bogenmaß
@@ -121,9 +128,12 @@ class GridNode:
 		# P-U-Knoten (Einspeisung)
 		# setzen von : Wirkleistung in kW (active_injection_power), Knotenspannung (node_voltage) in kV
 		elif self.__typenumber == self.get_grid_node_type_index_of("voltage"):
-			self.__active_injection_power = node_parameters[2]
+			self.__p_injection = node_parameters[2]
 			self.__node_voltage = node_parameters[5]
-		
+			self.__p_min = node_parameters[6]
+			self.__p_max = node_parameters[7]
+			self.__q_min = node_parameters[8]
+			self.__q_max = node_parameters[9]
 		else:
 			ERROR = ""
 	
@@ -134,15 +144,15 @@ class GridNode:
 		result += "\nKnotenbezeichnung: " + str(self.__name)
 		result += "\nKnotentyp: " + str(self.grid_node_types_index[self.__typenumber])
 		
-		if self.__active_injection_power:
+		if self.__p_injection:
 			result += "\n\nEinspeisung:"
-			result += "\nWirkleistung P = " + str(self.__active_injection_power) + " kW"
-			result += "\nBlindleistung Q = " + str(self.__reactive_injection_power) + " kVar"
+			result += "\nWirkleistung P = " + str(self.__p_injection) + " kW"
+			result += "\nBlindleistung Q = " + str(self.__q_injection) + " kVar"
 		
-		if self.__active_load_power:
+		if self.__p_load:
 			result += "\n\nLast:"
-			result += "\nWirkleistung P = " + str(self.__active_load_power) + " kW"
-			result += "\nBlindleistung Q = " + str(self.__reactive_load_power) + " kVar"
+			result += "\nWirkleistung P = " + str(self.__p_load) + " kW"
+			result += "\nBlindleistung Q = " + str(self.__q_load) + " kVar"
 		
 		if self.__node_voltage:
 			result += "\n\nSpannung am Knoten: " + str(self.__node_voltage) + " kV"

@@ -35,39 +35,57 @@ class GridNodeParser(CSVParser):
 			number_of_gridnodes = len(self.csv_dictionary[list_of_keys[0]])
 			
 			# alle Eintraege des dictionaries durchgehen
-			for i in range(0, number_of_gridnodes):
+			for i in range(number_of_gridnodes):
 				parameter_list = list()
 				for key in self.csv_dictionary:
 					if key == "name":
 						gridnode_name = self.csv_dictionary[key][i]
 					elif key == "typenumber":
 						type_number = int(self.csv_dictionary[key][i])
-					elif key == "active_load_power":
+					elif key == "p_load":
 						parameter_list.append(self.csv_dictionary[key][i])
-					elif key == "reactive_load_power":
+					elif key == "q_load":
 						parameter_list.append(self.csv_dictionary[key][i])
-					elif key == "active_injection_power":
+					elif key == "p_injection":
 						parameter_list.append(self.csv_dictionary[key][i])
-					elif key == "reactive_injection_power":
+					elif key == "q_injection":
 						parameter_list.append(self.csv_dictionary[key][i])
 					elif key == "theta in rad":
 						parameter_list.append(self.csv_dictionary[key][i])
-					elif key == "node_voltage in kV":
+					elif key == "node_voltage":
+						parameter_list.append(self.csv_dictionary[key][i])
+					elif key == "p_min in MW":
+						parameter_list.append(self.csv_dictionary[key][i])
+					elif key == "p_max in MW":
+						parameter_list.append(self.csv_dictionary[key][i])
+					elif key == "q_min in MVar":
+						parameter_list.append(self.csv_dictionary[key][i])
+					elif key == "q_max in MVar":
+						parameter_list.append(self.csv_dictionary[key][i])
+					elif key == "s_nom in MVA":
+						parameter_list.append(self.csv_dictionary[key][i])
+					elif key == "u_nom in kV":
 						parameter_list.append(self.csv_dictionary[key][i])
 				
-				gridnode = GridNode(gridnode_name, type_number,
-				                    self.__get_node_parameters_by_type(type_number, parameter_list))
+				grid_node_parameters = self.__get_node_parameters_by_type(type_number, parameter_list)
+				gridnode = GridNode(gridnode_name, type_number, grid_node_parameters)
 				self.__gridnodes.append(gridnode)
 	
 	def __get_node_parameters_by_type(self, type_number, list_of_parameters):
 		
 		# list_of_parameters
-		# [0] : active_load_power
-		# [1] : reactive_load_power
-		# [2] : active_injection_power
-		# [3] : reactive_injection_power
+		# [0] : p_load
+		# [1] : q_load
+		# [2] : p_injection
+		# [3] : q_injection
 		# [4] : theta
 		# [5] : node_voltage
+		# [6] : p_min
+		# [7] : p_max
+		# [8] : q_min
+		# [9] : q_max
+		# [10] : s_nom
+		# [11] : u_nom
 		
 		# Konvertiere explizit Eingabeparameter String => Float
 		for index, parameter in enumerate(list_of_parameters):
@@ -87,5 +105,17 @@ class GridNodeParser(CSVParser):
 		grid_node_parameters.append(list_of_parameters[4])
 		# node_voltage
 		grid_node_parameters.append(list_of_parameters[5])
+		# minimale Wirkleistungsgrenze
+		grid_node_parameters.append(list_of_parameters[6])
+		# maximale Wirkleistungsgrenze
+		grid_node_parameters.append(list_of_parameters[7])
+		# minimale Blindleistungsgrenze
+		grid_node_parameters.append(list_of_parameters[8])
+		# maximale Blindleistungsgrenze
+		grid_node_parameters.append(list_of_parameters[9])
+		# nominelle Scheinleistung (Bezugsgroeße)
+		grid_node_parameters.append(list_of_parameters[10])
+		# nominelle Spannung (Bezugsgroeße)
+		grid_node_parameters.append(list_of_parameters[11])
 		
 		return grid_node_parameters
