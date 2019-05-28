@@ -14,12 +14,6 @@ class GridNodeParser(CSVParser):
 		self.__read_node_parameters(file_path)
 		self.__get_nodes_from_csv_dictionary()
 	
-	# self.__grid_node_types = {"slack": 1, "load": 2, "voltage": 3}
-	
-	# getter
-	# def get_grid_node_type_index_of(self, node_type):
-	#     return self.__grid_node_types[node_type]
-	
 	def get_gridnodes(self):
 		return self.__gridnodes
 	

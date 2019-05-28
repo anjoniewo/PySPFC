@@ -1,4 +1,3 @@
-import math
 from LoadFlowTool.loadflowtool.loadflow.loadflowreporter import LoadFlowReporter
 from LoadFlowTool.loadflowtool.grid.impedance import Impedance
 from LoadFlowTool.loadflowtool.grid.admittance import Admittance
