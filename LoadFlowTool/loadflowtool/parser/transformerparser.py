@@ -20,7 +20,7 @@ class TransformerParser(CSVParser):
 	def __read_transformer_parameters(self, file_path):
 		self.read_csv_to_dictionary(file_path)
 	
-	def __get_transformers_from_csv_dictionary(self, frequency):
+	def __get_transformers_from_csv_dictionary(self):
 		
 		parameter_list = list()
 		
@@ -40,19 +40,26 @@ class TransformerParser(CSVParser):
 					elif key == "node_j":
 						node_j = self.csv_dictionary[key][i]
 					elif key == "r":
-						parameter_list.append(float(self.csv_dictionary[key][i]))
+						parameter_list.append(
+							None if not self.csv_dictionary[key][i] else float(self.csv_dictionary[key][i]))
 					elif key == "x":
-						parameter_list.append(float(self.csv_dictionary[key][i]))
+						parameter_list.append(
+							None if not self.csv_dictionary[key][i] else float(self.csv_dictionary[key][i]))
 					elif key == "g":
-						parameter_list.append(float(self.csv_dictionary[key][i]))
+						parameter_list.append(
+							None if not self.csv_dictionary[key][i] else float(self.csv_dictionary[key][i]))
 					elif key == "b":
-						parameter_list.append(float(self.csv_dictionary[key][i]))
+						parameter_list.append(
+							None if not self.csv_dictionary[key][i] else float(self.csv_dictionary[key][i]))
 					elif key == "tap_ratio":
-						parameter_list.append(float(self.csv_dictionary[key][i]))
+						parameter_list.append(
+							None if not self.csv_dictionary[key][i] else float(self.csv_dictionary[key][i]))
 					elif key == "phase_shift":
-						parameter_list.append(float(self.csv_dictionary[key][i]))
+						parameter_list.append(
+							None if not self.csv_dictionary[key][i] else float(self.csv_dictionary[key][i]))
 					elif key == "s_n":
-						parameter_list.append(float(self.csv_dictionary[key][i]))
+						parameter_list.append(
+							None if not self.csv_dictionary[key][i] else float(self.csv_dictionary[key][i]))
 				
-				transformer = Transformer(frequency, name, node_i, node_j, parameter_list)
+				transformer = Transformer(name, node_i, node_j, parameter_list)
 				self.__transformers.append(transformer)
