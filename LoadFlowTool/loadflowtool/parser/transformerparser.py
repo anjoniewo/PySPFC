@@ -2,6 +2,7 @@
 from LoadFlowTool.loadflowtool.parser.csvparser import CSVParser
 from LoadFlowTool.loadflowtool.grid.transformer import Transformer
 
+
 class TransformerParser(CSVParser):
 	
 	def __init__(self, file_path):
@@ -52,6 +53,6 @@ class TransformerParser(CSVParser):
 						parameter_list.append(float(self.csv_dictionary[key][i]))
 					elif key == "s_n":
 						parameter_list.append(float(self.csv_dictionary[key][i]))
-						
+				
 				transformer = Transformer(frequency, name, node_i, node_j, parameter_list)
 				self.__transformers.append(transformer)
