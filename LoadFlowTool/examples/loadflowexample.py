@@ -21,7 +21,8 @@ gridparser = GridParser(gridline_file_path=gridline_path, gridnode_file_path=gri
 
 # Erstellung des Netzwerks
 network = Grid(grid_node_list=gridparser.grid_node_parser.get_gridnodes(),
-               grid_line_list=gridparser.grid_line_parser.get_gridlines())
+               grid_line_list=gridparser.grid_line_parser.get_gridlines(),
+               transformer_list=gridparser.transformer_parser.get_transformers())
 
 # network.print_bus_admittance_matrix()
 

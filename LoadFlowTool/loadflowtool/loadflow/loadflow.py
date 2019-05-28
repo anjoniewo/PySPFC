@@ -53,7 +53,7 @@ class LoadFlow:
 		reached_convergence_limit = False
 		reached_max_iteration = False
 		iteration = 0
-		MAX_ITERATIONS = 50
+		MAX_ITERATIONS = 10
 		self.CONVERGENCE_ACCURACY = 10e-6 * np.sqrt(len(sub_p_q_v_info_vector))
 		
 		while (not reached_convergence_limit) and (not reached_max_iteration):

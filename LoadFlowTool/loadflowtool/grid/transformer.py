@@ -57,6 +57,19 @@ class Transformer:
 		
 		self.__set_transformer_parameters(transformer_parameters)
 	
+	# getter-Methoden
+	def get_name(self):
+		return self.__name
+	
+	def get_node_name_i(self):
+		return self.__node_name_i
+	
+	def get_node_name_j(self):
+		return self.__node_name_j
+	
+	def get_sc_admittance(self):
+		return self.__sc_admittance
+	
 	# Methode setzt die Transformatordaten
 	def __set_transformer_parameters(self, transformer_parameters):
 		

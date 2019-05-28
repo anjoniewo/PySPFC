@@ -9,7 +9,7 @@ from LoadFlowTool.loadflowtool.loadflow.loadflowreporter import LoadFlowReporter
 class Grid:
 	
 	# Initialisierungskonstruktor
-	def __init__(self, grid_node_list=list(), grid_line_list=list(), frequency=50):
+	def __init__(self, grid_node_list=list(), grid_line_list=list(), transformer_list=list(), frequency=50):
 		
 		# Netzfrequenz (default 50 Hz)
 		self.__frequency = frequency
@@ -20,11 +20,15 @@ class Grid:
 		                            grid_node.get_type_number() == grid_node.get_grid_node_type_index_of("voltage")]
 		self.__grid_line_list = grid_line_list
 		
+		# Liste von Transformatoren im Netz
+		self.__transformer_list = transformer_list
+		
 		# Instanzierung der LoadFlowReporter-Klasse
 		self.load_flow_reporter = LoadFlowReporter()
 		
 		# Instanzierung der BusAdmittanceMatrix-Klasse
-		self.bus_admittance_matrix = BusAdmittanceMatrix(self.__grid_node_list, self.__grid_line_list)
+		self.bus_admittance_matrix = BusAdmittanceMatrix(self.__grid_node_list, self.__grid_line_list,
+		                                                 self.__transformer_list)
 		
 		self.jacobi_matrix = JacobianMatrix(self.__grid_node_list, self.__voltage_node_list,
 		                                    self.bus_admittance_matrix.matrix)
