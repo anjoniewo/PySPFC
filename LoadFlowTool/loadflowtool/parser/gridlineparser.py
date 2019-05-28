@@ -32,9 +32,11 @@ class GridLineParser(CSVParser):
             number_of_gridnodes = len(self.csv_dictionary[list_of_keys[0]])
 
             # alle Eintraege des dictionaries durchgehen
-            for i in range(0, number_of_gridnodes):
+            for i in range(number_of_gridnodes):
                 for key in self.csv_dictionary:
-                    if key == "node_i":
+                    if key == "name":
+                        name = self.csv_dictionary[key][i]
+                    elif key == "node_i":
                         node_i = self.csv_dictionary[key][i]
                     elif key == "node_j":
                         node_j = self.csv_dictionary[key][i]
@@ -51,5 +53,5 @@ class GridLineParser(CSVParser):
                         parameter_list.append(
                             None if not self.csv_dictionary[key][i] else float(self.csv_dictionary[key][i]))
 
-                gridline = GridLine(frequency, node_i, node_j, parameter_list)
+                gridline = GridLine(frequency, name, node_i, node_j, parameter_list)
                 self.__gridlines.append(gridline)

@@ -8,6 +8,7 @@ from LoadFlowTool.loadflowtool.grid.admittance import Admittance
 class GridLine:
 
     # Initialisierungs-Konstruktor
+    # name = Leitungsbezeichnung
     # node_i = Anfangsknoten
     # node_j = Endknoten
     # lineParameters: [0,1,2,3,4]
@@ -16,10 +17,13 @@ class GridLine:
     # [2] -> [induktiver Längsleitungsbelag] = mH/km
     # [3] -> [resistiver Querleitungsbelag] = Ω/km
     # [4] -> [kapazitiver Querleitungsbelag] = nF/km
-    def __init__(self, frequency, node_name_i, node_name_j, line_parameters):
+    def __init__(self, frequency, name, node_name_i, node_name_j, line_parameters):
 
         # Frequenz
         self.__frequency = frequency
+        
+        # Leitungsbezeichnung
+        self.__name = name
 
         # Knoten 1
         self.__node_name_i = node_name_i
@@ -61,6 +65,9 @@ class GridLine:
         self.__set_line_parameters(line_parameters)
 
     # getter-Methoden
+    def get_name(self):
+        return self.__name
+    
     def get_node_name_i(self):
         return self.__node_name_i
 
@@ -136,6 +143,7 @@ class GridLine:
         result = ""
         result += "\n\n----------------------------------"
         result += "\nLEITUNG/KABEL"
+        result += "\nLeitungsbezeichnung: " + str(self.__name)
         result += "\nKnoten 1: " + str(self.__node_name_i)
         result += "\nKnoten 2: " + str(self.__node_name_j)
         result += "\nLänge: " + str(self.__length) + " km " + "--> " + str(self.__length * 1000) + " m"
