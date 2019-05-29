@@ -34,7 +34,7 @@ Aufbau der Jacobimatrix J:
 
 class JacobianMatrix:
 	
-	def __init__(self, grid_node_list, voltage_node_list, bus_admittance_matrix):
+	def __init__(self, grid_node_list, voltage_node_list, bus_admittance_matrix, Fk_Ek_vector=None):
 		
 		# Liste der Netzknoten
 		self.__grid_node_list = grid_node_list
@@ -55,7 +55,10 @@ class JacobianMatrix:
 		                            grid_node.get_type_number() == self.__grid_node_list[
 			                            index].get_grid_node_type_index_of("slack")), None)
 		
-		self.Fk_Ek_vector = self.sub_Fk_Ek_vector = self.init_Fk_Ek_vector()
+		if Fk_Ek_vector is not None:
+			self.Fk_Ek_vector = self.sub_Fk_Ek_vector = Fk_Ek_vector
+		else:
+			self.Fk_Ek_vector = self.sub_Fk_Ek_vector = self.init_Fk_Ek_vector()
 		
 		self.p_q_v_info_vector = self.create_p_q_v_info_vector()
 		
