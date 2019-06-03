@@ -45,7 +45,7 @@ class LoadFlowEquations:
 		Ei = Fk_Ek_vector[self.number_of_nodes + grid_node_index]
 		Fi = Fk_Ek_vector[grid_node_index]
 		Pi = 0
-		for j in range(0, self.number_of_nodes):
+		for j in range(self.number_of_nodes):
 			Ej = Fk_Ek_vector[self.number_of_nodes + j]
 			Fj = Fk_Ek_vector[j]
 			Yij = self.__bus_admittance_matrix[grid_node_index][j]
@@ -61,7 +61,7 @@ class LoadFlowEquations:
 		Ei = Fk_Ek_vector[self.number_of_nodes + grid_node_index]
 		Fi = Fk_Ek_vector[grid_node_index]
 		Qi = 0
-		for j in range(0, self.number_of_nodes):
+		for j in range(self.number_of_nodes):
 			Ej = Fk_Ek_vector[self.number_of_nodes + j]
 			Fj = Fk_Ek_vector[j]
 			Yij = self.__bus_admittance_matrix[grid_node_index][j]
