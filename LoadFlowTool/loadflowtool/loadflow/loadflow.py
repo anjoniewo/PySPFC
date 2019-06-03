@@ -24,7 +24,7 @@ class LoadFlow:
 		
 		self.init_Fk_Ek_vector = self.jacobian_matrix.Fk_Ek_vector
 		
-		self.nodes_that_exceeded_q_limit = list()
+		self.nodes_that_exceeded_q_limit = set()
 		
 		self.loadflow_result = None
 		
@@ -62,9 +62,8 @@ class LoadFlow:
 		reached_convergence_limit = False
 		reached_max_iteration = False
 		iteration = 0
-		MAX_ITERATIONS = 50
-		self.CONVERGENCE_ACCURACY = 1e-6
-		sub_p_q_v_iteration_vector = np.zeros(len(sub_p_q_v_info_vector))
+		MAX_ITERATIONS = 100
+		self.CONVERGENCE_ACCURACY = 1e-3
 		
 		while (not reached_convergence_limit) and (not reached_max_iteration):
 			Fk_Ek_vector, delta_p_q_v_vector, sub_p_q_v_iteration_vector = self.do_iteration(
@@ -78,12 +77,13 @@ class LoadFlow:
 			if len(self.nodes_that_exceeded_q_limit) > 0:
 				# Methode prueft ob die Blindleistungsgrenzen wieder eingehalten werden
 				jacobian_with_changed_nodes = self.check_new_load_nodes_q_limit(sub_p_q_v_info_vector,
-				                                                                sub_p_q_v_iteration_vector, Fk_Ek_vector)
+				                                                                sub_p_q_v_iteration_vector,
+				                                                                Fk_Ek_vector)
 				sub_p_q_v_info_vector = jacobian_with_changed_nodes.sub_p_q_v_info_vector
 				self.sub_p_q_v_vector = self.calculate_p_q_v_vector(sub_p_q_v_info_vector, Fk_Ek_vector,
 				                                                    initial=True)
 				self.jacobian_matrix = jacobian_with_changed_nodes
-				checked_new_load_nodes = True
+				#checked_new_load_nodes = True
 			
 			# wenn noch keine Blindleistungsbandverletzung vorliegt wird diese geprueft
 			if not checked_new_load_nodes:
@@ -96,7 +96,7 @@ class LoadFlow:
 					if jacobian_with_changed_nodes:
 						sub_p_q_v_info_vector = jacobian_with_changed_nodes.sub_p_q_v_info_vector
 						self.sub_p_q_v_vector = self.calculate_p_q_v_vector(sub_p_q_v_info_vector, None, initial=True)
-						self.jacobian_matrix = jacobian_with_changed_nodes
+						self.jacobian_matrix = copy.deepcopy(jacobian_with_changed_nodes)
 			
 			sub_Fk_Ek_vector = self.jacobian_matrix.get_sub_Fk_Ek_vector(Fk_Ek_vector)
 			
@@ -122,8 +122,8 @@ class LoadFlow:
 		sub_Fk_Ek_iteration_vector = sub_Fk_Ek_vector + delta_sub_Fk_Ek_vector
 		
 		number_of_nodes_without_slack = len(self.grid_node_list) - 1
-		new_Fk_Ek_vector = self.calculate_new_Fk_Ek_vector(Fk_Ek_vector, sub_Fk_Ek_iteration_vector,
-		                                                   number_of_nodes_without_slack)
+		new_Fk_Ek_vector = self.create_new_Fk_Ek_vector(Fk_Ek_vector, sub_Fk_Ek_iteration_vector,
+		                                                number_of_nodes_without_slack)
 		
 		return new_Fk_Ek_vector, delta_p_q_v_vector, sub_p_q_v_iteration_vector
 	
@@ -131,6 +131,7 @@ class LoadFlow:
 	# Falls nicht, wird aus einem PU-Knoten ein PQ- respektive Lastknoten
 	def check_q_limits(self, Fk_Ek_vector):
 		
+		new_load_nodes = list(())
 		for index, grid_node in enumerate(self.grid_node_list):
 			if grid_node.get_type_number() == 3:
 				q_value_of_voltage_node = self.loadflowequations.calculate_reactive_power(Fk_Ek_vector, index)
@@ -139,14 +140,21 @@ class LoadFlow:
 				exceeded_limit = False if q_min <= q_value_of_voltage_node <= q_max else True
 				
 				if exceeded_limit:
-					self.nodes_that_exceeded_q_limit.append(self.grid_node_list[index])
+					original_voltage_node = self.grid_node_list[index]
+					if original_voltage_node not in self.nodes_that_exceeded_q_limit:
+						self.nodes_that_exceeded_q_limit.add(original_voltage_node)
 					q_load = q_max if q_value_of_voltage_node > q_max else q_min
 					node_parameters = [grid_node.get_p_load(), q_load]
 					new_load_node = GridNode(grid_node.get_name(), 2, node_parameters)
-					self.new_grid_node_list = copy.deepcopy(self.grid_node_list)
-					self.new_grid_node_list[index] = new_load_node
+					new_load_nodes.append((index, new_load_node))
 		
 		if exceeded_limit:
+			self.new_grid_node_list = copy.deepcopy(self.grid_node_list)
+			for item in new_load_nodes:
+				index = item[0]
+				new_load_node = item[1]
+				self.new_grid_node_list[index] = new_load_node
+			
 			return self.new_grid_node_list
 		else:
 			return False
@@ -161,7 +169,7 @@ class LoadFlow:
 	
 	def check_new_load_nodes_q_limit(self, sub_p_q_v_info_vector, p_q_v_iteration_vector, Fk_Ek_vector):
 		
-		for grid_node in self.nodes_that_exceeded_q_limit:
+		for grid_node in list(self.nodes_that_exceeded_q_limit):
 			grid_node_name = grid_node.get_name()
 			q_min = grid_node.get_q_min()
 			q_max = grid_node.get_q_max()
@@ -169,7 +177,8 @@ class LoadFlow:
 			
 			if q_min <= q_value <= q_max:
 				self.nodes_that_exceeded_q_limit.remove(grid_node)
-				node_index_in_origin_list, origin_node = self.get_index_and_grid_node_from_list(grid_node.get_name())
+				node_index_in_origin_list, origin_node = self.get_index_and_grid_node_from_list(grid_node.get_name(),
+				                                                                                self.grid_node_list)
 				self.new_grid_node_list[node_index_in_origin_list] = origin_node
 			elif q_value < q_min:
 				index, grid_node = self.get_index_and_grid_node_from_list(grid_node_name, self.new_grid_node_list)
@@ -177,9 +186,9 @@ class LoadFlow:
 			elif q_value > q_max:
 				index, grid_node = self.get_index_and_grid_node_from_list(grid_node_name, self.new_grid_node_list)
 				self.new_grid_node_list[index].set_q_load(q_max)
-			
-			return JacobianMatrix(self.new_grid_node_list, self.get_voltage_nodes(self.new_grid_node_list),
-			                      self.bus_admittance_matrix, Fk_Ek_vector)
+		
+		return JacobianMatrix(self.new_grid_node_list, self.get_voltage_nodes(self.new_grid_node_list),
+		                      self.bus_admittance_matrix, Fk_Ek_vector)
 	
 	def get_q_value_and_index(self, grid_node_name, sub_p_q_v_info_vector, p_q_v_iteration_vector):
 		for index, item in enumerate(sub_p_q_v_info_vector):
@@ -189,7 +198,7 @@ class LoadFlow:
 				return p_q_v_iteration_vector[index], index
 	
 	# Spannungsvektor [Im{U}, Re{U}] berechnen
-	def calculate_new_Fk_Ek_vector(self, Fk_Ek_vector, sub_Fk_Ek_iteration_vector, number_of_nodes_without_slack):
+	def create_new_Fk_Ek_vector(self, Fk_Ek_vector, sub_Fk_Ek_iteration_vector, number_of_nodes_without_slack):
 		index_of_slack = self.jacobian_matrix.index_of_slack
 		Fk_slack = Fk_Ek_vector[index_of_slack]
 		Ek_slack = Fk_Ek_vector[index_of_slack + number_of_nodes_without_slack + 1]

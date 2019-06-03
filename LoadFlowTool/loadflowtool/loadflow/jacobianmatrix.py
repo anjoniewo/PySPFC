@@ -141,12 +141,15 @@ class JacobianMatrix:
 				
 				p_value = -1 * grid_node.get_p_load()
 				q_value = -1 * grid_node.get_q_load()
+				v_value = None
 				
 				node_name_and_p_value = (grid_node.get_name(), grid_node_type, index, "P", p_value)
 				node_name_and_q_value = (grid_node.get_name(), grid_node_type, index, "Q", q_value)
+				node_name_and_v_value = (grid_node.get_name(), grid_node_type, index, "U", v_value)
 				
 				p_values.append(node_name_and_p_value)
 				q_values.append(node_name_and_q_value)
+				v_values.append(node_name_and_v_value)
 		
 		p_info_vector = np.array(p_values, dtype=object)
 		q_info_vector = np.array(q_values, dtype=object)
@@ -168,7 +171,6 @@ class JacobianMatrix:
 		# Initialisierung der Teilmatrizen
 		J1, J2, J3, J4, J5, J6 = self.__init_sub_matrices(self.__number_of_nodes, self.__number_of_voltage_nodes + 1)
 		
-		self.calculate_jacobian_matrix()
 		# Fuelle Jacobi-Teilmatrizen
 		for index, grid_node in enumerate(self.__grid_node_list):
 			
@@ -193,27 +195,28 @@ class JacobianMatrix:
 					                                                                                            Gij,
 					                                                                                            Bij)
 				
-				# dim(J1, J2) = Anzahl der Knoten. Hier muss nicht auf den Wert der Laufvariablen i geachtet werden.
+				# dim(J1, J2) = Anzahl der Knoten. Hier muss nicht auf den Wert der Laufvariablen index geachtet werden.
+				# Wirkleistungselemente
 				J1[index][j] = dPi_dFj
 				J2[index][j] = dPi_dEj
 				
+				# Blindleistungselemente
+				J3[index][j] = dQi_dFj
+				J4[index][j] = dQi_dEj
+				
 				# wenn es Spannungsknoten gibt gilt: dim(J1, J2) = dim(J3, J4) + dim(J5, J6)
 				if (J5 is not None) and (J6 is not None):
-					if index < len(J3):
-						J3[index][j] = dQi_dFj
-						J4[index][j] = dQi_dEj
-					if index < len(J5):
-						J5[index][j] = dUi2_dFj
-						J6[index][j] = dUi2_dEj
-				else:
-					J3[index][j] = dQi_dFj
-					J4[index][j] = dQi_dEj
+					# if index < len(J3):
+					# 	J3[index][j] = dQi_dFj
+					# 	J4[index][j] = dQi_dEj
+					# if index < len(J5):
+					J5[index][j] = dUi2_dFj
+					J6[index][j] = dUi2_dEj
+			# else:
+			# 	J3[index][j] = dQi_dFj
+			# 	J4[index][j] = dQi_dEj
 		
 		return J1, J2, J3, J4, J5, J6
-	
-	# Jacobimatrix fuellen
-	def calculate_jacobian_matrix(self):
-		return None
 	
 	# Initialisierung der Jacobi-Teilmatrizen
 	def __init_sub_matrices(self, number_of_nodes, number_of_voltage_nodes):
@@ -226,8 +229,10 @@ class JacobianMatrix:
 		
 		# wenn Spannungsknoten existieren
 		if number_of_voltage_nodes:
-			J5 = np.ndarray(shape=(number_of_voltage_nodes, number_of_nodes), dtype=float)
-			J6 = np.ndarray(shape=(number_of_voltage_nodes, number_of_nodes), dtype=float)
+			# J5 = np.ndarray(shape=(number_of_voltage_nodes, number_of_nodes), dtype=float)
+			# J6 = np.ndarray(shape=(number_of_voltage_nodes, number_of_nodes), dtype=float)
+			J5 = np.ndarray(shape=(number_of_nodes, number_of_nodes), dtype=float)
+			J6 = np.ndarray(shape=(number_of_nodes, number_of_nodes), dtype=float)
 		else:
 			J5 = None
 			J6 = None
@@ -245,7 +250,8 @@ class JacobianMatrix:
 		
 		sum_part_dPi_dFi = sum_part_dPi_dEi = sum_part_dQi_dFi = sum_part_dQi_Ei = 0
 		
-		for j in range(0, self.__number_of_nodes):
+		# an dieser Stelle wird fuer die Elemente i != j der Summenanteil berechnet
+		for j in range(self.__number_of_nodes):
 			if j != i:
 				Fj = self.Fk_Ek_vector[j]
 				Ej = self.Fk_Ek_vector[j + self.__number_of_nodes]
@@ -313,7 +319,8 @@ class JacobianMatrix:
 			if grid_node_type == "slack":
 				columns_to_delete.append(index)
 				rows_to_delete.append(index)
-			elif grid_node_type == "voltage" and value_type == "Q":
+			elif (grid_node_type == "voltage" and value_type == "Q") or (
+					grid_node_type == "load" and value_type == "U"):
 				rows_to_delete.append(index)
 		
 		# Zeilen und Spalten loeschen
