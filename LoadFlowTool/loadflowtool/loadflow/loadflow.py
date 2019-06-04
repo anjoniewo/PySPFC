@@ -4,6 +4,7 @@ from LoadFlowTool.loadflowtool.loadflow.jacobianmatrix import JacobianMatrix
 from .loadflowequations import *
 from LoadFlowTool.loadflowtool.utils.complexutils import get_polar
 from LoadFlowTool.loadflowtool.grid.gridnode import GridNode
+from LoadFlowTool.loadflowtool.utils.loadflowutils import *
 
 
 class LoadFlow:
@@ -104,7 +105,7 @@ class LoadFlow:
 		                                                         initial=False)
 		
 		delta_p_q_v_vector = self.sub_p_q_v_vector - sub_p_q_v_iteration_vector
-		delta_sub_Fk_Ek_vector = inverse_sub_jacobian.dot(delta_p_q_v_vector)
+		delta_sub_Fk_Ek_vector = np.matmul(inverse_sub_jacobian, delta_p_q_v_vector)
 		sub_Fk_Ek_iteration_vector = sub_Fk_Ek_vector + delta_sub_Fk_Ek_vector
 		
 		number_of_nodes_without_slack = len(self.grid_node_list) - 1

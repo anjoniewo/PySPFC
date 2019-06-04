@@ -28,6 +28,8 @@ Bi = Im{Yi}
 
 import copy
 
+import math
+
 
 class LoadFlowEquations:
 	
