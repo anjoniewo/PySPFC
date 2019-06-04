@@ -63,3 +63,4 @@ class TransformerParser(CSVParser):
 				
 				transformer = Transformer(name, node_i, node_j, parameter_list)
 				self.__transformers.append(transformer)
+				parameter_list = list()

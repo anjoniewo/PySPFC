@@ -64,6 +64,7 @@ class GridNodeParser(CSVParser):
 				grid_node_parameters = self.__get_node_parameters_by_type(type_number, parameter_list)
 				gridnode = GridNode(gridnode_name, type_number, grid_node_parameters)
 				self.__gridnodes.append(gridnode)
+				parameter_list = list()
 	
 	def __get_node_parameters_by_type(self, type_number, list_of_parameters):
 		

@@ -83,7 +83,7 @@ class LoadFlow:
 				self.sub_p_q_v_vector = self.calculate_p_q_v_vector(sub_p_q_v_info_vector, Fk_Ek_vector,
 				                                                    initial=True)
 				self.jacobian_matrix = jacobian_with_changed_nodes
-				#checked_new_load_nodes = True
+				checked_new_load_nodes = True
 			
 			# wenn noch keine Blindleistungsbandverletzung vorliegt wird diese geprueft
 			if not checked_new_load_nodes:
@@ -148,13 +148,13 @@ class LoadFlow:
 					new_load_node = GridNode(grid_node.get_name(), 2, node_parameters)
 					new_load_nodes.append((index, new_load_node))
 		
-		if exceeded_limit:
-			self.new_grid_node_list = copy.deepcopy(self.grid_node_list)
-			for item in new_load_nodes:
-				index = item[0]
-				new_load_node = item[1]
-				self.new_grid_node_list[index] = new_load_node
-			
+		self.new_grid_node_list = copy.deepcopy(self.grid_node_list)
+		for item in new_load_nodes:
+			index = item[0]
+			new_load_node = item[1]
+			self.new_grid_node_list[index] = new_load_node
+		
+		if len(new_load_nodes) > 0:
 			return self.new_grid_node_list
 		else:
 			return False
