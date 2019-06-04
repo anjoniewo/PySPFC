@@ -143,6 +143,10 @@ class GridNode:
 			# Spannungsbetrag
 			self.__node_voltage = node_parameters[5]
 			self.__theta = node_parameters[4]
+			self.__p_min = node_parameters[6]
+			self.__p_max = node_parameters[7]
+			self.__q_min = node_parameters[8]
+			self.__q_max = node_parameters[9]
 		
 		# P-U-Knoten (Einspeisung)
 		# setzen von : Wirkleistung in kW (active_injection_power), Knotenspannung (node_voltage) in kV

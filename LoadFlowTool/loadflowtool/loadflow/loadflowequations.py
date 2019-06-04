@@ -52,7 +52,7 @@ class LoadFlowEquations:
 			Gij = Yij.get_real_part()
 			Bij = Yij.get_imaginary_part()
 			
-			Pi += Ei * ((Ej * Gij) - (Fj * Bij)) + Fi * ((Fj * Gij) + (Ej * Bij))
+			Pi += (Ei * ((Ej * Gij) - (Fj * Bij))) + (Fi * ((Fj * Gij) + (Ej * Bij)))
 		return Pi
 	
 	# Lastflussgleichung - Blindleistung
@@ -68,7 +68,7 @@ class LoadFlowEquations:
 			Gij = Yij.get_real_part()
 			Bij = Yij.get_imaginary_part()
 			
-			Qi += Fi * ((Ej * Gij) - (Fj * Bij)) - Ei * ((Fj * Gij) + (Ej * Bij))
+			Qi += (Fi * ((Ej * Gij) - (Fj * Bij))) - (Ei * ((Fj * Gij) + (Ej * Bij)))
 		return Qi
 	
 	# Knotenspannung berechnen
@@ -76,4 +76,5 @@ class LoadFlowEquations:
 		
 		Ei = Fk_Ek_vector[self.number_of_nodes + grid_node_index]
 		Fi = Fk_Ek_vector[grid_node_index]
-		return Ei ** 2 + Fi ** 2
+		Ui_2 = (Ei ** 2) + (Fi ** 2)
+		return Ui_2

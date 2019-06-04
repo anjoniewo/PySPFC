@@ -10,9 +10,16 @@ class LoadFlow:
 	
 	def __init__(self, grid):
 		
+		# urspruengliche, eingelesene Knotenliste
 		self.grid_node_list = grid.get_grid_node_list()
 		
-		self.new_grid_node_list = list()
+		# Knotenliste die sich waehrend der Iterationen aendern kann
+		# Beispiel:
+		# Aus Spannungsknoten wird Lastknoten wenn Ungleichung Qmin <= Q <= Qmax nicht erfuellt ist
+		self.new_grid_node_list = copy.deepcopy(self.grid_node_list)
+		
+		# initiale Spannungsknotennamen speichern
+		self.initial_injection_node_names_and_indices = self.get_injection_node_names_and_index(self.grid_node_list)
 		
 		self.bus_admittance_matrix = grid.get_bus_admittance_matrix()
 		
@@ -62,8 +69,8 @@ class LoadFlow:
 		reached_convergence_limit = False
 		reached_max_iteration = False
 		iteration = 0
-		MAX_ITERATIONS = 100
-		self.CONVERGENCE_ACCURACY = 1e-3
+		MAX_ITERATIONS = 20
+		self.CONVERGENCE_ACCURACY = 1e-6
 		
 		while (not reached_convergence_limit) and (not reached_max_iteration):
 			Fk_Ek_vector, delta_p_q_v_vector, sub_p_q_v_iteration_vector = self.do_iteration(
@@ -72,36 +79,15 @@ class LoadFlow:
 				sub_Fk_Ek_vector=sub_Fk_Ek_vector,
 				sub_p_q_v_info_vector=sub_p_q_v_info_vector)
 			
-			checked_new_load_nodes = False
-			# Pruefung ob waehrend der vorherigen Iteration ein Spannungsknoten die Blindgrenze uber- bzw. unterschritten hat
-			if len(self.nodes_that_exceeded_q_limit) > 0:
-				# Methode prueft ob die Blindleistungsgrenzen wieder eingehalten werden
-				jacobian_with_changed_nodes = self.check_new_load_nodes_q_limit(sub_p_q_v_info_vector,
-				                                                                sub_p_q_v_iteration_vector,
-				                                                                Fk_Ek_vector)
-				sub_p_q_v_info_vector = jacobian_with_changed_nodes.sub_p_q_v_info_vector
-				self.sub_p_q_v_vector = self.calculate_p_q_v_vector(sub_p_q_v_info_vector, Fk_Ek_vector,
-				                                                    initial=True)
-				self.jacobian_matrix = jacobian_with_changed_nodes
-				checked_new_load_nodes = True
-			
-			# wenn noch keine Blindleistungsbandverletzung vorliegt wird diese geprueft
-			if not checked_new_load_nodes:
-				self.new_grid_node_list = self.check_q_limits(Fk_Ek_vector)
-				if self.new_grid_node_list:
-					jacobian_with_changed_nodes = JacobianMatrix(self.new_grid_node_list,
-					                                             self.get_voltage_nodes(self.new_grid_node_list),
-					                                             self.bus_admittance_matrix, Fk_Ek_vector)
-					
-					if jacobian_with_changed_nodes:
-						sub_p_q_v_info_vector = jacobian_with_changed_nodes.sub_p_q_v_info_vector
-						self.sub_p_q_v_vector = self.calculate_p_q_v_vector(sub_p_q_v_info_vector, None, initial=True)
-						self.jacobian_matrix = copy.deepcopy(jacobian_with_changed_nodes)
+			# Blindleistungsgrenzen der Einspeiseknoten pruefen und bei Verletzung die new_grid_node_list anpassen
+			self.new_grid_node_list = self.check_q_limits(Fk_Ek_vector)
 			
 			sub_Fk_Ek_vector = self.jacobian_matrix.get_sub_Fk_Ek_vector(Fk_Ek_vector)
 			
-			new_jacobian_matrix = self.jacobian_matrix.create_jacobian(Fk_Ek_vector)
-			new_sub_jacobian = self.jacobian_matrix.create_sub_jacobian_Jk(new_jacobian_matrix)
+			new_jacobi = JacobianMatrix(self.new_grid_node_list, self.get_voltage_nodes(self.new_grid_node_list),
+			                            self.bus_admittance_matrix, Fk_Ek_vector)
+			
+			new_sub_jacobian = new_jacobi.Jk
 			inverse_sub_jacobian = np.linalg.inv(new_sub_jacobian)
 			
 			iteration += 1
@@ -131,33 +117,41 @@ class LoadFlow:
 	# Falls nicht, wird aus einem PU-Knoten ein PQ- respektive Lastknoten
 	def check_q_limits(self, Fk_Ek_vector):
 		
-		new_load_nodes = list(())
-		for index, grid_node in enumerate(self.grid_node_list):
-			if grid_node.get_type_number() == 3:
-				q_value_of_voltage_node = self.loadflowequations.calculate_reactive_power(Fk_Ek_vector, index)
+		for tup in self.initial_injection_node_names_and_indices:
+			index = tup[0]
+			grid_node_name = tup[1]
+			grid_node = next(
+				(grid_node for grid_node in self.new_grid_node_list if grid_node.get_name() == grid_node_name), None)
+			
+			grid_node_type = grid_node.get_type_number()
+			if grid_node_type == 3:
+				q_value_of_injection_node = self.loadflowequations.calculate_reactive_power(Fk_Ek_vector, index)
 				q_min = grid_node.get_q_min()
 				q_max = grid_node.get_q_max()
-				exceeded_limit = False if q_min <= q_value_of_voltage_node <= q_max else True
+				exceeded_q_limit = False if q_min <= q_value_of_injection_node <= q_max else True
 				
-				if exceeded_limit:
-					original_voltage_node = self.grid_node_list[index]
-					if original_voltage_node not in self.nodes_that_exceeded_q_limit:
-						self.nodes_that_exceeded_q_limit.add(original_voltage_node)
-					q_load = q_max if q_value_of_voltage_node > q_max else q_min
+				if exceeded_q_limit:
+					q_load = q_max if q_value_of_injection_node > q_max else q_min
 					node_parameters = [grid_node.get_p_load(), q_load]
-					new_load_node = GridNode(grid_node.get_name(), 2, node_parameters)
-					new_load_nodes.append((index, new_load_node))
+					new_load_node = GridNode(grid_node_name, 2, node_parameters)
+					self.new_grid_node_list[index] = new_load_node
+			
+			elif grid_node_type == 2:
+				if q_min <= q_value_of_injection_node <= q_max:
+					node_index_in_origin_list, origin_node = self.get_index_and_grid_node_from_list(
+						grid_node.get_name(),
+						self.grid_node_list)
+					self.new_grid_node_list[node_index_in_origin_list] = origin_node
+				
+				elif q_value_of_injection_node < q_min:
+					index, grid_node = self.get_index_and_grid_node_from_list(grid_node_name, self.new_grid_node_list)
+					self.new_grid_node_list[index].set_q_load(q_min)
+				
+				elif q_value_of_injection_node > q_max:
+					index, grid_node = self.get_index_and_grid_node_from_list(grid_node_name, self.new_grid_node_list)
+					self.new_grid_node_list[index].set_q_load(q_max)
 		
-		self.new_grid_node_list = copy.deepcopy(self.grid_node_list)
-		for item in new_load_nodes:
-			index = item[0]
-			new_load_node = item[1]
-			self.new_grid_node_list[index] = new_load_node
-		
-		if len(new_load_nodes) > 0:
-			return self.new_grid_node_list
-		else:
-			return False
+		return self.new_grid_node_list
 	
 	def get_index_and_grid_node_from_list(self, grid_node_name, grid_node_list):
 		for index, grid_node in enumerate(grid_node_list):
@@ -165,30 +159,20 @@ class LoadFlow:
 				return index, grid_node
 	
 	def get_voltage_nodes(self, grid_node_list):
-		return [grid_node for grid_node in grid_node_list if grid_node.get_type_number() == 3]
+		voltage_nodes_and_index = list(())
+		for index, grid_node in enumerate(grid_node_list):
+			if grid_node.get_type_number() == 3:
+				voltage_nodes_and_index.append((index, grid_node))
+		
+		return voltage_nodes_and_index
 	
-	def check_new_load_nodes_q_limit(self, sub_p_q_v_info_vector, p_q_v_iteration_vector, Fk_Ek_vector):
+	def get_injection_node_names_and_index(self, grid_node_list):
+		voltage_node_names = list(())
+		for index, grid_node in enumerate(grid_node_list):
+			if grid_node.get_type_number() == 3:
+				voltage_node_names.append((index, grid_node.get_name()))
 		
-		for grid_node in list(self.nodes_that_exceeded_q_limit):
-			grid_node_name = grid_node.get_name()
-			q_min = grid_node.get_q_min()
-			q_max = grid_node.get_q_max()
-			q_value, index = self.get_q_value_and_index(grid_node_name, sub_p_q_v_info_vector, p_q_v_iteration_vector)
-			
-			if q_min <= q_value <= q_max:
-				self.nodes_that_exceeded_q_limit.remove(grid_node)
-				node_index_in_origin_list, origin_node = self.get_index_and_grid_node_from_list(grid_node.get_name(),
-				                                                                                self.grid_node_list)
-				self.new_grid_node_list[node_index_in_origin_list] = origin_node
-			elif q_value < q_min:
-				index, grid_node = self.get_index_and_grid_node_from_list(grid_node_name, self.new_grid_node_list)
-				self.new_grid_node_list[index].set_q_load(q_min)
-			elif q_value > q_max:
-				index, grid_node = self.get_index_and_grid_node_from_list(grid_node_name, self.new_grid_node_list)
-				self.new_grid_node_list[index].set_q_load(q_max)
-		
-		return JacobianMatrix(self.new_grid_node_list, self.get_voltage_nodes(self.new_grid_node_list),
-		                      self.bus_admittance_matrix, Fk_Ek_vector)
+		return voltage_node_names
 	
 	def get_q_value_and_index(self, grid_node_name, sub_p_q_v_info_vector, p_q_v_iteration_vector):
 		for index, item in enumerate(sub_p_q_v_info_vector):
