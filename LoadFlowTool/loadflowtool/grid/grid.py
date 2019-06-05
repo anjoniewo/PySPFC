@@ -2,6 +2,7 @@ from LoadFlowTool.loadflowtool.grid.busadmittancematrix import BusAdmittanceMatr
 from LoadFlowTool.loadflowtool.grid.gridline import GridLine
 from LoadFlowTool.loadflowtool.grid.gridnode import GridNode
 from LoadFlowTool.loadflowtool.loadflow.jacobianmatrix import JacobianMatrix
+from LoadFlowTool.loadflowtool.loadflow.loadflow import LoadFlow
 from LoadFlowTool.loadflowtool.loadflow.loadflowreporter import LoadFlowReporter
 
 
@@ -32,6 +33,8 @@ class Grid:
 		
 		self.jacobi_matrix = JacobianMatrix(self.__grid_node_list, self.__voltage_node_list,
 		                                    self.bus_admittance_matrix.matrix)
+		
+		self.loadflow = LoadFlow(self)
 	
 	# getter
 	def get_frequency(self):
@@ -84,6 +87,16 @@ class Grid:
 	# Inverse der Knotenadmittanzmatrix berechnen
 	def get_inverse_of_bus_admittance_matrix(self):
 		return self.__bus_admittance_matrix.calc_inverse()
+	
+	# Lastflussberechnung durchfuehren
+	def do_powerflow(self):
+		self.loadflow.do_loadflow()
+	
+	def print_loadflow_results(self):
+		if self.loadflow.loadflow_result:
+			print(self.loadflow)
+		else:
+			print("Lastflussberechnung wurde noch nicht durchgefuehrt!")
 	
 	# Methode gibt die aktuelle Knotenadmittanzmatrix zurück
 	def print_bus_admittance_matrix(self):

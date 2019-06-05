@@ -26,8 +26,6 @@ network = Grid(grid_node_list=gridparser.grid_node_parser.get_gridnodes(),
 
 # network.print_bus_admittance_matrix()
 
-# Lastflussberechnung für das eingelesene durchführen
-loadflow = LoadFlow(network)
-
-# Zeige Ergebnisse der Lastflussberechnung
-print(loadflow)
+# Lastflussberechnung für das eingelesene Netz durchführen
+network.do_powerflow()
+network.print_loadflow_results()
