@@ -288,6 +288,8 @@ class LoadFlow:
 					result_info_vector[str(item[0])]["P_injection"] = p_injection
 				
 				elif item[3] == "Q":
+					q_gross = item[4]
+					
 					q_load = grid_node.get_q_load()
 					q_injection = q_gross - q_load
 					result_info_vector[str(item[0])]["Q_load"] = q_load
@@ -344,14 +346,14 @@ class LoadFlow:
 			result += str("|")
 			result += str("{:^10}".format(str(grid_node_name)))
 			result += str("|")
-			result += str("{:^15}".format(str(round(float(p_injection), 3))))
-			result += str("{:^15}".format(str(round(float(q_injection), 3))))
+			result += str("{:^15}".format(str(round(float(p_injection), 6))))
+			result += str("{:^15}".format(str(round(float(q_injection), 6))))
 			result += str("|")
 			result += str("{:^15}".format(str(round(float(p_load), 3))))
 			result += str("{:^15}".format(str(round(float(q_load), 3))))
 			result += str("|")
-			result += str("{:^15}".format(str(round(float(u_mag), 3))))
-			result += str("{:^15}".format(str(round(float(theta), 3)) + str("°")))
+			result += str("{:^15}".format(str(round(float(u_mag), 6))))
+			result += str("{:^15}".format(str(round(float(theta), 6)) + str("°")))
 			result += str("|\n")
 		
 		for i in range(105):
