@@ -24,7 +24,7 @@ network = Grid(grid_node_list=gridparser.grid_node_parser.get_gridnodes(),
                grid_line_list=gridparser.grid_line_parser.get_gridlines(),
                transformer_list=gridparser.transformer_parser.get_transformers())
 
-network.print_bus_admittance_matrix()
+# network.print_bus_admittance_matrix()
 
 # Lastflussberechnung für das eingelesene durchführen
 loadflow = LoadFlow(network)
