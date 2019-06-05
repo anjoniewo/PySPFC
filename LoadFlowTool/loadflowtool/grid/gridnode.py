@@ -95,6 +95,12 @@ class GridNode:
 	def get_q_injection(self):
 		return self.__q_injection
 	
+	def get_q_min(self):
+		return self.__q_min
+	
+	def get_q_max(self):
+		return self.__q_max
+	
 	def get_grid_node_type_index_of(self, node_type):
 		return self.__types[node_type]
 	
@@ -109,6 +115,13 @@ class GridNode:
 	# Methode gibt den Spannungswinkel in Bogenmaß zurück
 	def get_node_voltage_angle_in_grad(self):
 		return self.__theta * (180 / math.pi)
+	
+	# setzt die Typenumber um nachtraeglich aus PU-Knoten, PQ-Knoten machen zu koennen
+	def set_typenumber(self, typenumber):
+		self.__typenumber = typenumber
+		
+	def set_q_load(self, q_load):
+		self.__q_load = q_load
 	
 	# Methode setzt die Knotenparameter in Abhaengigkeit des Knotentyps
 	def set_node_parameters(self, node_parameters):
@@ -130,6 +143,10 @@ class GridNode:
 			# Spannungsbetrag
 			self.__node_voltage = node_parameters[5]
 			self.__theta = node_parameters[4]
+			self.__p_min = node_parameters[6]
+			self.__p_max = node_parameters[7]
+			self.__q_min = node_parameters[8]
+			self.__q_max = node_parameters[9]
 		
 		# P-U-Knoten (Einspeisung)
 		# setzen von : Wirkleistung in kW (active_injection_power), Knotenspannung (node_voltage) in kV

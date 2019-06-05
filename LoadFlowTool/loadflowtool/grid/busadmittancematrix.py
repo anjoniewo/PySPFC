@@ -101,3 +101,9 @@ class BusAdmittanceMatrix:
 				self.matrix[row][column] = self.matrix[column][row] = self.__get_sum_of_grid_lines_on_node(
 					grid_node.get_name(),
 					gridnode_name_j)
+				
+	# Methode ermoeglicht das manuelle setzen einzelner Admittanz elemente
+	def set_element(self, row, column, admittance):
+		self.matrix[row][column] = admittance
+		if row != column:
+			self.matrix[column][row] = self.matrix[row][column]

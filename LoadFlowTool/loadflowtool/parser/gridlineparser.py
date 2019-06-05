@@ -42,16 +42,17 @@ class GridLineParser(CSVParser):
                         node_j = self.csv_dictionary[key][i]
                     elif key == "length in km":
                         parameter_list.append(float(self.csv_dictionary[key][i]))
-                    elif key == "resistance in Ohm/km":
+                    elif key == "r":
                         parameter_list.append(float(self.csv_dictionary[key][i]))
-                    elif key == "inductive_reactance in mH/km":
+                    elif key == "x":
                         parameter_list.append(float(self.csv_dictionary[key][i]))
-                    elif key == "transverse_resistance in  Ohm/km":
+                    elif key == "g_shunt":
                         parameter_list.append(
                             None if not self.csv_dictionary[key][i] else float(self.csv_dictionary[key][i]))
-                    elif key == "capacative_reactance in  nF/km":
+                    elif key == "b_shunt":
                         parameter_list.append(
                             None if not self.csv_dictionary[key][i] else float(self.csv_dictionary[key][i]))
 
                 gridline = GridLine(frequency, name, node_i, node_j, parameter_list)
                 self.__gridlines.append(gridline)
+                parameter_list = list()

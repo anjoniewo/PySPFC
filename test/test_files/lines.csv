@@ -1,4 +1,0 @@
-name;node_i;node_j;length in km;resistance in Ohm/km;inductive_reactance in mH/km;transverse_resistance in  Ohm/km;capacative_reactance in  nF/km
-line_1;K1;K2;1;0;0.1;;
-line_2;K2;K3;1;0;0.1;;
-line_3;K1;K3;1;0;0.1;;
