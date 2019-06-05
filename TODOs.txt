@@ -1,0 +1,21 @@
+LoadFlowTool - STAND: IST
+
+	- liest Netzdaten aus CSV-Dateien ein
+	- führt für einen einzelnen stationären Betriebspunkt eine Lastflussberechnung durch
+	- gibt die Ergebnisse der Berechnungen in bezogenen Größen in der Konsole aus
+
+LoadFlowTool - TODOs:
+
+	- einzelne Lasten und Einspeiser zu Knoten hinzufügen und löschen können
+	- packages und sub-packages klären
+	- Ausgabe der Ergebnisse in CSV-Dateien (pu oder physikalische Größe???) und eventuell graphisch
+	- Eingabe der Parameter in physikalischen ODER bezogenen Größen ermöglichen
+	- Eingabe Validierung und Logger implementieren
+	- Zusätzliche Netzelemente:
+		- regelbare Trafos (PST, Schräg-, Längs-, Querregler)
+		- Kompensationselemente (Höchstspannungsnetz) z.B. Kondensatoren, Spulen
+	- Zeitreihen erfassen und simulieren
+
+	- WICHTIG: Leistung auf den Leitungen !!!
+
+	- WEBBASIERT

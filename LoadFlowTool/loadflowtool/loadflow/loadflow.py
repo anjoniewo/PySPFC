@@ -35,13 +35,11 @@ class LoadFlow:
 		self.nodes_that_exceeded_q_limit = set()
 		
 		self.loadflow_result = None
-		
-		# Lastflussberechnung durchfuehren
-		self.do_loadflow(grid)
 	
 	# Lastflussberechnung
-	def do_loadflow(self, grid):
+	def do_loadflow(self):
 		
+		# initialer Spannungsvektor ohne Slack-Elemente
 		sub_Fk_Ek_vector = self.jacobian_matrix.get_sub_Fk_Ek_vector(self.init_Fk_Ek_vector)
 		
 		p_q_v_info_vector = self.jacobian_matrix.p_q_v_info_vector
@@ -49,7 +47,7 @@ class LoadFlow:
 		
 		number_of_nodes = len(self.grid_node_list)
 		
-		self.loadflowequations = LoadFlowEquations(grid.get_grid_node_list(), self.bus_admittance_matrix)
+		self.loadflowequations = LoadFlowEquations(self.grid_node_list, self.bus_admittance_matrix)
 		
 		self.sub_p_q_v_vector = self.calculate_p_q_v_vector(sub_p_q_v_info_vector, None, initial=True)
 		
@@ -346,14 +344,14 @@ class LoadFlow:
 			result += str("|")
 			result += str("{:^10}".format(str(grid_node_name)))
 			result += str("|")
-			result += str("{:^15}".format(str(round(float(p_injection), 6))))
-			result += str("{:^15}".format(str(round(float(q_injection), 6))))
+			result += str("{:^15}".format(str(round(float(p_injection), 3))))
+			result += str("{:^15}".format(str(round(float(q_injection), 3))))
 			result += str("|")
 			result += str("{:^15}".format(str(round(float(p_load), 3))))
 			result += str("{:^15}".format(str(round(float(q_load), 3))))
 			result += str("|")
-			result += str("{:^15}".format(str(round(float(u_mag), 6))))
-			result += str("{:^15}".format(str(round(float(theta), 6)) + str("°")))
+			result += str("{:^15}".format(str(round(float(u_mag), 3))))
+			result += str("{:^15}".format(str(round(float(theta), 3)) + str("°")))
 			result += str("|\n")
 		
 		for i in range(105):
