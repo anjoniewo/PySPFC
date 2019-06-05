@@ -49,7 +49,7 @@ network.bus_admittance_matrix.set_element(1, 2, admittance6)
 network.bus_admittance_matrix.set_element(1, 3, admittance2)
 network.bus_admittance_matrix.set_element(2, 3, admittance4)
 
-network.print_bus_admittance_matrix()
+# network.print_bus_admittance_matrix()
 
 # Lastflussberechnung für das eingelesene durchführen
 loadflow = LoadFlow(network)
