@@ -125,19 +125,19 @@ def create_result_info_vector(p_q_v_info_vector, p_q_v_vector, Fk_Ek_vector):
         if item[4] is None:
             item[4] = value
 
-        # Dictionary anlegen wenn Key nicht vorhanden
+        # Dictionary anlegen wenn Key(Knotenname) nicht vorhanden
         if not(str(item[0]) in result_info_vector):
             result_info_vector[str(item[0])] = {}
 
-        if item[1] == "P":
+        if item[3] == "P":
             result_info_vector[str(item[0])]["P_load"] = item[4]
             result_info_vector[str(item[0])]["P_insection"] = item[4]
 
-        if item[1] == "Q":
+        if item[3] == "Q":
             result_info_vector[str(item[0])]["Q_load"] = item[4]
             result_info_vector[str(item[0])]["Q_insection"] = item[4]
 
-        if item[1] == "U":
+        if item[3] == "U":
             result_info_vector[str(item[0])]["U_magnitude"] = item[4]
             result_info_vector[str(item[0])]["U_angle"] = Fk_Ek_vector
 

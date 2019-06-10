@@ -24,5 +24,10 @@ network = Grid(grid_node_list=gridparser.grid_node_parser.get_gridnodes(),
 # Lastflussberechnung für das eingelesene durchführen
 loadflow_result = do_loadflow(network)
 
+for x in loadflow_result:
+    print (x)
+    for y in loadflow_result[x]:
+        print (y,':',loadflow_result[x][y])
+
 # Zeige Ergebnisse der Lastflussberechnung
 print(loadflow_result)
