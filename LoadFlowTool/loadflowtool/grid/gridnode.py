@@ -119,7 +119,7 @@ class GridNode:
 	# setzt die Typenumber um nachtraeglich aus PU-Knoten, PQ-Knoten machen zu koennen
 	def set_typenumber(self, typenumber):
 		self.__typenumber = typenumber
-		
+	
 	def set_q_load(self, q_load):
 		self.__q_load = q_load
 	

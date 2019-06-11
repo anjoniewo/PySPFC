@@ -11,6 +11,9 @@ class LoadFlow:
 	
 	def __init__(self, grid):
 		
+		# Liste der Leitungen
+		self.grid_line_list = grid.get_grid_line_list()
+		
 		# urspruengliche, eingelesene Knotenliste
 		self.grid_node_list = grid.get_grid_node_list()
 		
@@ -59,6 +62,8 @@ class LoadFlow:
 		
 		self.loadflow_result = self.create_result_info_vector(p_q_v_info_vector, p_q_v_vector, Fk_Ek_vector,
 		                                                      number_of_nodes)
+		
+		self.calculate_p_q_over_lines(Fk_Ek_vector)
 	
 	# iterative Lastflussberechnung mit Newton-Raphson verfahren durchfuehren
 	def do_iterations(self, Fk_Ek_vector, sub_Fk_Ek_vector, sub_p_q_v_info_vector):
@@ -124,7 +129,7 @@ class LoadFlow:
 			
 			grid_node_type = grid_node.get_type_number()
 			if grid_node_type == 3:
-				q_value_of_injection_node = self.loadflowequations.calculate_reactive_power(Fk_Ek_vector, index)
+				q_value_of_injection_node = self.loadflowequations.calculate_reactive_power_at_node(Fk_Ek_vector, index)
 				q_min = grid_node.get_q_min()
 				q_max = grid_node.get_q_max()
 				exceeded_q_limit = False if q_min <= q_value_of_injection_node <= q_max else True
@@ -152,10 +157,17 @@ class LoadFlow:
 		
 		return self.new_grid_node_list
 	
+	# Methode gibt den Index sowie den Knoten aus der uebergebenen Knotenliste zurueck
 	def get_index_and_grid_node_from_list(self, grid_node_name, grid_node_list):
 		for index, grid_node in enumerate(grid_node_list):
 			if grid_node.get_name() == grid_node_name:
 				return index, grid_node
+	
+	# Methode gibt den Index eines Knotens aus der uebergebenen Knotenliste zurueck
+	def get_index_of_node_from_grid_node_lust(self, grid_node_name, grid_node_list):
+		for index, grid_node in enumerate(grid_node_list):
+			if grid_node.get_name() == grid_node_name:
+				return index
 	
 	def get_voltage_nodes(self, grid_node_list):
 		voltage_nodes_and_index = list(())
@@ -209,14 +221,14 @@ class LoadFlow:
 				type_of_value = item[3]
 				
 				if type_of_value == "P":
-					p_q_v_vector[index] = self.loadflowequations.calculate_active_power(Fk_Ek_vector,
-					                                                                    grid_node_index)
+					p_q_v_vector[index] = self.loadflowequations.calculate_active_power_at_node(Fk_Ek_vector,
+					                                                                            grid_node_index)
 				elif type_of_value == "Q":
-					p_q_v_vector[index] = self.loadflowequations.calculate_reactive_power(Fk_Ek_vector,
-					                                                                      grid_node_index)
+					p_q_v_vector[index] = self.loadflowequations.calculate_reactive_power_at_node(Fk_Ek_vector,
+					                                                                              grid_node_index)
 				elif type_of_value == "U":
-					p_q_v_vector[index] = self.loadflowequations.calculate_node_voltage(Fk_Ek_vector,
-					                                                                    grid_node_index)
+					p_q_v_vector[index] = self.loadflowequations.calculate_node_voltage_at_node(Fk_Ek_vector,
+					                                                                            grid_node_index)
 		
 		return p_q_v_vector
 	
@@ -299,6 +311,17 @@ class LoadFlow:
 					result_info_vector[str(item[0])]["U_angle"] = u_result["angleGrad"]
 		
 		return result_info_vector
+	
+	def calculate_p_q_over_lines(self, Fk_Ek_vector):
+		for grid_line in self.grid_line_list:
+			grid_node_name_i = grid_line.get_node_name_i()
+			grid_node_name_j = grid_line.get_node_name_j()
+			grid_node_index_i = self.get_index_of_node_from_grid_node_lust(grid_node_name_i, self.grid_node_list)
+			grid_node_index_j = self.get_index_of_node_from_grid_node_lust(grid_node_name_j, self.grid_node_list)
+			p_over_line = self.loadflowequations.calculate_p_over_line(grid_line, Fk_Ek_vector, grid_node_index_i,
+			                                                           grid_node_index_j)
+			q_over_line = self.loadflowequations.calculate_q_over_line(grid_line, Fk_Ek_vector, grid_node_index_i,
+			                                                           grid_node_index_j)
 	
 	def __str__(self):
 		result = str("\n")
