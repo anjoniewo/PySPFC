@@ -1,5 +1,4 @@
-import numpy as np
-
+from LoadFlowTool.loadflowtool.griddataexport.gridlines import export_grid_line_data
 from LoadFlowTool.loadflowtool.loadflow.jacobianmatrix import JacobianMatrix
 from .loadflowequations import *
 from LoadFlowTool.loadflowtool.utils.complexutils import get_polar
@@ -10,6 +9,9 @@ from LoadFlowTool.loadflowtool.utils.loadflowutils import *
 class LoadFlow:
 
     def __init__(self, grid):
+
+        # Liste der Leitungen
+        self.grid_line_list = grid.get_grid_line_list()
 
         # urspruengliche, eingelesene Knotenliste
         self.grid_node_list = grid.get_grid_node_list()
@@ -36,6 +38,14 @@ class LoadFlow:
 
         self.loadflow_result = None
 
+        # Results
+        self.s_over_lines = dict()
+        self.p_over_lines = dict()
+        self.q_over_lines = dict()
+        self.p_transmission_losses = dict()
+        self.q_transmission_losses = dict()
+        self.current_on_lines = dict()
+
     # Lastflussberechnung
     def do_loadflow(self):
 
@@ -59,6 +69,10 @@ class LoadFlow:
 
         self.loadflow_result = self.create_result_info_vector(p_q_v_info_vector, p_q_v_vector, Fk_Ek_vector,
                                                               number_of_nodes)
+
+        self.calculate_flows_over_lines(Fk_Ek_vector)
+
+        self.export_loadflow_results()
 
     # iterative Lastflussberechnung mit Newton-Raphson verfahren durchfuehren
     def do_iterations(self, Fk_Ek_vector, sub_Fk_Ek_vector, sub_p_q_v_info_vector):
@@ -124,7 +138,7 @@ class LoadFlow:
 
             grid_node_type = grid_node.get_type_number()
             if grid_node_type == 3:
-                q_value_of_injection_node = self.loadflowequations.calculate_reactive_power(Fk_Ek_vector, index)
+                q_value_of_injection_node = self.loadflowequations.calculate_reactive_power_at_node(Fk_Ek_vector, index)
                 q_min = grid_node.get_q_min()
                 q_max = grid_node.get_q_max()
                 exceeded_q_limit = False if q_min <= q_value_of_injection_node <= q_max else True
@@ -152,10 +166,17 @@ class LoadFlow:
 
         return self.new_grid_node_list
 
+    # Methode gibt den Index sowie den Knoten aus der uebergebenen Knotenliste zurueck
     def get_index_and_grid_node_from_list(self, grid_node_name, grid_node_list):
         for index, grid_node in enumerate(grid_node_list):
             if grid_node.get_name() == grid_node_name:
                 return index, grid_node
+
+    # Methode gibt den Index eines Knotens aus der uebergebenen Knotenliste zurueck
+    def get_index_of_node_from_grid_node_list(self, grid_node_name, grid_node_list):
+        for index, grid_node in enumerate(grid_node_list):
+            if grid_node.get_name() == grid_node_name:
+                return index
 
     def get_voltage_nodes(self, grid_node_list):
         voltage_nodes_and_index = list(())
@@ -209,14 +230,14 @@ class LoadFlow:
                 type_of_value = item[3]
 
                 if type_of_value == "P":
-                    p_q_v_vector[index] = self.loadflowequations.calculate_active_power(Fk_Ek_vector,
-                                                                                        grid_node_index)
+                    p_q_v_vector[index] = self.loadflowequations.calculate_active_power_at_node(Fk_Ek_vector,
+                                                                                                grid_node_index)
                 elif type_of_value == "Q":
-                    p_q_v_vector[index] = self.loadflowequations.calculate_reactive_power(Fk_Ek_vector,
-                                                                                          grid_node_index)
+                    p_q_v_vector[index] = self.loadflowequations.calculate_reactive_power_at_node(Fk_Ek_vector,
+                                                                                                  grid_node_index)
                 elif type_of_value == "U":
-                    p_q_v_vector[index] = self.loadflowequations.calculate_node_voltage(Fk_Ek_vector,
-                                                                                        grid_node_index)
+                    p_q_v_vector[index] = self.loadflowequations.calculate_node_voltage_at_node(Fk_Ek_vector,
+                                                                                                grid_node_index)
 
         return p_q_v_vector
 
@@ -300,6 +321,40 @@ class LoadFlow:
 
         return result_info_vector
 
+    def calculate_flows_over_lines(self, Fk_Ek_vector):
+
+        self.s_over_lines["time"] = "yyyy-mm-dd"
+        self.p_over_lines["time"] = "yyyy-mm-dd"
+        self.q_over_lines["time"] = "yyyy-mm-dd"
+        self.p_transmission_losses["time"] = "yyyy-mm-dd"
+        self.q_transmission_losses["time"] = "yyyy-mm-dd"
+        self.current_on_lines["time"] = "yyyy-mm-dd"
+
+        for grid_line in self.grid_line_list:
+            grid_node_name_i = grid_line.get_node_name_i()
+            grid_node_name_j = grid_line.get_node_name_j()
+            grid_node_index_i = self.get_index_of_node_from_grid_node_list(grid_node_name_i, self.grid_node_list)
+            grid_node_index_j = self.get_index_of_node_from_grid_node_list(grid_node_name_j, self.grid_node_list)
+
+            s_from_node_i_to_node_j, current_from_node_i_to_node_j = self.loadflowequations.calculate_s_from_node_i_to_node_j(
+                grid_line, Fk_Ek_vector,
+                grid_node_index_i,
+                grid_node_index_j)
+
+            s_from_node_j_to_node_i, current_from_node_j_to_node_i = self.loadflowequations.calculate_s_from_node_j_to_node_i(
+                grid_line, Fk_Ek_vector,
+                grid_node_index_i,
+                grid_node_index_j)
+
+            s_loss_over_line = s_from_node_i_to_node_j + s_from_node_j_to_node_i
+
+            self.s_over_lines[grid_line.get_name()] = str(round(float(s_from_node_i_to_node_j), 6))
+            self.p_over_lines[grid_line.get_name()] = str(round(float(s_from_node_i_to_node_j.real), 6))
+            self.q_over_lines[grid_line.get_name()] = str(round(float(s_from_node_i_to_node_j.imag), 6))
+            self.p_transmission_losses[grid_line.get_name()] = str(round(float(s_loss_over_line.real), 6))
+            self.q_transmission_losses[grid_line.get_name()] = str(round(float(s_loss_over_line.imag.real), 6))
+            self.current_on_lines[grid_line.get_name()] = str(round(float(current_from_node_j_to_node_i), 6))
+
     def __str__(self):
         result = str("\n")
         result += str(
@@ -363,3 +418,11 @@ class LoadFlow:
             "Die Konvergenzgrenze von Δx = " + str(self.CONVERGENCE_ACCURACY) + " wurde nach " + str(
                 self.iterations) + " Iterationen erreicht.")
         return result
+
+    def export_loadflow_results(self):
+        export_grid_line_data("p_lines", self.p_over_lines)
+        export_grid_line_data("q_lines", self.q_over_lines)
+        export_grid_line_data("s_lines", self.s_over_lines)
+        export_grid_line_data("p_transmission_losses", self.p_transmission_losses)
+        export_grid_line_data("q__transmission_losses", self.q_transmission_losses)
+        export_grid_line_data("current_on_lines", self.current_on_lines)

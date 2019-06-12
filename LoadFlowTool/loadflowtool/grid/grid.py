@@ -43,6 +43,9 @@ class Grid:
 	def get_grid_node_list(self):
 		return self.__grid_node_list
 	
+	def get_grid_line_list(self):
+		return self.__grid_line_list
+	
 	# Methode erstellt einen neuen Netzknoten und fuegt diesen der Knotenliste hinzu
 	def create_grid_node(self, name, type, node_parameters):
 		# Instanzierung eines neuen GridNode Objektes

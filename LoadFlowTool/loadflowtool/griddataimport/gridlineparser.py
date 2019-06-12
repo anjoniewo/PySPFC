@@ -1,4 +1,4 @@
-from LoadFlowTool.loadflowtool.parser.csvparser import CSVParser
+from LoadFlowTool.loadflowtool.griddataimport.csvparser import CSVParser
 from LoadFlowTool.loadflowtool.grid.gridline import GridLine
 
 

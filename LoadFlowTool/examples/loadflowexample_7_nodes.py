@@ -1,6 +1,6 @@
 import os.path
 from LoadFlowTool.loadflowtool.grid.grid import Grid
-from LoadFlowTool.loadflowtool.parser.gridparser import GridParser
+from LoadFlowTool.loadflowtool.griddataimport.gridparser import GridParser
 from LoadFlowTool.loadflowtool.loadflow.loadflow import LoadFlow
 
 # Erstelle Dateipfad zu grideline- und gridnode-Dateien
