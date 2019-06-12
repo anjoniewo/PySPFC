@@ -1,0 +1,4 @@
+name;node_i;node_j;r;x;g;b;tap_ratio;phase_shift;s_n
+trafo_1;K1;K2;0.0012;0.015;;0;;;4
+trafo_2;K3;K4;0.001;0.012;;0;;;5
+trafo_3;K5;K6;0.002;0.024;;0;;;2.5

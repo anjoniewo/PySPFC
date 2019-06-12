@@ -28,6 +28,8 @@ Bi = Im{Yi}
 
 import copy
 
+import math
+
 
 class LoadFlowEquations:
 	
@@ -45,14 +47,14 @@ class LoadFlowEquations:
 		Ei = Fk_Ek_vector[self.number_of_nodes + grid_node_index]
 		Fi = Fk_Ek_vector[grid_node_index]
 		Pi = 0
-		for j in range(0, self.number_of_nodes):
+		for j in range(self.number_of_nodes):
 			Ej = Fk_Ek_vector[self.number_of_nodes + j]
 			Fj = Fk_Ek_vector[j]
 			Yij = self.__bus_admittance_matrix[grid_node_index][j]
 			Gij = Yij.get_real_part()
 			Bij = Yij.get_imaginary_part()
 			
-			Pi += Ei * ((Ej * Gij) - (Fj * Bij)) + Fi * ((Fj * Gij) + (Ej * Bij))
+			Pi += (Ei * ((Ej * Gij) - (Fj * Bij))) + (Fi * ((Fj * Gij) + (Ej * Bij)))
 		return Pi
 	
 	# Lastflussgleichung - Blindleistung
@@ -61,14 +63,14 @@ class LoadFlowEquations:
 		Ei = Fk_Ek_vector[self.number_of_nodes + grid_node_index]
 		Fi = Fk_Ek_vector[grid_node_index]
 		Qi = 0
-		for j in range(0, self.number_of_nodes):
+		for j in range(self.number_of_nodes):
 			Ej = Fk_Ek_vector[self.number_of_nodes + j]
 			Fj = Fk_Ek_vector[j]
 			Yij = self.__bus_admittance_matrix[grid_node_index][j]
 			Gij = Yij.get_real_part()
 			Bij = Yij.get_imaginary_part()
 			
-			Qi += Fi * ((Ej * Gij) - (Fj * Bij)) - Ei * ((Fj * Gij) + (Ej * Bij))
+			Qi += (Fi * ((Ej * Gij) - (Fj * Bij))) - (Ei * ((Fj * Gij) + (Ej * Bij)))
 		return Qi
 	
 	# Knotenspannung berechnen
@@ -76,4 +78,5 @@ class LoadFlowEquations:
 		
 		Ei = Fk_Ek_vector[self.number_of_nodes + grid_node_index]
 		Fi = Fk_Ek_vector[grid_node_index]
-		return Ei ** 2 + Fi ** 2
+		Ui_2 = (Ei ** 2) + (Fi ** 2)
+		return Ui_2

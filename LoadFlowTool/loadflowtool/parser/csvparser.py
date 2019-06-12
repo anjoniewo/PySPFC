@@ -32,17 +32,16 @@ class CSVParser:
                     self.header_row = row
 
                     # die Ueberschriftenliste durchgehen
-                    for i in range(0, len(self.header_row)):
+                    for entry in self.header_row:
                         # jedes Element der Ueberschriftenliste wird der key des Dictionaries
-                        new_key = self.header_row[i]
-                        self.csv_dictionary[new_key] = []
+                        self.csv_dictionary[entry] = []
 
                 # alle weiteren Zeilen
                 else:
-                    for i in range(0, len(row)):
+                    for index, entry in enumerate(row):
                         # falls der key enthalten ist
-                        if self.header_row[i] in self.csv_dictionary:
+                        if self.header_row[index] in self.csv_dictionary:
                             # values des Dictionaries fuellen
-                            self.csv_dictionary[self.header_row[i]].append(row[i])
+                            self.csv_dictionary[self.header_row[index]].append(row[index])
 
                 line_count += 1
