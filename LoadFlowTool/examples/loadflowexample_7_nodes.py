@@ -29,3 +29,4 @@ network = Grid(grid_node_list=gridparser.grid_node_parser.get_gridnodes(),
 # Lastflussberechnung für das eingelesene durchführen
 network.do_powerflow()
 network.print_loadflow_results()
+foo = 1
