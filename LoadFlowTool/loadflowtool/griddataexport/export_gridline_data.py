@@ -2,9 +2,8 @@ import csv
 import os
 
 
-def export_grid_line_data(file_name, data_dict):
-    csv_files_path = os.path.join(os.path.dirname(__file__), "test\\test_export")
-    file_path_name = os.path.join(csv_files_path, file_name + ".csv")
+def export_grid_line_data(csv_export_path, file_name, data_dict):
+    file_path_name = os.path.join(csv_export_path, file_name + ".csv")
 
     data = [data_dict]
 

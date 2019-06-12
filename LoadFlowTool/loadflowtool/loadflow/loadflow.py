@@ -1,4 +1,4 @@
-from LoadFlowTool.loadflowtool.griddataexport.gridlines import export_grid_line_data
+from LoadFlowTool.loadflowtool.griddataexport.export_gridline_data import export_grid_line_data
 from LoadFlowTool.loadflowtool.loadflow.jacobianmatrix import JacobianMatrix
 from .loadflowequations import *
 from LoadFlowTool.loadflowtool.utils.complexutils import get_polar
@@ -71,8 +71,6 @@ class LoadFlow:
                                                               number_of_nodes)
 
         self.calculate_flows_over_lines(Fk_Ek_vector)
-
-        self.export_loadflow_results()
 
     # iterative Lastflussberechnung mit Newton-Raphson verfahren durchfuehren
     def do_iterations(self, Fk_Ek_vector, sub_Fk_Ek_vector, sub_p_q_v_info_vector):
@@ -419,10 +417,10 @@ class LoadFlow:
                 self.iterations) + " Iterationen erreicht.")
         return result
 
-    def export_loadflow_results(self):
-        export_grid_line_data("p_lines", self.p_over_lines)
-        export_grid_line_data("q_lines", self.q_over_lines)
-        export_grid_line_data("s_lines", self.s_over_lines)
-        export_grid_line_data("p_transmission_losses", self.p_transmission_losses)
-        export_grid_line_data("q__transmission_losses", self.q_transmission_losses)
-        export_grid_line_data("current_on_lines", self.current_on_lines)
+    def export_loadflow_results(self, csv_export_path):
+        export_grid_line_data(csv_export_path, "p_lines", self.p_over_lines)
+        export_grid_line_data(csv_export_path, "q_lines", self.q_over_lines)
+        export_grid_line_data(csv_export_path, "s_lines", self.s_over_lines)
+        export_grid_line_data(csv_export_path, "p_transmission_losses", self.p_transmission_losses)
+        export_grid_line_data(csv_export_path, "q__transmission_losses", self.q_transmission_losses)
+        export_grid_line_data(csv_export_path, "current_on_lines", self.current_on_lines)
