@@ -15,5 +15,6 @@ LoadFlowTool - TODOs:
 		- regelbare Trafos (PST, Schr�g-, L�ngs-, Querregler)
 		- Kompensationselemente (H�chstspannungsnetz) z.B. Kondensatoren, Spulen
 	- Zeitreihen erfassen und simulieren
+	- Prüfung der Wirkleistungsgrenzen der Generatoren, Hinweis wenn überschritten
 
 	- WEBBASIERT
