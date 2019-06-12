@@ -1,10 +1,12 @@
 import os.path
 from LoadFlowTool.loadflowtool.grid.grid import Grid
 from LoadFlowTool.loadflowtool.griddataimport.gridparser import GridParser
-from LoadFlowTool.loadflowtool.loadflow.loadflow import LoadFlow
 
 # Erstelle Dateipfad zu grideline- und gridnode-Dateien
 csv_files_path = os.path.join(os.path.dirname(__file__), "../../test/test_files/3_knoten")
+
+# Erstelle Dateipfad fuer export
+csv_export_path = os.path.join(os.path.dirname(__file__), "../../test/test_export")
 
 # Dateipfad fuer gridline-Datei
 gridline_path = os.path.join(csv_files_path, "lines.csv")
@@ -29,3 +31,4 @@ network = Grid(grid_node_list=gridparser.grid_node_parser.get_gridnodes(),
 # Lastflussberechnung für das eingelesene Netz durchführen
 network.do_powerflow()
 network.print_loadflow_results()
+network.export_loadflow_results(csv_export_path=csv_export_path)
