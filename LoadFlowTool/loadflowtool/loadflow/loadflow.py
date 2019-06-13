@@ -68,7 +68,7 @@ class LoadFlow:
 		reached_convergence_limit = False
 		reached_max_iteration = False
 		iteration = 0
-		MAX_ITERATIONS = 20
+		MAX_ITERATIONS = 100
 		self.CONVERGENCE_ACCURACY = 1e-6
 		
 		while (not reached_convergence_limit) and (not reached_max_iteration):
