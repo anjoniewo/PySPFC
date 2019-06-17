@@ -4,6 +4,7 @@ from .loadflowequations import *
 from LoadFlowTool.loadflowtool.utils.complexutils import get_polar
 from LoadFlowTool.loadflowtool.grid.gridnode import GridNode
 from LoadFlowTool.loadflowtool.utils.loadflowutils import *
+from LoadFlowTool.loadflowtool.utils.create_plot import *
 
 
 class LoadFlow:
@@ -71,6 +72,9 @@ class LoadFlow:
                                                               number_of_nodes)
 
         self.calculate_flows_over_lines(Fk_Ek_vector)
+
+        self.export_node_voltage_plot()
+        self.export_currents_on_lines_plot()
 
     # iterative Lastflussberechnung mit Newton-Raphson verfahren durchfuehren
     def do_iterations(self, Fk_Ek_vector, sub_Fk_Ek_vector, sub_p_q_v_info_vector):
@@ -424,3 +428,27 @@ class LoadFlow:
         export_grid_line_data(csv_export_path, "p_transmission_losses", self.p_transmission_losses)
         export_grid_line_data(csv_export_path, "q__transmission_losses", self.q_transmission_losses)
         export_grid_line_data(csv_export_path, "current_on_lines", self.current_on_lines)
+
+    def export_currents_on_lines_plot(self):
+        # die X-Werte:
+        grid_lines = [*self.current_on_lines]
+        # die Y-Werte:
+        current_on_lines = list()
+
+        for grid_line_name in self.current_on_lines:
+            current_on_lines.append(self.current_on_lines[grid_line_name])
+
+        create_plot(grid_lines, current_on_lines, "Strom pro Leitung", "Leitung k", "Strom in pu")
+
+
+    def export_node_voltage_plot(self):
+        # die X-Werte:
+        grid_nodes = list()
+        # die Y-Werte:
+        node_voltages = list()
+
+        for grid_node_name in self.loadflow_result:
+            grid_nodes.append(grid_node_name)
+            node_voltages.append(self.loadflow_result[grid_node_name]["U_magnitude"])
+
+        create_plot(grid_nodes, node_voltages, "Knotenspannung pro Knoten", "Knoten n", "Spannung in pu")
