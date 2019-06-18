@@ -29,10 +29,10 @@ class GridLineParser(CSVParser):
 
         # wenn das csv dictionary nicht leer ist
         if list_of_keys:
-            number_of_gridnodes = len(self.csv_dictionary[list_of_keys[0]])
+            number_of_gridlines = len(self.csv_dictionary[list_of_keys[0]])
 
             # alle Eintraege des dictionaries durchgehen
-            for i in range(number_of_gridnodes):
+            for i in range(number_of_gridlines):
                 for key in self.csv_dictionary:
                     if key == "name":
                         name = self.csv_dictionary[key][i]

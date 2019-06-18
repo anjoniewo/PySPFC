@@ -449,7 +449,7 @@ class LoadFlow:
             grid_lines.append(grid_line_name)
             current_on_lines.append(self.grid_line_results[grid_line_name]["current_from_i_to_j"])
 
-        create_plot(grid_lines, current_on_lines, "Strom pro Leitung", "Leitung k", "Strom in pu")
+        create_current_plot(grid_lines, current_on_lines, "Strom pro Leitung", "Leitung k", "Strom in pu")
 
     def export_node_voltage_plot(self):
         # die X-Werte:
@@ -461,4 +461,5 @@ class LoadFlow:
             grid_nodes.append(grid_node_name)
             node_voltages.append(self.grid_node_results[grid_node_name]["U_magnitude"])
 
-        create_plot(grid_nodes, node_voltages, "Knotenspannung pro Knoten", "Knoten n", "Spannung in pu")
+        create_voltage_plot(grid_nodes, node_voltages, "Knotenspannung pro Knoten", "Knoten n", "Spannung in pu",
+                            type="bar")
