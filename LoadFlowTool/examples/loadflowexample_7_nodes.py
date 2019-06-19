@@ -36,6 +36,6 @@ network = Grid(grid_node_list=gridparser.grid_node_parser.get_gridnodes(),
 
 # Lastflussberechnung für das eingelesene durchführen
 network.do_powerflow()
-# network.print_loadflow_results()
+network.print_loadflow_results()
 network.export_loadflow_results(csv_export_path=csv_export_path)
 create_pdf_report(network.loadflow.grid_node_results, network.loadflow.grid_line_results)
