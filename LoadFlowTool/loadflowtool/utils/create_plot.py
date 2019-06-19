@@ -61,9 +61,9 @@ def create_current_plot(x_vals=list(), y_vals=list(), title="title", x_axis_labe
 	ax = y_vals_series.plot(kind='bar')
 	add_value_labels(ax)
 	
-	y_min = 0
-	y_max = max(y_vals) * 1.1
-	plt.ylim(y_min, y_max)
+	# y_min = 0
+	# y_max = max(y_vals) * 1.1
+	# plt.ylim(y_min, y_max)
 	
 	plt.xticks(y_pos, x_vals)
 	plt.title(title, fontsize=TITLE_FONTSIZE)
