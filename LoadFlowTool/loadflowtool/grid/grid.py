@@ -99,7 +99,7 @@ class Grid:
 		self.loadflow.export_loadflow_results(csv_export_path)
 	
 	def print_loadflow_results(self):
-		if self.loadflow.loadflow_result:
+		if self.loadflow.grid_node_results:
 			print(self.loadflow)
 		else:
 			print("Lastflussberechnung wurde noch nicht durchgefuehrt!")
