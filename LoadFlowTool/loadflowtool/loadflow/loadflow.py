@@ -1,14 +1,17 @@
+from LoadFlowTool.loadflowtool.grid.gridnode import GridNode
 from LoadFlowTool.loadflowtool.griddataexport.export_gridline_data import export_grid_line_data
 from LoadFlowTool.loadflowtool.loadflow.jacobianmatrix import JacobianMatrix
-from .loadflowequations import *
 from LoadFlowTool.loadflowtool.utils.complexutils import get_polar
-from LoadFlowTool.loadflowtool.grid.gridnode import GridNode
-from LoadFlowTool.loadflowtool.utils.loadflowutils import *
+from LoadFlowTool.loadflowtool.utils.create_plot import *
+from .loadflowequations import *
 
 
 class LoadFlow:
 
     def __init__(self, grid):
+
+        self.v_nom = grid.v_nom
+        self.s_nom = grid.s_nom
 
         # Liste der Leitungen
         self.grid_line_list = grid.get_grid_line_list()
@@ -36,15 +39,11 @@ class LoadFlow:
 
         self.nodes_that_exceeded_q_limit = set()
 
-        self.loadflow_result = None
+        self.grid_node_results = dict()
 
-        # Results
-        self.s_over_lines = dict()
-        self.p_over_lines = dict()
-        self.q_over_lines = dict()
-        self.p_transmission_losses = dict()
-        self.q_transmission_losses = dict()
-        self.current_on_lines = dict()
+        self.grid_line_results = dict()
+
+        self.export_result_df = None
 
     # Lastflussberechnung
     def do_loadflow(self):
@@ -67,10 +66,13 @@ class LoadFlow:
 
         p_q_v_vector = self.calculate_p_q_v_vector(p_q_v_info_vector, Fk_Ek_vector, initial=False)
 
-        self.loadflow_result = self.create_result_info_vector(p_q_v_info_vector, p_q_v_vector, Fk_Ek_vector,
-                                                              number_of_nodes)
+        self.create_node_results(p_q_v_info_vector, p_q_v_vector, Fk_Ek_vector,
+                                 number_of_nodes)
 
-        self.calculate_flows_over_lines(Fk_Ek_vector)
+        self.create_line_results(Fk_Ek_vector)
+
+        self.export_node_voltage_plot()
+        self.export_currents_on_lines_plot()
 
     # iterative Lastflussberechnung mit Newton-Raphson verfahren durchfuehren
     def do_iterations(self, Fk_Ek_vector, sub_Fk_Ek_vector, sub_p_q_v_info_vector):
@@ -239,8 +241,7 @@ class LoadFlow:
 
         return p_q_v_vector
 
-    def create_result_info_vector(self, p_q_v_info_vector, p_q_v_vector, Fk_Ek_vector, number_of_nodes):
-        result_info_vector = {}
+    def create_node_results(self, p_q_v_info_vector, p_q_v_vector, Fk_Ek_vector, number_of_nodes):
 
         for index, item in enumerate(p_q_v_info_vector):
 
@@ -259,76 +260,75 @@ class LoadFlow:
                 item[4] = value
 
             # Dictionary anlegen wenn Key nicht vorhanden
-            if not (str(item[0]) in result_info_vector):
-                result_info_vector[str(item[0])] = {}
-                result_info_vector[str(item[0])]["Nodetyp"] = item[1]
+            if not (grid_node_name in self.grid_node_results):
+                self.grid_node_results[grid_node_name] = {}
+                self.grid_node_results[grid_node_name]["Nodetyp"] = item[1]
 
             if grid_node.types_index[type_number] == "slack":
                 if item[3] == "P":
                     p_gross = item[4]
                     p_load = grid_node.get_p_load()
 
-                    result_info_vector[str(item[0])]["P_load"] = p_load
-                    result_info_vector[str(item[0])]["P_injection"] = p_gross + p_load
+                    self.grid_node_results[grid_node_name]["P_load"] = p_load
+                    self.grid_node_results[grid_node_name]["P_injection"] = p_gross + p_load
+                    self.grid_node_results[grid_node_name]["P"] = p_gross
 
                 elif item[3] == "Q":
                     q_gross = item[4]
 
                     q_load = grid_node.get_q_load()
-                    result_info_vector[str(item[0])]["Q_load"] = q_load
-                    result_info_vector[str(item[0])]["Q_injection"] = q_gross + q_load
+                    self.grid_node_results[grid_node_name]["Q_load"] = q_load
+                    self.grid_node_results[grid_node_name]["Q_injection"] = q_gross + q_load
+                    self.grid_node_results[grid_node_name]["Q"] = q_gross
 
                 elif item[3] == "U":
-                    result_info_vector[str(item[0])]["U_magnitude"] = grid_node.get_node_voltage_magnitude()
-                    result_info_vector[str(item[0])]["U_angle"] = grid_node.get_node_voltage_angle_in_rad()
+                    self.grid_node_results[grid_node_name]["U_magnitude"] = grid_node.get_node_voltage_magnitude()
+                    self.grid_node_results[grid_node_name]["U_angle"] = grid_node.get_node_voltage_angle_in_rad()
 
             elif grid_node.types_index[type_number] == "load":
                 u_result = get_polar(real=Fk_Ek_vector[item[2] + number_of_nodes], imaginary=Fk_Ek_vector[item[2]])
-                result_info_vector[str(item[0])]["U_magnitude"] = u_result["magnitude"]
-                result_info_vector[str(item[0])]["U_angle"] = u_result["angleGrad"]
+                self.grid_node_results[grid_node_name]["U_magnitude"] = u_result["magnitude"]
+                self.grid_node_results[grid_node_name]["U_angle"] = u_result["angleGrad"]
 
                 if item[3] == "P":
                     p_load = grid_node.get_p_load()
-                    result_info_vector[str(item[0])]["P_load"] = p_load
-                    result_info_vector[str(item[0])]["P_injection"] = 0
+                    self.grid_node_results[grid_node_name]["P_load"] = p_load
+                    self.grid_node_results[grid_node_name]["P_injection"] = 0
+                    self.grid_node_results[grid_node_name]["P"] = p_load
 
                 elif item[3] == "Q":
                     q_load = grid_node.get_q_load()
-                    result_info_vector[str(item[0])]["Q_load"] = q_load
-                    result_info_vector[str(item[0])]["Q_injection"] = 0
+                    self.grid_node_results[grid_node_name]["Q_load"] = q_load
+                    self.grid_node_results[grid_node_name]["Q_injection"] = 0
+                    self.grid_node_results[grid_node_name]["Q"] = q_load
 
             elif grid_node.types_index[type_number] == "voltage":
                 if item[3] == "P":
                     p_load = grid_node.get_p_load()
                     p_injection = grid_node.get_p_injection()
-                    result_info_vector[str(item[0])]["P_load"] = p_load
-                    result_info_vector[str(item[0])]["P_injection"] = p_injection
+                    self.grid_node_results[grid_node_name]["P_load"] = p_load
+                    self.grid_node_results[grid_node_name]["P_injection"] = p_injection
+                    self.grid_node_results[grid_node_name]["P"] = p_load + p_injection
 
                 elif item[3] == "Q":
                     q_gross = item[4]
 
                     q_load = grid_node.get_q_load()
                     q_injection = q_gross - q_load
-                    result_info_vector[str(item[0])]["Q_load"] = q_load
-                    result_info_vector[str(item[0])]["Q_injection"] = q_injection
+                    self.grid_node_results[grid_node_name]["Q_load"] = q_load
+                    self.grid_node_results[grid_node_name]["Q_injection"] = q_injection
+                    self.grid_node_results[grid_node_name]["Q"] = q_gross
 
                 elif item[3] == "U":
                     u_result = get_polar(real=Fk_Ek_vector[item[2] + number_of_nodes], imaginary=Fk_Ek_vector[item[2]])
-                    result_info_vector[str(item[0])]["U_magnitude"] = u_result["magnitude"]
-                    result_info_vector[str(item[0])]["U_angle"] = u_result["angleGrad"]
+                    self.grid_node_results[grid_node_name]["U_magnitude"] = u_result["magnitude"]
+                    self.grid_node_results[grid_node_name]["U_angle"] = u_result["angleGrad"]
 
-        return result_info_vector
-
-    def calculate_flows_over_lines(self, Fk_Ek_vector):
-
-        self.s_over_lines["time"] = "yyyy-mm-dd"
-        self.p_over_lines["time"] = "yyyy-mm-dd"
-        self.q_over_lines["time"] = "yyyy-mm-dd"
-        self.p_transmission_losses["time"] = "yyyy-mm-dd"
-        self.q_transmission_losses["time"] = "yyyy-mm-dd"
-        self.current_on_lines["time"] = "yyyy-mm-dd"
+    def create_line_results(self, Fk_Ek_vector):
 
         for grid_line in self.grid_line_list:
+            grid_line_name = grid_line.get_name()
+
             grid_node_name_i = grid_line.get_node_name_i()
             grid_node_name_j = grid_line.get_node_name_j()
             grid_node_index_i = self.get_index_of_node_from_grid_node_list(grid_node_name_i, self.grid_node_list)
@@ -344,14 +344,23 @@ class LoadFlow:
                 grid_node_index_i,
                 grid_node_index_j)
 
-            s_loss_over_line = s_from_node_i_to_node_j + s_from_node_j_to_node_i
+            s_loss = s_from_node_i_to_node_j + s_from_node_j_to_node_i
 
-            self.s_over_lines[grid_line.get_name()] = str(round(float(s_from_node_i_to_node_j), 6))
-            self.p_over_lines[grid_line.get_name()] = str(round(float(s_from_node_i_to_node_j.real), 6))
-            self.q_over_lines[grid_line.get_name()] = str(round(float(s_from_node_i_to_node_j.imag), 6))
-            self.p_transmission_losses[grid_line.get_name()] = str(round(float(s_loss_over_line.real), 6))
-            self.q_transmission_losses[grid_line.get_name()] = str(round(float(s_loss_over_line.imag.real), 6))
-            self.current_on_lines[grid_line.get_name()] = str(round(float(current_from_node_j_to_node_i), 6))
+            if not (grid_line_name in self.grid_node_results):
+                self.grid_line_results[grid_line_name] = {}
+
+            self.grid_line_results[grid_line_name]["s_from_i_to_j"] = round(float(s_from_node_i_to_node_j), 6)
+            self.grid_line_results[grid_line_name]["p_from_i_to_j"] = round(float(s_from_node_i_to_node_j.real), 6)
+            self.grid_line_results[grid_line_name]["q_from_i_to_j"] = round(float(s_from_node_i_to_node_j.imag), 6)
+            self.grid_line_results[grid_line_name]["s_from_j_to_i"] = round(float(s_from_node_j_to_node_i), 6)
+            self.grid_line_results[grid_line_name]["p_from_j_to_i"] = round(float(s_from_node_j_to_node_i.real), 6)
+            self.grid_line_results[grid_line_name]["q_from_j_to_i"] = round(float(s_from_node_j_to_node_i.imag), 6)
+            self.grid_line_results[grid_line_name]["p_loss"] = round(float(s_loss.real), 6)
+            self.grid_line_results[grid_line_name]["q_loss"] = round(float(s_loss.imag), 6)
+            self.grid_line_results[grid_line_name]["current_from_i_to_j"] = round(float(current_from_node_i_to_node_j),
+                                                                                  6)
+            self.grid_line_results[grid_line_name]["current_from_j_to_i"] = round(float(current_from_node_j_to_node_i),
+                                                                                  6)
 
     def __str__(self):
         result = str("\n")
@@ -381,18 +390,17 @@ class LoadFlow:
         result += str("{:^15}".format("U_mag"))
         result += str("{:^15}".format("θ"))
         result += str("|\n")
-        for i in range(105):
-            result += str("-")
+        result += str("-") * 105
         result += str("\n")
 
-        for key in self.loadflow_result:
+        for key in self.grid_node_results:
             grid_node_name = key
-            p_injection = self.loadflow_result[key]["P_injection"]
-            q_injection = self.loadflow_result[key]["Q_injection"]
-            p_load = self.loadflow_result[key]["P_load"]
-            q_load = self.loadflow_result[key]["Q_load"]
-            u_mag = self.loadflow_result[key]["U_magnitude"]
-            theta = self.loadflow_result[key]["U_angle"]
+            p_injection = self.grid_node_results[key]["P_injection"]
+            q_injection = self.grid_node_results[key]["Q_injection"]
+            p_load = self.grid_node_results[key]["P_load"]
+            q_load = self.grid_node_results[key]["Q_load"]
+            u_mag = self.grid_node_results[key]["U_magnitude"]
+            theta = self.grid_node_results[key]["U_angle"]
 
             result += str("|")
             result += str("{:^10}".format(str(grid_node_name)))
@@ -407,8 +415,7 @@ class LoadFlow:
             result += str("{:^15}".format(str(round(float(theta), 3)) + str("°")))
             result += str("|\n")
 
-        for i in range(105):
-            result += str("-")
+        result += str("-") * 105
 
         result += str("\n\n")
 
@@ -418,9 +425,45 @@ class LoadFlow:
         return result
 
     def export_loadflow_results(self, csv_export_path):
-        export_grid_line_data(csv_export_path, "p_lines", self.p_over_lines)
-        export_grid_line_data(csv_export_path, "q_lines", self.q_over_lines)
-        export_grid_line_data(csv_export_path, "s_lines", self.s_over_lines)
-        export_grid_line_data(csv_export_path, "p_transmission_losses", self.p_transmission_losses)
-        export_grid_line_data(csv_export_path, "q__transmission_losses", self.q_transmission_losses)
-        export_grid_line_data(csv_export_path, "current_on_lines", self.current_on_lines)
+        p_over_lines = dict((k, v['p_from_i_to_j']) for k, v in self.grid_line_results.items() if 'p_from_i_to_j' in v)
+        q_over_lines = dict((k, v['q_from_i_to_j']) for k, v in self.grid_line_results.items() if 'q_from_i_to_j' in v)
+        s_over_lines = dict((k, v['s_from_i_to_j']) for k, v in self.grid_line_results.items() if 's_from_i_to_j' in v)
+        p_transmission_losses = dict((k, v['p_loss']) for k, v in self.grid_line_results.items() if 'p_loss' in v)
+        q_transmission_losses = dict((k, v['q_loss']) for k, v in self.grid_line_results.items() if 'q_loss' in v)
+        line_currents = dict(
+            (k, v['current_from_i_to_j']) for k, v in self.grid_line_results.items() if 'current_from_i_to_j' in v)
+
+        export_grid_line_data(csv_export_path, "p_lines", p_over_lines)
+        export_grid_line_data(csv_export_path, "q_lines", q_over_lines)
+        export_grid_line_data(csv_export_path, "s_lines", s_over_lines)
+        export_grid_line_data(csv_export_path, "p_transmission_losses", p_transmission_losses)
+        export_grid_line_data(csv_export_path, "q__transmission_losses", q_transmission_losses)
+        export_grid_line_data(csv_export_path, "current_on_lines", line_currents)
+
+    def export_currents_on_lines_plot(self):
+        # die X-Werte:
+        grid_lines = list()
+        # die Y-Werte:
+        current_on_lines = list()
+
+        for grid_line_name in self.grid_line_results:
+            grid_lines.append(grid_line_name)
+            current_on_lines.append(self.grid_line_results[grid_line_name]["current_from_i_to_j"])
+            
+        pu_factor = self.s_nom / self.v_nom
+        current_on_lines = list(map(lambda value: value*pu_factor, current_on_lines))
+
+        create_current_plot(grid_lines, current_on_lines, "Strom pro Leitung", "Leitung k", "Strom in A")
+
+    def export_node_voltage_plot(self):
+        # die X-Werte:
+        grid_nodes = list()
+        # die Y-Werte:
+        node_voltages = list()
+
+        for grid_node_name in self.grid_node_results:
+            grid_nodes.append(grid_node_name)
+            node_voltages.append(self.grid_node_results[grid_node_name]["U_magnitude"])
+
+        create_voltage_plot(grid_nodes, node_voltages, "Knotenspannung pro Knoten", "Knoten n", "Spannung in pu",
+                            type="bar")
