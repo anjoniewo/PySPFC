@@ -1,6 +1,6 @@
-from LoadFlowTool.loadflowtool.parser.gridlineparser import GridLineParser
-from LoadFlowTool.loadflowtool.parser.gridnodeparser import GridNodeParser
-from LoadFlowTool.loadflowtool.parser.transformerparser import TransformerParser
+from LoadFlowTool.loadflowtool.griddataimport.gridlineparser import GridLineParser
+from LoadFlowTool.loadflowtool.griddataimport.gridnodeparser import GridNodeParser
+from LoadFlowTool.loadflowtool.griddataimport.transformerparser import TransformerParser
 
 
 class GridParser:

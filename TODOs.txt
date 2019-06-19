@@ -17,6 +17,4 @@ LoadFlowTool - TODOs:
 	- Zeitreihen erfassen und simulieren
 	- Prüfung der Wirkleistungsgrenzen der Generatoren, Hinweis wenn überschritten
 
-	- WICHTIG: Leistung auf den Leitungen !!!
-
 	- WEBBASIERT
