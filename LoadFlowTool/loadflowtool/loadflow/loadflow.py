@@ -326,7 +326,7 @@ class LoadFlow:
 	def __str__(self):
 		result = str("\n")
 		result += str(
-			"Die angebenen Werte (in p.u.) beziehen sich auf die Bezugsgroeßen U_nom = 400 V und S_nom = 220 MVA\n\n")
+			"Die angebenen Werte (in p.u.) beziehen sich auf die Bezugsgroeßen U_nom = 400 kV und S_nom = 220 MVA\n\n")
 		for i in range(105):
 			result += str("-")
 		result += str("\n")
