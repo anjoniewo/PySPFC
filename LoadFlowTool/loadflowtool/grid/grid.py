@@ -10,7 +10,11 @@ from LoadFlowTool.loadflowtool.loadflow.loadflowreporter import LoadFlowReporter
 class Grid:
 	
 	# Initialisierungskonstruktor
-	def __init__(self, grid_node_list=list(), grid_line_list=list(), transformer_list=list(), frequency=50):
+	def __init__(self, grid_node_list=list(), grid_line_list=list(), transformer_list=list(), frequency=50, v_nom=200,
+	             s_nom=100):
+		
+		self.v_nom = v_nom
+		self.s_nom = s_nom
 		
 		# Netzfrequenz (default 50 Hz)
 		self.__frequency = frequency
@@ -95,8 +99,11 @@ class Grid:
 	def do_powerflow(self):
 		self.loadflow.do_loadflow()
 	
+	def export_loadflow_results(self, csv_export_path):
+		self.loadflow.export_loadflow_results(csv_export_path)
+	
 	def print_loadflow_results(self):
-		if self.loadflow.loadflow_result:
+		if self.loadflow.grid_node_results:
 			print(self.loadflow)
 		else:
 			print("Lastflussberechnung wurde noch nicht durchgefuehrt!")
