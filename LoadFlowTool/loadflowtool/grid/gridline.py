@@ -94,7 +94,7 @@ class GridLine:
 				self.__resistance = line_parameters[1] * self.__length
 			
 			# induktiver Laengswiderstand
-			if line_parameters[2] > 0:
+			if line_parameters[2] >= 0:
 				# self.__inductive_reactance = (2 * math.pi * self.__frequency * line_parameters[2]) * self.__length
 				# induktiver Belag * Leitungslaenge
 				self.__inductive_reactance = line_parameters[2] * self.__length
