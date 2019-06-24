@@ -4,10 +4,10 @@ from LoadFlowTool.loadflowtool.griddataexport.export_results_to_pdf import creat
 from LoadFlowTool.loadflowtool.griddataimport.gridparser import GridParser
 
 # Erstelle Dateipfad zu grideline- und gridnode-Dateien
-csv_files_path = os.path.join(os.path.dirname(__file__), "../../test/test_files/7_knoten_mit_trafo")
+csv_files_path = os.path.join(os.path.dirname(__file__), "../../test/test_files/6_knoten_mit_ladeboxen")
 
 # Erstelle Dateipfad fuer export
-csv_export_path = os.path.join(os.path.dirname(__file__), "../../test/test_export")
+csv_export_path = os.path.join(os.path.dirname(__file__), "../../test/test_export/6_knoten_export")
 
 # Dateipfad fuer gridline-Datei
 gridline_path = os.path.join(csv_files_path, "lines.csv")
