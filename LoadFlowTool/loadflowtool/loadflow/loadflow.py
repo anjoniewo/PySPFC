@@ -1,16 +1,17 @@
+from LoadFlowTool.loadflowtool.grid.gridnode import GridNode
 from LoadFlowTool.loadflowtool.griddataexport.export_gridline_data import export_grid_line_data
 from LoadFlowTool.loadflowtool.loadflow.jacobianmatrix import JacobianMatrix
-from .loadflowequations import *
 from LoadFlowTool.loadflowtool.utils.complexutils import get_polar
-from LoadFlowTool.loadflowtool.grid.gridnode import GridNode
-from LoadFlowTool.loadflowtool.utils.loadflowutils import *
 from LoadFlowTool.loadflowtool.utils.create_plot import *
-import pandas as pd
+from .loadflowequations import *
 
 
 class LoadFlow:
 
     def __init__(self, grid):
+
+        self.v_nom = grid.v_nom
+        self.s_nom = grid.s_nom
 
         # Liste der Leitungen
         self.grid_line_list = grid.get_grid_line_list()
@@ -104,8 +105,7 @@ class LoadFlow:
 
             iteration += 1
             reached_max_iteration = True if iteration == MAX_ITERATIONS else False
-            vector_norm = np.linalg.norm(delta_p_q_v_vector)
-            reached_convergence_limit = True if vector_norm < self.CONVERGENCE_ACCURACY else False
+            reached_convergence_limit = self.check_convergency(delta_p_q_v_vector)
 
         return Fk_Ek_vector, sub_Fk_Ek_vector, iteration
 
@@ -164,6 +164,9 @@ class LoadFlow:
                     self.new_grid_node_list[index].set_q_load(q_max)
 
         return self.new_grid_node_list
+
+    def check_convergency(self, delta_p_q_v_vector):
+        return True if max(delta_p_q_v_vector) < self.CONVERGENCE_ACCURACY else False
 
     # Methode gibt den Index sowie den Knoten aus der uebergebenen Knotenliste zurueck
     def get_index_and_grid_node_from_list(self, grid_node_name, grid_node_list):
@@ -448,8 +451,11 @@ class LoadFlow:
         for grid_line_name in self.grid_line_results:
             grid_lines.append(grid_line_name)
             current_on_lines.append(self.grid_line_results[grid_line_name]["current_from_i_to_j"])
+            
+        pu_factor = self.s_nom / self.v_nom
+        current_on_lines = list(map(lambda value: value*pu_factor, current_on_lines))
 
-        create_current_plot(grid_lines, current_on_lines, "Strom pro Leitung", "Leitung k", "Strom in pu")
+        create_current_plot(grid_lines, current_on_lines, "Strom pro Leitung", "Leitung k", "Strom in A")
 
     def export_node_voltage_plot(self):
         # die X-Werte:
