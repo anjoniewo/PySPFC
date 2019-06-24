@@ -366,8 +366,6 @@ class LoadFlow:
 
     def __str__(self):
         result = str("\n")
-        result += str(
-            "Die angebenen Werte (in p.u.) beziehen sich auf die Bezugsgroeßen U_nom = 400 V und S_nom = 220 MVA\n\n")
         for i in range(105):
             result += str("-")
         result += str("\n")
@@ -407,13 +405,13 @@ class LoadFlow:
             result += str("|")
             result += str("{:^10}".format(str(grid_node_name)))
             result += str("|")
-            result += str("{:^15}".format(str(round(float(p_injection), 3))))
-            result += str("{:^15}".format(str(round(float(q_injection), 3))))
+            result += str("{:^15}".format(str(round(float(p_injection * self.s_nom), 3))))
+            result += str("{:^15}".format(str(round(float(q_injection * self.s_nom), 3))))
             result += str("|")
-            result += str("{:^15}".format(str(round(float(p_load), 3))))
-            result += str("{:^15}".format(str(round(float(q_load), 3))))
+            result += str("{:^15}".format(str(round(float(p_load * self.s_nom), 3))))
+            result += str("{:^15}".format(str(round(float(q_load * self.s_nom), 3))))
             result += str("|")
-            result += str("{:^15}".format(str(round(float(u_mag), 3))))
+            result += str("{:^15}".format(str(round(float(u_mag * self.v_nom), 3))))
             result += str("{:^15}".format(str(round(float(theta), 3)) + str("°")))
             result += str("|\n")
 
@@ -451,9 +449,9 @@ class LoadFlow:
         for grid_line_name in self.grid_line_results:
             grid_lines.append(grid_line_name)
             current_on_lines.append(self.grid_line_results[grid_line_name]["current_from_i_to_j"])
-            
-        pu_factor = self.s_nom / self.v_nom
-        current_on_lines = list(map(lambda value: value*pu_factor, current_on_lines))
+
+        current_nom = self.s_nom / (self.v_nom * math.sqrt(3))
+        current_on_lines = list(map(lambda value: value * current_nom, current_on_lines))
 
         create_current_plot(grid_lines, current_on_lines, "Strom pro Leitung", "Leitung k", "Strom in A")
 
@@ -467,5 +465,4 @@ class LoadFlow:
             grid_nodes.append(grid_node_name)
             node_voltages.append(self.grid_node_results[grid_node_name]["U_magnitude"])
 
-        create_voltage_plot(grid_nodes, node_voltages, "Knotenspannung pro Knoten", "Knoten n", "Spannung in pu",
-                            type="bar")
+        create_voltage_plot(grid_nodes, node_voltages, "Knotenspannung pro Knoten", "Knoten n", "Spannung in pu")

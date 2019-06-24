@@ -26,7 +26,7 @@ gridparser = GridParser(gridline_file_path=gridline_path, gridnode_file_path=gri
 
 # Bezugsgroeßen des Netzwerks
 v_nom = 400
-s_nom = 1e6
+s_nom = 250e3
 
 network = Grid(grid_node_list=gridparser.grid_node_parser.get_gridnodes(),
                grid_line_list=gridparser.grid_line_parser.get_gridlines(),
