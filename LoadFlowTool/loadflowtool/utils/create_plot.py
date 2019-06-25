@@ -6,122 +6,130 @@ import pandas as pd
 """
     Konstanten
 """
-TITLE_FONTSIZE = 18
+TITLE_FONTSIZE = 16
 LABEL_FONTSIZE = 14
 TICK_FONTSIZE = 12
 
 BAR_COLOR = 'red'
 
+plt.rcParams["font.family"] = "Arial"
+
 
 def create_voltage_plot(x_vals=list(), y_vals=list(), title="title", x_axis_label="abscissa",
                         y_axis_label="ordinate"):
+    fig, voltage_axes = plt.subplots()
 
-    y_pos = np.arange(len(x_vals))
-    plt.bar(y_pos, y_vals, align='center', alpha=0, color=[BAR_COLOR])
+    # Spannungsband
+    voltage_range_min = 0.9
+    voltage_range_max = 1.1
+    voltage_axes.axhline(voltage_range_max, color='r', linestyle='--', label='Umax')
+    voltage_axes.axhline(voltage_range_min, color='r', linestyle='--', label='Umin')
 
-    y_vals_series = pd.Series(y_vals)
-    ax = y_vals_series.plot(kind='bar')
+    # Balkendiagramm erstellen
+    volt_rects = voltage_axes.bar(x_vals, y_vals, width=0.5, label='Knotenspannung', color='#0090ff')
 
-    # add legend
-    blue_patch = mpatches.Patch(color=BAR_COLOR, label='Spannung am Knoten')
-    ax.legend(handles=[blue_patch], loc='upper right')
+    # Titel des Diagramms
+    voltage_axes.set_title(title, fontsize=TITLE_FONTSIZE)
 
-    add_value_labels(ax)
+    # Y-Achsentitel
+    voltage_axes.set_ylabel(y_axis_label, fontsize=LABEL_FONTSIZE, labelpad=15)
 
-    plt.xticks(y_pos, x_vals)
-    plt.title(title, fontsize=TITLE_FONTSIZE)
-    plt.ylabel(y_axis_label, fontsize=LABEL_FONTSIZE, labelpad=20)
-    plt.yticks(fontsize=TICK_FONTSIZE)
-    plt.xlabel(x_axis_label, fontsize=LABEL_FONTSIZE, labelpad=10)
-    plt.xticks(fontsize=TICK_FONTSIZE, rotation='horizontal')
+    # min, max Y-Achse
+    temp_y_min = min(y_vals)
+    temp_y_max = max(y_vals)
+    rel_max_delta = 1.1
 
-    y_min = min(y_vals) * 0.95
-    y_max = max(y_vals) * 1.02
+    if temp_y_min < voltage_range_min:
+        y_min = temp_y_min - (temp_y_max * (rel_max_delta - 1))
+    else:
+        y_min = voltage_range_min - (voltage_range_max * (rel_max_delta - 1))
 
-    plt.ylim(y_min, y_max)
-    plt.grid(True)
-    # Pad margins so that markers don't get clipped by the axes
-    plt.margins(0.2)
-    # Tweak spacing to prevent clipping of tick-labels
+    if temp_y_max < voltage_range_max:
+        y_max = voltage_range_max * rel_max_delta
+    else:
+        y_max = temp_y_max * rel_max_delta
+
+    voltage_axes.set_ylim(y_min, y_max)
+
+    # X-Achsentitel
+    voltage_axes.set_xlabel(x_axis_label, fontsize=LABEL_FONTSIZE, labelpad=10)
+
+    # X-Achsenbeschriftungen
+    voltage_axes.set_xticks(x_vals)
+
+    # absolute max. Werte der einzelnen Balken
+    autolabel(volt_rects, voltage_axes, 3)
+
+    labels = ['$\pm$ 10 % ${U}_{ref}$', 'Knotenspannung']
+    handles, _ = voltage_axes.get_legend_handles_labels()
+
+    # Slice list to remove first handle
+    voltage_axes.legend(handles=handles[1:], labels=labels)
+
     plt.subplots_adjust(left=0.175, bottom=0.15)
-
-    plt.savefig('..\\..\\test\\test_export\\' + title + '.png', format='png', dpi=100)
+    plt.savefig('..\\..\\test\\test_export\\' + title + '.png', format='png', dpi=120)
     plt.clf()
     plt.cla()
 
 
 def create_current_plot(x_vals=list(), y_vals=list(), title="title", x_axis_label="abscissa",
                         y_axis_label="ordinate"):
-    y_pos = np.arange(len(x_vals))
-    plt.bar(y_pos, y_vals, align='center', alpha=0.5, color=[BAR_COLOR])
+    fig, voltage_axes = plt.subplots()
 
-    y_vals_series = pd.Series(y_vals)
-    ax = y_vals_series.plot(kind='bar')
+    # Balkendiagramm erstellen
+    volt_rects = voltage_axes.bar(x_vals, y_vals, width=0.5, label='Strom', color='#ff8a00')
 
-    # add legend
-    blue_patch = mpatches.Patch(color=BAR_COLOR, label='Strom pro Leitung')
-    ax.legend(handles=[blue_patch], loc='upper right')
+    # Titel des Diagramms
+    voltage_axes.set_title(title, fontsize=TITLE_FONTSIZE)
 
-    add_value_labels(ax)
+    # Y-Achsentitel
+    voltage_axes.set_ylabel(y_axis_label, fontsize=LABEL_FONTSIZE, labelpad=15)
 
-    # y_min = 0
-    # y_max = max(y_vals) * 1.1
-    # plt.ylim(y_min, y_max)
+    # min, max Y-Achse
+    temp_y_min = min(y_vals)
+    temp_y_max = max(y_vals)
+    rel_max_delta = 1.1
 
-    plt.xticks(y_pos, x_vals)
-    plt.title(title, fontsize=TITLE_FONTSIZE)
-    plt.ylabel(y_axis_label, fontsize=LABEL_FONTSIZE, labelpad=20)
-    plt.yticks(fontsize=TICK_FONTSIZE)
-    plt.xlabel(x_axis_label, fontsize=LABEL_FONTSIZE, labelpad=10)
-    plt.xticks(fontsize=TICK_FONTSIZE, rotation='horizontal')
-    plt.grid(True)
-    # Pad margins so that markers don't get clipped by the axes
-    plt.margins(0.5)
-    # Tweak spacing to prevent clipping of tick-labels
+    y_min = 0
+    y_max = temp_y_max * rel_max_delta
+
+    voltage_axes.set_ylim(y_min, y_max)
+
+    # X-Achsentitel
+    voltage_axes.set_xlabel(x_axis_label, fontsize=LABEL_FONTSIZE, labelpad=10)
+
+    # X-Achsenbeschriftungen
+    voltage_axes.set_xticks(x_vals)
+
+    # absolute max. Werte der einzelnen Balken
+    autolabel(volt_rects, voltage_axes, 0)
+
+    voltage_axes.legend()
+
     plt.subplots_adjust(left=0.175, bottom=0.15)
-
-    plt.savefig('..\\..\\test\\test_export\\' + title + '.png', format='png', dpi=100)
+    plt.savefig('..\\..\\test\\test_export\\' + title + '.png', format='png', dpi=120)
     plt.clf()
     plt.cla()
 
 
-def add_value_labels(ax, spacing=5):
-    """Add labels to the end of each bar in a bar chart.
+def autolabel(rects, axes, decimals=2, xpos='center'):
+    """
+    Attach a text label above each bar in *rects*, displaying its height.
 
-    Arguments:
-        ax (matplotlib.axes.Axes): The matplotlib object containing the axes
-            of the plot to annotate.
-        spacing (int): The distance between the labels and the bars.
+    *xpos* indicates which side to place the text w.r.t. the center of
+    the bar. It can be one of the following {'center', 'right', 'left'}.
     """
 
-    # For each bar: Place a label
-    for rect in ax.patches:
+    ha = {'center': 'center', 'right': 'left', 'left': 'right'}
+    offset = {'center': 0, 'right': 1, 'left': -1}
 
-        # Get X and Y placement of label from rect.
-        y_value = rect.get_height()
-        x_value = rect.get_x() + rect.get_width() / 2
-
-        # Number of points between bar and label. Change to your liking.
-        space = spacing
-        # Vertical alignment for positive values
-        va = 'bottom'
-
-        # If value of bar is negative: Place label below bar
-        if y_value < 0:
-            # Invert space to place label below
-            space *= -1
-            # Vertically align label at top
-            va = 'top'
-
-        # Use Y value as label and format number with one decimal place
-        label = "{:.3f}".format(y_value)
-
-        # Create annotation
-        ax.annotate(
-            label,  # Use `label` as label
-            (x_value, y_value),  # Place label at end of the bar
-            xytext=(0, space),  # Vertically shift label by `space`
-            textcoords="offset points",  # Interpret `xytext` as offset in points
-            ha='center',  # Horizontally center label
-            va=va)  # Vertically align label differently for
-# positive and negative values.
+    for rect in rects:
+        if decimals == 0:
+            height = int(round(float(rect.get_height())))
+        else:
+            height = round(float(rect.get_height()), decimals)
+        axes.annotate('{}'.format(height),
+                      xy=(rect.get_x() + rect.get_width() / 2, height),
+                      xytext=(offset[xpos] * 3, 3),  # use 3 points offset
+                      textcoords="offset points",  # in both directions
+                      ha=ha[xpos], va='bottom')

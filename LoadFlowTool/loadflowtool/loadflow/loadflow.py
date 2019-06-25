@@ -1,3 +1,4 @@
+from LoadFlowTool.examples.electrical_schematic import create_network_schematic
 from LoadFlowTool.loadflowtool.grid.gridnode import GridNode
 from LoadFlowTool.loadflowtool.griddataexport.export_gridline_data import export_grid_line_data
 from LoadFlowTool.loadflowtool.loadflow.jacobianmatrix import JacobianMatrix
@@ -15,6 +16,9 @@ class LoadFlow:
 
         # Liste der Leitungen
         self.grid_line_list = grid.get_grid_line_list()
+
+        # Liste der Transformatoren
+        self.transformers = grid.get_transformers()
 
         # urspruengliche, eingelesene Knotenliste
         self.grid_node_list = grid.get_grid_node_list()
@@ -73,6 +77,9 @@ class LoadFlow:
 
         self.export_node_voltage_plot()
         self.export_currents_on_lines_plot()
+
+        create_network_schematic(self.grid_node_results, self.grid_node_list, self.grid_line_results,
+                                 self.grid_line_list, self.transformers)
 
     # iterative Lastflussberechnung mit Newton-Raphson verfahren durchfuehren
     def do_iterations(self, Fk_Ek_vector, sub_Fk_Ek_vector, sub_p_q_v_info_vector):
@@ -288,10 +295,6 @@ class LoadFlow:
                     self.grid_node_results[grid_node_name]["U_angle"] = grid_node.get_node_voltage_angle_in_rad()
 
             elif grid_node.types_index[type_number] == "load":
-                u_result = get_polar(real=Fk_Ek_vector[item[2] + number_of_nodes], imaginary=Fk_Ek_vector[item[2]])
-                self.grid_node_results[grid_node_name]["U_magnitude"] = u_result["magnitude"]
-                self.grid_node_results[grid_node_name]["U_angle"] = u_result["angleGrad"]
-
                 if item[3] == "P":
                     p_load = grid_node.get_p_load()
                     self.grid_node_results[grid_node_name]["P_load"] = p_load
@@ -303,6 +306,11 @@ class LoadFlow:
                     self.grid_node_results[grid_node_name]["Q_load"] = q_load
                     self.grid_node_results[grid_node_name]["Q_injection"] = 0
                     self.grid_node_results[grid_node_name]["Q"] = q_load
+
+                elif item[3] == "U":
+                    u_result = get_polar(real=Fk_Ek_vector[item[2] + number_of_nodes], imaginary=Fk_Ek_vector[item[2]])
+                    self.grid_node_results[grid_node_name]["U_magnitude"] = u_result["magnitude"]
+                    self.grid_node_results[grid_node_name]["U_angle"] = u_result["angleGrad"]
 
             elif grid_node.types_index[type_number] == "voltage":
                 if item[3] == "P":
@@ -351,18 +359,22 @@ class LoadFlow:
             if not (grid_line_name in self.grid_node_results):
                 self.grid_line_results[grid_line_name] = {}
 
-            self.grid_line_results[grid_line_name]["s_from_i_to_j"] = round(float(s_from_node_i_to_node_j), 6)
+            self.grid_line_results[grid_line_name]["s_from_i_to_j"] = round(float(np.absolute(s_from_node_i_to_node_j)),
+                                                                            6)
             self.grid_line_results[grid_line_name]["p_from_i_to_j"] = round(float(s_from_node_i_to_node_j.real), 6)
             self.grid_line_results[grid_line_name]["q_from_i_to_j"] = round(float(s_from_node_i_to_node_j.imag), 6)
-            self.grid_line_results[grid_line_name]["s_from_j_to_i"] = round(float(s_from_node_j_to_node_i), 6)
+            self.grid_line_results[grid_line_name]["s_from_j_to_i"] = round(float(np.absolute(s_from_node_j_to_node_i)),
+                                                                            6)
             self.grid_line_results[grid_line_name]["p_from_j_to_i"] = round(float(s_from_node_j_to_node_i.real), 6)
             self.grid_line_results[grid_line_name]["q_from_j_to_i"] = round(float(s_from_node_j_to_node_i.imag), 6)
             self.grid_line_results[grid_line_name]["p_loss"] = round(float(s_loss.real), 6)
             self.grid_line_results[grid_line_name]["q_loss"] = round(float(s_loss.imag), 6)
-            self.grid_line_results[grid_line_name]["current_from_i_to_j"] = round(float(current_from_node_i_to_node_j),
-                                                                                  6)
-            self.grid_line_results[grid_line_name]["current_from_j_to_i"] = round(float(current_from_node_j_to_node_i),
-                                                                                  6)
+            self.grid_line_results[grid_line_name]["current_from_i_to_j"] = round(
+                float(np.absolute(current_from_node_i_to_node_j)),
+                6)
+            self.grid_line_results[grid_line_name]["current_from_j_to_i"] = round(
+                float(np.absolute(current_from_node_j_to_node_i)),
+                6)
 
     def __str__(self):
         result = str("\n")
@@ -465,4 +477,4 @@ class LoadFlow:
             grid_nodes.append(grid_node_name)
             node_voltages.append(self.grid_node_results[grid_node_name]["U_magnitude"])
 
-        create_voltage_plot(grid_nodes, node_voltages, "Knotenspannung pro Knoten", "Knoten n", "Spannung in pu")
+        create_voltage_plot(grid_nodes, node_voltages, "Betrag der Knotenspannung", "Knoten n", "Spannung in pu")
