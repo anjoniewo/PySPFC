@@ -1,4 +1,5 @@
 import os.path
+
 from simpleloadflow.loadflowtool.grid.grid import Grid
 from simpleloadflow.loadflowtool.griddataexport.export_results_to_pdf import create_pdf_report
 from simpleloadflow.loadflowtool.griddataimport.gridparser import GridParser
@@ -8,10 +9,10 @@ csv_files_path = os.path.join(os.path.dirname(__file__), "../../test/test_files/
 
 # Erstelle Dateipfad fuer export
 try:
-	os.makedirs(os.path.join(os.path.dirname(__file__), "../../test/test_export/6_knoten_export"))
+    os.makedirs(os.path.join(os.path.dirname(__file__), "../../test/test_export/6_knoten_export"))
 except FileExistsError:
-	# directory already exists
-	pass
+    # directory already exists
+    pass
 csv_export_path = os.path.join(os.path.dirname(__file__), "../../test/test_export/6_knoten_export")
 
 # Dateipfade fuer einzulesenden Dateien
@@ -28,9 +29,8 @@ v_nom = 400
 s_nom = 250e3
 
 # Erstellung des Netzwerks
-network = Grid(grid_node_list=gridparser.grid_node_parser.get_gridnodes(),
-               grid_line_list=gridparser.grid_line_parser.get_gridlines(),
-               transformer_list=gridparser.transformer_parser.get_transformers(), v_nom=v_nom, s_nom=s_nom)
+network = Grid(grid_node_list=gridparser.gridnodes, grid_line_list=gridparser.gridlines,
+               transformer_list=gridparser.transformers, v_nom=v_nom, s_nom=s_nom)
 
 # Lastflussberechnung für das eingelesene durchführen
 network.do_powerflow()

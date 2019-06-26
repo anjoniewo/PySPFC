@@ -23,9 +23,8 @@ v_nom = 220e3
 s_nom = 100e6
 
 # Erstellung des Netzwerks
-network = Grid(grid_node_list=gridparser.grid_node_parser.get_gridnodes(),
-               grid_line_list=gridparser.grid_line_parser.get_gridlines(),
-               transformer_list=gridparser.transformer_parser.get_transformers(), v_nom=v_nom, s_nom=s_nom)
+network = Grid(grid_node_list=gridparser.gridnodes, grid_line_list=gridparser.gridlines,
+               transformer_list=gridparser.transformers, v_nom=v_nom, s_nom=s_nom)
 
 # Lastflussberechnung für das eingelesene durchführen
 network.do_powerflow()
