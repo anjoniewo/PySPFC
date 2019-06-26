@@ -1,9 +1,9 @@
-from simpleloadflow.powerflow.grid.busadmittancematrix import BusAdmittanceMatrix
-from simpleloadflow.powerflow.grid.gridline import GridLine
-from simpleloadflow.powerflow.grid.gridnode import GridNode
-from simpleloadflow.powerflow.powerflow.jacobianmatrix import JacobianMatrix
-from simpleloadflow.powerflow.powerflow.powerflow import PowerFlow
-from simpleloadflow.powerflow.powerflow.powerflowreporter import LoadFlowReporter
+from simplepowerflow.powerflow.grid.busadmittancematrix import BusAdmittanceMatrix
+from simplepowerflow.powerflow.grid.gridline import GridLine
+from simplepowerflow.powerflow.grid.gridnode import GridNode
+from simplepowerflow.powerflow.powerflow.jacobianmatrix import JacobianMatrix
+from simplepowerflow.powerflow.powerflow.powerflow import PowerFlow
+from simplepowerflow.powerflow.powerflow.powerflowreporter import LoadFlowReporter
 
 
 # Klasse fuer ein elektrisches Netz
@@ -38,7 +38,7 @@ class Grid:
         self.jacobi_matrix = JacobianMatrix(self.__grid_node_list, self.__voltage_node_list,
                                             self.bus_admittance_matrix.matrix)
 
-        self.loadflow = PowerFlow(self)
+        self.powerflow = PowerFlow(self)
 
     # getter
     def get_frequency(self):
@@ -100,14 +100,14 @@ class Grid:
 
     # Lastflussberechnung durchfuehren
     def do_powerflow(self):
-        self.loadflow.do_loadflow()
+        self.powerflow.do_loadflow()
 
-    def export_loadflow_results(self, csv_export_path):
-        self.loadflow.export_loadflow_results(csv_export_path)
+    def export_powerflow_results(self, csv_export_path):
+        self.powerflow.export_loadflow_results(csv_export_path)
 
     def print_loadflow_results(self):
-        if self.loadflow.grid_node_results:
-            print(self.loadflow)
+        if self.powerflow.grid_node_results:
+            print(self.powerflow)
         else:
             print("Lastflussberechnung wurde noch nicht durchgefuehrt!")
 

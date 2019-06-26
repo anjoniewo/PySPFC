@@ -1,7 +1,7 @@
 import numpy as np
-from simpleloadflow.powerflow.grid.admittance import Admittance
-from simpleloadflow.powerflow.grid.gridline import GridLine
-from simpleloadflow.powerflow.grid.transformer import Transformer
+from simplepowerflow.powerflow.grid.admittance import Admittance
+from simplepowerflow.powerflow.grid.gridline import GridLine
+from simplepowerflow.powerflow.grid.transformer import Transformer
 import copy
 
 

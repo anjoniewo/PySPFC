@@ -119,7 +119,7 @@ def create_pdf_report(grid_node_data, grid_line_data, v_nom, s_nom):
     grid_node_data = convert_data_to_table_data(grid_node_data)
     grid_line_data = convert_data_to_table_data(grid_line_data, type='line', v_nom=v_nom, s_nom=s_nom)
 
-    plot_path = '\\..\\..\\test\\test_export\\'
+    plot_path = '..\\..\\test\\test_export\\'
     current_plot_path = plot_path + 'Strom pro Leitung.png'
     voltage_plot_path = plot_path + 'Betrag der Knotenspannung.png'
     network_schematic_path = plot_path + 'network_schematic.png'

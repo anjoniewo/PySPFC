@@ -1,7 +1,7 @@
 import os.path
-from simpleloadflow.powerflow.grid.grid import Grid
-from simpleloadflow.powerflow.griddataimport.gridparser import GridParser
-from simpleloadflow.powerflow.powerflow.powerflow import PowerFlow
+from simplepowerflow.powerflow.grid.grid import Grid
+from simplepowerflow.powerflow.griddataimport.gridparser import GridParser
+from simplepowerflow.powerflow.powerflow.powerflow import PowerFlow
 
 # Erstelle Dateipfad zu grideline- und gridnode-Dateien
 csv_files_path = os.path.join(os.path.dirname(__file__), "../../test/test_files/pypsa_example")

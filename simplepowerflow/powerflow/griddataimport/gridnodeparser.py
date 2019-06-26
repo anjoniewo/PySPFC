@@ -1,6 +1,6 @@
 # Parser-Klasse zum Einleser der Leitungsdaten
-from simpleloadflow.powerflow.parser.csvparser import CSVParser
-from simpleloadflow.powerflow.grid.gridnode import GridNode
+from simplepowerflow.powerflow.griddataimport.csvparser import CSVParser
+from simplepowerflow.powerflow.grid.gridnode import GridNode
 
 
 class GridNodeParser(CSVParser):

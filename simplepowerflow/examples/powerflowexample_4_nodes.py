@@ -1,21 +1,21 @@
 import os.path
 
-from simpleloadflow.powerflow.grid.admittance import Admittance
-from simpleloadflow.powerflow.grid.grid import Grid
-from simpleloadflow.powerflow.griddataimport.gridparser import GridParser
-from simpleloadflow.powerflow.powerflow.powerflow import PowerFlow
+from simplepowerflow.powerflow.grid.admittance import Admittance
+from simplepowerflow.powerflow.grid.grid import Grid
+from simplepowerflow.powerflow.griddataimport.gridparser import GridParser
+from simplepowerflow.powerflow.powerflow.powerflow import PowerFlow
 
 # Erstelle Dateipfad zu grideline- und gridnode-Dateien
-csv_files_path = os.path.join(os.path.dirname(__file__), "../../test/test_files/4_knoten")
+csv_files_path = os.path.join(os.path.dirname(__file__), '../../test/test_files/4_knoten')
 
 # Dateipfad fuer gridline-Datei
-gridline_path = os.path.join(csv_files_path, "lines.csv")
+gridline_path = os.path.join(csv_files_path, 'lines.csv')
 
 # Dateipfad fuer gridnode-Datei
-gridnode_path = os.path.join(csv_files_path, "gridnodes_350kW.csv")
+gridnode_path = os.path.join(csv_files_path, 'gridnodes_350kW.csv')
 
 # Dateipfad fuer transformator-Datei
-transformer_path = os.path.join(csv_files_path, "transformers.csv")
+transformer_path = os.path.join(csv_files_path, 'transformers.csv')
 
 # einlesen der Netzdaten
 gridparser = GridParser(gridline_file_path=gridline_path, gridnode_file_path=gridnode_path,

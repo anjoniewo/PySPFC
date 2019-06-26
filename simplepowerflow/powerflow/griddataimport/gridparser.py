@@ -1,6 +1,6 @@
-from simpleloadflow.powerflow.griddataimport.gridlineparser import GridLineParser
-from simpleloadflow.powerflow.griddataimport.gridnodeparser import GridNodeParser
-from simpleloadflow.powerflow.griddataimport.transformerparser import TransformerParser
+from simplepowerflow.powerflow.griddataimport.gridlineparser import GridLineParser
+from simplepowerflow.powerflow.griddataimport.gridnodeparser import GridNodeParser
+from simplepowerflow.powerflow.griddataimport.transformerparser import TransformerParser
 
 
 class GridParser:

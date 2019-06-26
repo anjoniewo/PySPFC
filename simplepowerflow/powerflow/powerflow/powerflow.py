@@ -1,11 +1,11 @@
 import numpy as np
 
-from simpleloadflow.powerflow.grid.gridnode import GridNode
-from simpleloadflow.powerflow.griddataexport.electrical_schematic import create_network_schematic
-from simpleloadflow.powerflow.griddataexport.export_gridline_data import export_grid_line_data
-from simpleloadflow.powerflow.powerflow.jacobianmatrix import JacobianMatrix
-from simpleloadflow.powerflow.utils.complexutils import get_polar
-from simpleloadflow.powerflow.utils.create_plot import *
+from simplepowerflow.powerflow.grid.gridnode import GridNode
+from simplepowerflow.powerflow.griddataexport.electrical_schematic import create_network_schematic
+from simplepowerflow.powerflow.griddataexport.export_gridline_data import export_grid_line_data
+from simplepowerflow.powerflow.powerflow.jacobianmatrix import JacobianMatrix
+from simplepowerflow.powerflow.utils.complexutils import get_polar
+from simplepowerflow.powerflow.utils.create_plot import *
 from .powerflowequations import *
 
 
