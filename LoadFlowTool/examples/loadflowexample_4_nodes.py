@@ -12,7 +12,7 @@ csv_files_path = os.path.join(os.path.dirname(__file__), "../../test/test_files/
 gridline_path = os.path.join(csv_files_path, "lines.csv")
 
 # Dateipfad fuer gridnode-Datei
-gridnode_path = os.path.join(csv_files_path, "gridnodes.csv")
+gridnode_path = os.path.join(csv_files_path, "gridnodes_350kW.csv")
 
 # Dateipfad fuer transformator-Datei
 transformer_path = os.path.join(csv_files_path, "transformers.csv")

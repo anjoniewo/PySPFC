@@ -8,7 +8,6 @@ LoadFlowTool - TODOs:
 
 	- einzelne Lasten und Einspeiser zu Knoten hinzuf�gen und l�schen k�nnen
 	- packages und sub-packages kl�ren
-	- Ausgabe der Ergebnisse in CSV-Dateien (pu oder physikalische Gr��e???) und eventuell graphisch
 	- Eingabe der Parameter in physikalischen ODER bezogenen Gr��en erm�glichen
 	- Eingabe Validierung und Logger implementieren
 	- Zus�tzliche Netzelemente:
