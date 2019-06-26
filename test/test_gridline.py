@@ -1,5 +1,5 @@
 from unittest import TestCase
-from simpleloadflow.loadflowtool.grid.gridline import GridLine
+from simplepowerflow.powerflowtool.grid.gridline import GridLine
 
 
 # Klasse fuer GridLine-Tests
