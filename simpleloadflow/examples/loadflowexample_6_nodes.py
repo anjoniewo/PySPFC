@@ -8,10 +8,10 @@ csv_files_path = os.path.join(os.path.dirname(__file__), "../../test/test_files/
 
 # Erstelle Dateipfad fuer export
 try:
-	os.makedirs(os.path.join(os.path.dirname(__file__), "../../test/test_export/6_knoten_export"))
+    os.makedirs(os.path.join(os.path.dirname(__file__), "../../test/test_export/6_knoten_export"))
 except FileExistsError:
-	# directory already exists
-	pass
+    # directory already exists
+    pass
 csv_export_path = os.path.join(os.path.dirname(__file__), "../../test/test_export/6_knoten_export")
 
 # Dateipfade fuer einzulesenden Dateien
