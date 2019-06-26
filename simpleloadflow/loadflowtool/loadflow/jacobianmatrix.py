@@ -115,9 +115,9 @@ class JacobianMatrix:
 				# node_name_and_x_value[2] = Knotenindex
 				# node_name_and_x_value[3] = Elektrische Groeße
 				# node_name_and_x_value[4] = Wert der elektrischen Groeße
-				node_name_and_p_value = (grid_node.get_name(), grid_node_type, index, "P", p_value)
-				node_name_and_q_value = (grid_node.get_name(), grid_node_type, index, "Q", q_value)
-				node_name_and_v_value = (grid_node.get_name(), grid_node_type, index, "U", v_value)
+				node_name_and_p_value = (grid_node.name, grid_node_type, index, "P", p_value)
+				node_name_and_q_value = (grid_node.name, grid_node_type, index, "Q", q_value)
+				node_name_and_v_value = (grid_node.name, grid_node_type, index, "U", v_value)
 				
 				p_values.append(node_name_and_p_value)
 				q_values.append(node_name_and_q_value)
@@ -129,9 +129,9 @@ class JacobianMatrix:
 				q_value = None
 				v_value = grid_node.get_node_voltage_magnitude() ** 2
 				
-				node_name_and_p_value = (grid_node.get_name(), grid_node_type, index, "P", p_value)
-				node_name_and_q_value = (grid_node.get_name(), grid_node_type, index, "Q", q_value)
-				node_name_and_v_value = (grid_node.get_name(), grid_node_type, index, "U", v_value)
+				node_name_and_p_value = (grid_node.name, grid_node_type, index, "P", p_value)
+				node_name_and_q_value = (grid_node.name, grid_node_type, index, "Q", q_value)
+				node_name_and_v_value = (grid_node.name, grid_node_type, index, "U", v_value)
 				
 				p_values.append(node_name_and_p_value)
 				q_values.append(node_name_and_q_value)
@@ -143,9 +143,9 @@ class JacobianMatrix:
 				q_value = -1 * grid_node.get_q_load()
 				v_value = None
 				
-				node_name_and_p_value = (grid_node.get_name(), grid_node_type, index, "P", p_value)
-				node_name_and_q_value = (grid_node.get_name(), grid_node_type, index, "Q", q_value)
-				node_name_and_v_value = (grid_node.get_name(), grid_node_type, index, "U", v_value)
+				node_name_and_p_value = (grid_node.name, grid_node_type, index, "P", p_value)
+				node_name_and_q_value = (grid_node.name, grid_node_type, index, "Q", q_value)
+				node_name_and_v_value = (grid_node.name, grid_node_type, index, "U", v_value)
 				
 				p_values.append(node_name_and_p_value)
 				q_values.append(node_name_and_q_value)
@@ -212,9 +212,9 @@ class JacobianMatrix:
 					# if index < len(J5):
 					J5[index][j] = dUi2_dFj
 					J6[index][j] = dUi2_dEj
-			# else:
-			# 	J3[index][j] = dQi_dFj
-			# 	J4[index][j] = dQi_dEj
+		# else:
+		# 	J3[index][j] = dQi_dFj
+		# 	J4[index][j] = dQi_dEj
 		
 		return J1, J2, J3, J4, J5, J6
 	

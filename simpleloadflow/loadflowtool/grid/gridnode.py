@@ -77,7 +77,7 @@ class GridNode:
 		self.set_node_parameters(node_parameters)
 	
 	# getter-Methoden
-	def get_name(self):
+	def __get_name(self):
 		return self.__name
 	
 	def get_type_number(self):
@@ -122,6 +122,8 @@ class GridNode:
 	
 	def set_q_load(self, q_load):
 		self.__q_load = q_load
+	
+	name = property(__get_name)
 	
 	# Methode setzt die Knotenparameter in Abhaengigkeit des Knotentyps
 	def set_node_parameters(self, node_parameters):
