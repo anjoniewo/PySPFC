@@ -1,9 +1,9 @@
-from simpleloadflow.loadflowtool.grid.busadmittancematrix import BusAdmittanceMatrix
-from simpleloadflow.loadflowtool.grid.gridline import GridLine
-from simpleloadflow.loadflowtool.grid.gridnode import GridNode
-from simpleloadflow.loadflowtool.loadflow.jacobianmatrix import JacobianMatrix
-from simpleloadflow.loadflowtool.loadflow.loadflow import LoadFlow
-from simpleloadflow.loadflowtool.loadflow.loadflowreporter import LoadFlowReporter
+from simpleloadflow.powerflow.grid.busadmittancematrix import BusAdmittanceMatrix
+from simpleloadflow.powerflow.grid.gridline import GridLine
+from simpleloadflow.powerflow.grid.gridnode import GridNode
+from simpleloadflow.powerflow.powerflow.jacobianmatrix import JacobianMatrix
+from simpleloadflow.powerflow.powerflow.powerflow import PowerFlow
+from simpleloadflow.powerflow.powerflow.powerflowreporter import LoadFlowReporter
 
 
 # Klasse fuer ein elektrisches Netz
@@ -38,7 +38,7 @@ class Grid:
         self.jacobi_matrix = JacobianMatrix(self.__grid_node_list, self.__voltage_node_list,
                                             self.bus_admittance_matrix.matrix)
 
-        self.loadflow = LoadFlow(self)
+        self.loadflow = PowerFlow(self)
 
     # getter
     def get_frequency(self):

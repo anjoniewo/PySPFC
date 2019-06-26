@@ -1,6 +1,6 @@
 # Parser-Klasse zum Einleser der Leitungsdaten
-from simpleloadflow.loadflowtool.griddataimport.csvparser import CSVParser
-from simpleloadflow.loadflowtool.grid.transformer import Transformer
+from simpleloadflow.powerflow.griddataimport.csvparser import CSVParser
+from simpleloadflow.powerflow.grid.transformer import Transformer
 
 
 class TransformerParser(CSVParser):

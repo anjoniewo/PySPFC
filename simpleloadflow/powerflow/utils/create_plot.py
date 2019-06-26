@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from simpleloadflow.loadflowtool.utils.config import TITLE_FONTSIZE, LABEL_FONTSIZE
+from simpleloadflow.powerflow.utils.config import TITLE_FONTSIZE, LABEL_FONTSIZE
 
 plt.rcParams["font.family"] = "Arial"
 

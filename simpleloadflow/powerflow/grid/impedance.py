@@ -1,4 +1,4 @@
-from simpleloadflow.loadflowtool.utils.complexutils import *
+from simpleloadflow.powerflow.utils.complexutils import *
 
 
 class Impedance:
