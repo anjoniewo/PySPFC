@@ -1,0 +1,8 @@
+"""
+    Konstanten
+"""
+TITLE_FONTSIZE = 16
+LABEL_FONTSIZE = 14
+TICK_FONTSIZE = 12
+
+BAR_COLOR = 'red'
