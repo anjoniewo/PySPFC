@@ -25,6 +25,7 @@ class TestGridNode(TestCase):
 	
 	def test_set_node_parameters(self):
 		gridnode = GridNode("K1", 0, self.create_gridnode_parameter_list(5, 1.2, 0, 0, 0.9, 0.4))
+		print(gridnode.name)
 	
 	def test_print_gridnode_infos(self):
 		gridnode = GridNode("K1", 0, self.create_gridnode_parameter_list(5, 1.2, 0, 0, 0.9, 0.4))

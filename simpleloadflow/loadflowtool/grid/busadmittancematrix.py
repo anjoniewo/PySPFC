@@ -90,17 +90,16 @@ class BusAdmittanceMatrix:
 			
 			# Setzen der gefilterten Leitungsliste
 			bus_connecter_list_with_node_name = [bus_connecter for bus_connecter in bus_connecter_list if
-			                                     bus_connecter.get_node_name_i() == grid_node.get_name() or
-			                                     bus_connecter.get_node_name_j() == grid_node.get_name()]
+			                                     bus_connecter.get_node_name_i() == grid_node.name or
+			                                     bus_connecter.get_node_name_j() == grid_node.name]
 			
 			self.__bus_connecter_list = copy.deepcopy(bus_connecter_list_with_node_name)
 			
 			for column in range(row, number_of_grid_nodes):
-				gridnode_name_j = grid_node_list[column].get_name()
+				gridnode_name_j = grid_node_list[column].name
 				
 				self.matrix[row][column] = self.matrix[column][row] = self.__get_sum_of_grid_lines_on_node(
-					grid_node.get_name(),
-					gridnode_name_j)
+					grid_node.name, gridnode_name_j)
 	
 	# Methode ermoeglicht das manuelle setzen einzelner Admittanz elemente
 	def set_element(self, row, column, admittance):

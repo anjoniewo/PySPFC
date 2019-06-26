@@ -64,7 +64,7 @@ class GridLine:
 		self.__set_line_parameters(line_parameters)
 	
 	# getter-Methoden
-	def get_name(self):
+	def __get_name(self):
 		return self.__name
 	
 	def get_node_name_i(self):
@@ -81,6 +81,8 @@ class GridLine:
 	
 	def get_transverse_admittance_on_node(self):
 		return self.__transverse_admittance_on_node
+	
+	name = property(__get_name)
 	
 	# Methode setzt die Leitungsbelaege (Ω/km) als Parameter
 	def __set_line_parameters(self, line_parameters):
