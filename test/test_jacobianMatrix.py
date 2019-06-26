@@ -1,10 +1,10 @@
 from unittest import TestCase
 import numpy as np
-from LoadFlowTool.loadflowtool.grid.grid import Grid
-from LoadFlowTool.loadflowtool.grid.gridnode import GridNode
-from LoadFlowTool.loadflowtool.grid.gridline import GridLine
-from LoadFlowTool.loadflowtool.loadflow.jacobianmatrix import JacobianMatrix
-from LoadFlowTool.loadflowtool.utils import print_matrix
+from simpleloadflow.loadflowtool.grid.grid import Grid
+from simpleloadflow.loadflowtool.grid.gridnode import GridNode
+from simpleloadflow.loadflowtool.grid.gridline import GridLine
+from simpleloadflow.loadflowtool.loadflow.jacobianmatrix import JacobianMatrix
+from simpleloadflow.loadflowtool.utils import print_matrix
 
 from .test_gridNode import TestGridNode
 from .test_gridline import TestGridLine

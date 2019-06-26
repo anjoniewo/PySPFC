@@ -179,7 +179,7 @@ def create_pdf_report(grid_node_data, grid_line_data, v_nom, s_nom):
     # add line currents plot
     pdf.image(current_plot_path, x=x_pos, y=y_pos, w=width, h=height)
 
-    pdf.output('loadflow_report.pdf', 'F')
+    pdf.output('..\\..\\test\\test_export\\loadflow_report.pdf', 'F')
 
 
 def add_table(pdf=PDF, table_label='Table', tab_lab_height=5, data=list(list()), width=5, height=5,

@@ -1,9 +1,9 @@
-from LoadFlowTool.examples.electrical_schematic import create_network_schematic
-from LoadFlowTool.loadflowtool.grid.gridnode import GridNode
-from LoadFlowTool.loadflowtool.griddataexport.export_gridline_data import export_grid_line_data
-from LoadFlowTool.loadflowtool.loadflow.jacobianmatrix import JacobianMatrix
-from LoadFlowTool.loadflowtool.utils.complexutils import get_polar
-from LoadFlowTool.loadflowtool.utils.create_plot import *
+from simpleloadflow.loadflowtool.griddataexport.electrical_schematic import create_network_schematic
+from simpleloadflow.loadflowtool.grid.gridnode import GridNode
+from simpleloadflow.loadflowtool.griddataexport.export_gridline_data import export_grid_line_data
+from simpleloadflow.loadflowtool.loadflow.jacobianmatrix import JacobianMatrix
+from simpleloadflow.loadflowtool.utils.complexutils import get_polar
+from simpleloadflow.loadflowtool.utils.create_plot import *
 from .loadflowequations import *
 
 

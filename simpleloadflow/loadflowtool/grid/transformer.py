@@ -1,6 +1,6 @@
-from LoadFlowTool.loadflowtool.loadflow.loadflowreporter import LoadFlowReporter
-from LoadFlowTool.loadflowtool.grid.impedance import Impedance
-from LoadFlowTool.loadflowtool.grid.admittance import Admittance
+from simpleloadflow.loadflowtool.loadflow.loadflowreporter import LoadFlowReporter
+from simpleloadflow.loadflowtool.grid.impedance import Impedance
+from simpleloadflow.loadflowtool.grid.admittance import Admittance
 
 
 # ein Transformator wird als Knotenverbindendes Netzelement definiert

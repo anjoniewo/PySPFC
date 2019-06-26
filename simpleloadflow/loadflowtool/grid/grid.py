@@ -1,9 +1,9 @@
-from LoadFlowTool.loadflowtool.grid.busadmittancematrix import BusAdmittanceMatrix
-from LoadFlowTool.loadflowtool.grid.gridline import GridLine
-from LoadFlowTool.loadflowtool.grid.gridnode import GridNode
-from LoadFlowTool.loadflowtool.loadflow.jacobianmatrix import JacobianMatrix
-from LoadFlowTool.loadflowtool.loadflow.loadflow import LoadFlow
-from LoadFlowTool.loadflowtool.loadflow.loadflowreporter import LoadFlowReporter
+from simpleloadflow.loadflowtool.grid.busadmittancematrix import BusAdmittanceMatrix
+from simpleloadflow.loadflowtool.grid.gridline import GridLine
+from simpleloadflow.loadflowtool.grid.gridnode import GridNode
+from simpleloadflow.loadflowtool.loadflow.jacobianmatrix import JacobianMatrix
+from simpleloadflow.loadflowtool.loadflow.loadflow import LoadFlow
+from simpleloadflow.loadflowtool.loadflow.loadflowreporter import LoadFlowReporter
 
 
 # Klasse fuer ein elektrisches Netz

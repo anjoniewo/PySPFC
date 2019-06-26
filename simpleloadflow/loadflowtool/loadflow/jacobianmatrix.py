@@ -1,4 +1,4 @@
-from LoadFlowTool.loadflowtool.utils.complexutils import get_cartesian_from_euler
+from simpleloadflow.loadflowtool.utils.complexutils import get_cartesian_from_euler
 import numpy as np
 
 """
