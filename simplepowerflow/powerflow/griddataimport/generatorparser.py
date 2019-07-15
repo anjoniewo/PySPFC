@@ -1,4 +1,3 @@
-# Parser-Klasse zum Einleser der Leitungsdaten
 from simplepowerflow.powerflow.parser.csvparser import CSVParser
 from simplepowerflow.powerflow.grid.gridnode import GridNode
 
@@ -88,29 +87,32 @@ class GridNodeParser(CSVParser):
 				list_of_parameters[index] = float(parameter)
 		
 		grid_node_parameters = list()
-		# active_load_power
-		grid_node_parameters.append(list_of_parameters[0])
-		# reactive_load_power
-		grid_node_parameters.append(list_of_parameters[1])
-		# active_injection_power
-		grid_node_parameters.append(list_of_parameters[2])
-		# reactive_injection_power
-		grid_node_parameters.append(list_of_parameters[3])
-		# theta in rad
-		grid_node_parameters.append(list_of_parameters[4])
-		# node_voltage
-		grid_node_parameters.append(list_of_parameters[5])
-		# minimale Wirkleistungsgrenze
-		grid_node_parameters.append(list_of_parameters[6])
-		# maximale Wirkleistungsgrenze
-		grid_node_parameters.append(list_of_parameters[7])
-		# minimale Blindleistungsgrenze
-		grid_node_parameters.append(list_of_parameters[8])
-		# maximale Blindleistungsgrenze
-		grid_node_parameters.append(list_of_parameters[9])
-		# nominelle Scheinleistung (Bezugsgroeße)
-		grid_node_parameters.append(list_of_parameters[10])
-		# nominelle Spannung (Bezugsgroeße)
-		grid_node_parameters.append(list_of_parameters[11])
+
+		for item in list_of_parameters:
+			grid_node_parameters.append(item)
+		# # active_load_power
+		# grid_node_parameters.append(list_of_parameters[0])
+		# # reactive_load_power
+		# grid_node_parameters.append(list_of_parameters[1])
+		# # active_injection_power
+		# grid_node_parameters.append(list_of_parameters[2])
+		# # reactive_injection_power
+		# grid_node_parameters.append(list_of_parameters[3])
+		# # theta in rad
+		# grid_node_parameters.append(list_of_parameters[4])
+		# # node_voltage
+		# grid_node_parameters.append(list_of_parameters[5])
+		# # minimale Wirkleistungsgrenze
+		# grid_node_parameters.append(list_of_parameters[6])
+		# # maximale Wirkleistungsgrenze
+		# grid_node_parameters.append(list_of_parameters[7])
+		# # minimale Blindleistungsgrenze
+		# grid_node_parameters.append(list_of_parameters[8])
+		# # maximale Blindleistungsgrenze
+		# grid_node_parameters.append(list_of_parameters[9])
+		# # nominelle Scheinleistung (Bezugsgroeße)
+		# grid_node_parameters.append(list_of_parameters[10])
+		# # nominelle Spannung (Bezugsgroeße)
+		# grid_node_parameters.append(list_of_parameters[11])
 		
 		return grid_node_parameters

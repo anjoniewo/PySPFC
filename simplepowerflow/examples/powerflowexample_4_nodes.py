@@ -2,7 +2,7 @@ import os.path
 
 from simplepowerflow.powerflow.grid.admittance import Admittance
 from simplepowerflow.powerflow.grid.grid import Grid
-from simplepowerflow.powerflow.griddataimport.gridparser import GridParser
+from simplepowerflow.powerflow.griddataimport.gridimport import GridImport
 from simplepowerflow.powerflow.powerflow.powerflow import PowerFlow
 
 # Erstelle Dateipfad zu grideline- und gridnode-Dateien
@@ -18,7 +18,7 @@ gridnode_path = os.path.join(csv_files_path, 'gridnodes_350kW.csv')
 transformer_path = os.path.join(csv_files_path, 'transformers.csv')
 
 # einlesen der Netzdaten
-gridparser = GridParser(gridline_file_path=gridline_path, gridnode_file_path=gridnode_path,
+gridparser = GridImport(gridline_file_path=gridline_path, gridnode_file_path=gridnode_path,
                         transformer_path=transformer_path, frequency=50)
 
 # Erstellung des Netzwerks

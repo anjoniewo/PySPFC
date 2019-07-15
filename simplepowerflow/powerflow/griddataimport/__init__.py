@@ -1,3 +1,3 @@
-__all__ = ["gridparser", "gridlineparser", "csvparser", "gridnodeparser"]
+__all__ = ["gridimport", "gridlineparser", "csvparser", "gridnodeparser"]
 
-from . import csvparser, gridlineparser, gridnodeparser, gridparser
+from . import csvparser, gridlineparser, gridnodeparser, gridimport

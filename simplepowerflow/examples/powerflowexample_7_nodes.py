@@ -1,7 +1,7 @@
 import os.path
 from simplepowerflow.powerflow.grid.grid import Grid
 from simplepowerflow.powerflow.griddataexport.export_results_to_pdf import create_pdf_report
-from simplepowerflow.powerflow.griddataimport.gridparser import GridParser
+from simplepowerflow.powerflow.griddataimport.gridimport import GridImport
 
 # Erstelle Dateipfad zu grideline- und gridnode-Dateien
 csv_files_path = os.path.join(os.path.dirname(__file__), '../../test/test_files/7_knoten_mit_trafo')
@@ -15,7 +15,7 @@ gridnode_path = os.path.join(csv_files_path, 'gridnodes.csv')
 transformer_path = os.path.join(csv_files_path, 'transformers.csv')
 
 # einlesen der Netzdaten
-gridparser = GridParser(gridline_file_path=gridline_path, gridnode_file_path=gridnode_path,
+gridparser = GridImport(gridline_file_path=gridline_path, gridnode_file_path=gridnode_path,
                         transformer_path=transformer_path, frequency=50)
 
 # Bezugsgroeßen des Netzwerks

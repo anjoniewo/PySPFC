@@ -3,7 +3,7 @@ from simplepowerflow.powerflow.griddataimport.gridnodeparser import GridNodePars
 from simplepowerflow.powerflow.griddataimport.transformerparser import TransformerParser
 
 
-class GridParser:
+class GridImport:
 
     def __init__(self, frequency, gridline_file_path="", gridnode_file_path="", transformer_path=""):
         self.__grid_line_parser = GridLineParser(gridline_file_path, frequency)
