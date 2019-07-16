@@ -4,6 +4,7 @@ import sys
 import math
 import pandas as pd
 
+from simplepowerflow.powerflow.grid.gridline import GridLine
 from simplepowerflow.powerflow.utils.config import get_file_names
 
 csv_import_path = os.path.join(os.path.dirname(__file__), '../../csv_import')
@@ -11,8 +12,8 @@ file_names = get_file_names()
 
 cols_generators = ['name', 'node_i', 'p_max', 'p_min', 'q_max', 'q_min']
 cols_gridnodes = ['name']
-cols_lines = ['name', 'node_i', 'node_j', 'length in km', 'r', 'x', 'g_shunt', 'b_shunt', 'r_l', 'x_l', 'g_shunt_l',
-              'b_shunt_l']
+cols_lines = ['name', 'node_i', 'node_j', 'r', 'x', 'g_shunt', 'b_shunt', 'r_l', 'x_l', 'g_shunt_l', 'b_shunt_l',
+              'length']
 cols_loads = []
 cols_settings = ['slack', 'v_nom', 's_nom', 'time_stamp_format']
 cols_transformers = []
@@ -26,28 +27,47 @@ class CSVimport:
         self.validator = ImportValidator()
         self.df_import = dict()
         self.network_settings = None
+        self.grid_lines = list()
 
     def import_csv_files(self):
-        self.import_as_dfs()
+        self.import_files_as_dfs()
         self.network_settings = self.get_settings()
+        self.get_lines()
+        foo = 1
+
+    def get_lines(self):
+        line_file_df = self.df_import['lines.csv']
+        line_file_columns = line_file_df.columns.values.tolist()
+        self.validator.validate_columns(cols_lines, line_file_columns)
+        for row in line_file_df.iterrows():
+            row = row[1]
+            grid_line_name = row['name']
+            node_i = row['node_i']
+            node_j = row['node_j']
+            r = row['r'] if not math.isnan(row['r']) else None
+            x = row['x'] if not math.isnan(row['x']) else None
+            g_shunt = row['g_shunt'] if not math.isnan(row['g_shunt']) else None
+            b_shunt = row['b_shunt'] if not math.isnan(row['b_shunt']) else None
+            line_parameters = {'r': r, 'x': x, 'g_shunt': g_shunt, 'b_shunt': b_shunt}
+            grid_line = GridLine(grid_line_name, node_i, node_j, line_parameters)
+            self.grid_lines.append(grid_line)
 
     def get_settings(self):
-        if len(self.df_import):
-            settings_file = self.df_import['simulation_settings.csv']
-            settings_file_columns = settings_file.columns.values.tolist()
-            self.validator.validate_columns(cols_settings, settings_file_columns)
-            slack = settings_file['slack'].iloc[0] if isinstance(settings_file['slack'].iloc[0], str) else None
-            v_nom = settings_file['v_nom'].iloc[0] if not math.isnan(settings_file['v_nom'].iloc[0]) else None
-            s_nom = settings_file['s_nom'].iloc[0] if not math.isnan(settings_file['s_nom'].iloc[0]) else None
-            time_stamp_format = settings_file['time_stamp_format'].iloc[0] if isinstance(
-                settings_file['time_stamp_format'].iloc[0], str) else None
-            if not (slack and v_nom and s_nom and time_stamp_format):
-                print('\nProgram was aborted. Entries are missing in "simulation_settings.csv"')
-                raise SystemExit(1)
+        settings_file_df = self.df_import['simulation_settings.csv']
+        settings_file_columns = settings_file_df.columns.values.tolist()
+        self.validator.validate_columns(cols_settings, settings_file_columns)
+        slack = settings_file_df['slack'].iloc[0] if isinstance(settings_file_df['slack'].iloc[0], str) else None
+        v_nom = settings_file_df['v_nom'].iloc[0] if not math.isnan(settings_file_df['v_nom'].iloc[0]) else None
+        s_nom = settings_file_df['s_nom'].iloc[0] if not math.isnan(settings_file_df['s_nom'].iloc[0]) else None
+        time_stamp_format = settings_file_df['time_stamp_format'].iloc[0] if isinstance(
+            settings_file_df['time_stamp_format'].iloc[0], str) else None
+        if not (slack and v_nom and s_nom and time_stamp_format):
+            print('\nProgram was aborted. Entries are missing in "simulation_settings.csv"')
+            raise SystemExit(1)
 
-            return Settings(slack, v_nom, s_nom, time_stamp_format)
+        return Settings(slack, v_nom, s_nom, time_stamp_format)
 
-    def import_as_dfs(self):
+    def import_files_as_dfs(self):
 
         files = os.listdir(csv_import_path)
         nonexistent_files = list()

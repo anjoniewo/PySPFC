@@ -81,26 +81,18 @@ class GridLine:
     # Methode setzt die Leitungsbelaege (Ω/km) als Parameter
     def __set_line_parameters(self, line_parameters):
 
-        # Leitungslaenge
-        if line_parameters[0]:
-            self.__length = line_parameters[0]
-
+        if line_parameters:
             # resistiver Laengswiderstand
-            if line_parameters[1] >= 0:
-                self.__resistance = line_parameters[1] * self.__length
+            self.__resistance = line_parameters['r']
 
             # induktiver Laengswiderstand
-            if line_parameters[2] >= 0:
-                # induktiver Belag * Leitungslaenge
-                self.__inductive_reactance = line_parameters[2] * self.__length
+            self.__inductive_reactance = line_parameters['x']
 
             # resistiver Querwiderstand
-            if line_parameters[3]:
-                self.__transverse_resistance = line_parameters[3] * self.__length
+            self.__transverse_resistance = line_parameters['g_shunt']
 
             # kapazitiver Querwiderstand
-            if line_parameters[4]:
-                self.__capacitive_reactance = line_parameters[4] * self.__length
+            self.__capacitive_reactance = line_parameters['b_shunt']
 
         else:
             LoadFlowReporter.error_report.append("Line-length: line_parameters[0] = 0")
