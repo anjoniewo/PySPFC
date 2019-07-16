@@ -10,14 +10,10 @@ from simplepowerflow.powerflow.powerflow.powerflowreporter import LoadFlowReport
 class Grid:
 
     # Initialisierungskonstruktor
-    def __init__(self, grid_node_list=list(), grid_line_list=list(), transformer_list=list(), frequency=50, v_nom=200,
-                 s_nom=100):
+    def __init__(self, grid_node_list=list(), grid_line_list=list(), transformer_list=list(), v_nom=200, s_nom=100):
 
         self.v_nom = v_nom
         self.s_nom = s_nom
-
-        # Netzfrequenz (default 50 Hz)
-        self.__frequency = frequency
 
         # Liste von Knoten und Liste von Leitungen
         self.__grid_node_list = grid_node_list
@@ -41,9 +37,6 @@ class Grid:
         self.powerflow = PowerFlow(self)
 
     # getter
-    def get_frequency(self):
-        return self.__frequency
-
     def get_grid_node_list(self):
         return self.__grid_node_list
 
@@ -66,7 +59,7 @@ class Grid:
     # Methode erstellt einen neuen Netzzweig und fuegt diese der Leitungsliste hinzu
     def create_grid_line(self, node_i, node_j, line_parameters):
         # Instanzierung eines neuen GridNode Objektes
-        line = GridLine(self.__frequency, node_i, node_j, line_parameters)
+        line = GridLine(node_i, node_j, line_parameters)
         self.add_grid_line(line)
 
     # Methode fuegt der Leitungsliste einen Netzzweig hinzu

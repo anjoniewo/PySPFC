@@ -17,7 +17,7 @@ transformer_path = os.path.join(csv_files_path, "transformers.csv")
 
 # einlesen der Netzdaten
 gridparser = GridImport(gridline_file_path=gridline_path, gridnode_file_path=gridnode_path,
-                        transformer_path=transformer_path, frequency=50)
+                        transformer_path=transformer_path)
 
 # Erstellung des Netzwerks
 network = Grid(grid_node_list=gridparser.grid_node_parser.get_gridnodes(),

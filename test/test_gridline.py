@@ -1,5 +1,5 @@
 from unittest import TestCase
-from simplepowerflow.powerflowtool.grid.gridline import GridLine
+from simplepowerflow.powerflow.grid.gridline import GridLine
 
 
 # Klasse fuer GridLine-Tests
@@ -24,11 +24,11 @@ class TestGridLine(TestCase):
 
     # Test fuer die Instanzierung eines GridLine-Objekts
     def test_set_line_parameters(self):
-        branch_1 = GridLine(50, "K0", "K1", self.test_create_line_parameters(1, 1, 1, 1, 1))
-        assert branch_1.get_frequency(), 50
+        branch_1 = GridLine("K0", "K1", self.test_create_line_parameters(1, 1, 1, 1, 1))
+        assert branch_1.node_name_i, 'K0'
 
     # Test fuer die Konsolenausgabe der Parameter eines GridLine-Objektes
     def test_info(self):
-        branch_1 = GridLine(50, "K0", "K1", self.test_create_line_parameters(1, 1, 1, 1, 1))
+        branch_1 = GridLine("K0", "K1", self.test_create_line_parameters(1, 1, 1, 1, 1))
         branch_1.info()
         assert branch_1.node_name_i, "K1"

@@ -2,13 +2,10 @@ generators.csv:
     - defines the generators connected to a bus:
         - name(required): generator type or name
         - node_i(required): name of the bus
-        - p_gen(optional): generated active power
-        - q_gen(optional): generated reactive power
-        - cos_phi(optional): powerfactor of the generator
         - p_max(optional): upper active power generation limit
         - p_min(optional): lower active power generation limit
         - q_max(optional): upper reactive power generation limit
-        - q_min(optional): lower reactive power generation limit
+        - q_min(optional): lower reactive power generation limits
 
 generators_t_series.csv:
     - holds the generators time series:
@@ -47,9 +44,6 @@ loads.csv:
     - defines the loads connected to a bus:
         - name(required): load type or name
         - node_i(required): name of the bus
-        - p_load(optional if is_time_series): active power consumption
-        - q_load(optional): reactive power consumption
-        - cos_phi(optional): powerfactor of the load
 
 loads_t_series.csv:
     - holds the loads time series:

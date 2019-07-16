@@ -1,7 +1,7 @@
 import os
 from unittest import TestCase
 
-from simplepowerflow.powerflowtool.griddataimport.gridlineparser import GridLineParser
+from simplepowerflow.powerflow.griddataimport.gridlineparser import GridLineParser
 
 
 class TestGridLineParser(TestCase):
@@ -13,5 +13,4 @@ class TestGridLineParser(TestCase):
         # Dateipfad fuer gridline-Datei
         gridline_path = os.path.join(csv_files_path, "lines.csv")
 
-        grid_line_parser = GridLineParser(file_path=gridline_path, frequency=50)
-
+        grid_line_parser = GridLineParser(file_path=gridline_path)

@@ -1,0 +1,6 @@
+name;node_i;node_j;length in km;r;x;g_shunt;b_shunt;r_l;x_l;g_shunt_l;b_shunt_l
+L1;K1;K2;0.05;0.157;0;;;;;;
+L2;K2;K3;0.02;0.157;0;;;;;;
+L3;K3;K4;0.02;0.157;0;;;;;;
+L4;K4;K5;0.02;0.157;0;;;;;;
+L5;K5;K6;0.02;0.157;0;;;;;;
