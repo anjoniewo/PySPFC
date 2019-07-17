@@ -30,15 +30,11 @@ lines.csv:
         - name(required): unique name of the gridline connecting node_i and node_j
         - node_i(required): unique gridnode name of node_i (defined in gridnodes.csv)
         - node_j(required): unique gridnode name of node_j (defined in gridnodes.csv)
-        - r(required if known): line resistance in Ω (including the length)
-        - x(required if known): reactive line resistance in Ω (including the length and network frequency)
-        - g_shunt(required if known): in 1/Ω (including the length)
-        - b_shunt(required if known): in 1/Ω (including the length and network frequency)
-        - r_l(required if length dependent parameters are set): in Ω/km
-        - x_l(required if length dependent parameters are set): in Ω/km (including the network frequency)
-        - g_shunt_l(required if length dependent parameters are set): in 1/(Ωkm)
-        - b_shunt_l(required if length dependent parameters are set): in 1/(Ωkm) (including the network frequency)
-        - length in km(required if length dependent parameters are set): in km
+        - r_l(required): in Ω/km
+        - x_l(required): in Ω/km (including the network frequency)
+        - g_shunt_l(required): in 1/(Ωkm)
+        - b_shunt_l(required): in 1/(Ωkm) (including the network frequency)
+        - length in km(required): in km
 
 loads.csv:
     - defines the loads connected to a bus:

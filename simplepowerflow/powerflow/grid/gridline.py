@@ -77,25 +77,33 @@ class GridLine:
         return self.__transverse_admittance_on_node
 
     name = property(__get_name)
+    # node_i = property(__get_node_name_i)
+    # node_j = property(__get_node_name_j)
+    # admittance = property(__get_admittance)
+    # shunt_admittance = property(__get_transverse_admittance_on_node)
 
     # Methode setzt die Leitungsbelaege (Ω/km) als Parameter
     def __set_line_parameters(self, line_parameters):
 
         if line_parameters:
+            
+            # Leitungslaenge
+            self.__length = line_parameters['length']
+            
             # resistiver Laengswiderstand
-            self.__resistance = line_parameters['r']
+            self.__resistance = line_parameters['r_l'] * self.__length
 
             # induktiver Laengswiderstand
-            self.__inductive_reactance = line_parameters['x']
+            self.__inductive_reactance = line_parameters['x_l'] * self.__length
 
             # resistiver Querwiderstand
-            self.__transverse_resistance = line_parameters['g_shunt']
+            self.__transverse_resistance = line_parameters['g_shunt_l'] * self.__length
 
             # kapazitiver Querwiderstand
-            self.__capacitive_reactance = line_parameters['b_shunt']
+            self.__capacitive_reactance = line_parameters['b_shunt_l'] * self.__length
 
         else:
-            LoadFlowReporter.error_report.append("Line-length: line_parameters[0] = 0")
+            LoadFlowReporter.error_report.append("Coudn't read line_parameters.")
             print(LoadFlowReporter.error_report)
 
         # Laengsimpedanz der Leitung
