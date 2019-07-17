@@ -23,12 +23,14 @@ import math
 class GridNode:
 	
 	# Initialisierungs-Konstruktor
-	def __init__(self, name, typenumber, node_parameters):
+	def __init__(self, name, generators, loads, typenumber, node_parameters):
 		
-		# **********************
 		# ***** Knotenname *****
-		# **********************
 		self.__name = name
+		
+		self.__generators = generators
+		
+		self.__loads = loads
 		
 		# **********************
 		# ***** Knotentyp  *****
