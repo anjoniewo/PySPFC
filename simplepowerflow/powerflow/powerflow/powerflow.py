@@ -52,7 +52,12 @@ class PowerFlow:
         self.export_result_df = None
 
     # Lastflussberechnung
-    def do_loadflow(self):
+    def do_powerflow(self):
+        """
+            Method performs non-linear power flow calculation with Newton-Raphson algorithm
+            results of each loop will be saved in lists and finally exported to csv files
+        :return:
+        """
 
         # initialer Spannungsvektor ohne Slack-Elemente
         sub_Fk_Ek_vector = self.jacobian_matrix.get_sub_Fk_Ek_vector(self.init_Fk_Ek_vector)
@@ -146,7 +151,8 @@ class PowerFlow:
 
             grid_node_type = grid_node.get_type_number()
             if grid_node_type == 3:
-                q_value_of_injection_node = self.powerflowequations.calculate_reactive_power_at_node(Fk_Ek_vector, index)
+                q_value_of_injection_node = self.powerflowequations.calculate_reactive_power_at_node(Fk_Ek_vector,
+                                                                                                     index)
                 q_min = grid_node.get_q_min()
                 q_max = grid_node.get_q_max()
                 exceeded_q_limit = False if q_min <= q_value_of_injection_node <= q_max else True

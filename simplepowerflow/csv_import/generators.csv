@@ -1,1 +1,6 @@
 name;node_i;p_max;p_min;q_max;q_min
+G1;K1;1;1;1;1
+G2;K2;1;1;1;1
+PV1;K3;1;1;1;1
+PV2;K4;1;1;1;1
+GAS1;K1;1;1;1;1

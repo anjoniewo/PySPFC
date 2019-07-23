@@ -93,7 +93,7 @@ class Grid:
 
     # Lastflussberechnung durchfuehren
     def do_powerflow(self):
-        self.powerflow.do_loadflow()
+        self.powerflow.do_powerflow()
 
     def export_powerflow_results(self, csv_export_path):
         self.powerflow.export_loadflow_results(csv_export_path)
