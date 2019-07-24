@@ -1,5 +1,7 @@
 from unittest import TestCase
 
+from simplepowerflow.powerflow.grid.grid import Grid
+
 
 class TestGrid(TestCase):
 	# network.create_grid_node("K1", 0, [0, 0, 400, 0])
@@ -26,3 +28,11 @@ class TestGrid(TestCase):
 	# # network.create_grid_line("K7", "K8", [1, 1, 1, 1, 1])
 	# # network.create_grid_line("K8", "K9", [1, 1, 1, 1, 1])
 	pass
+	
+	def test_import_csv_data(self):
+		grid = Grid(grid_node_list=list(), grid_line_list=list(), transformer_list=list(), v_nom=200, s_nom=100)
+		grid.import_csv_data()
+		grid.print_grid_line_list()
+		grid.print_grid_node_list()
+		
+		assert 1 == 1
