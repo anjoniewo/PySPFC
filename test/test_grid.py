@@ -34,5 +34,5 @@ class TestGrid(TestCase):
 		grid.import_csv_data()
 		grid.print_grid_line_list()
 		grid.print_grid_node_list()
-		
+		1
 		assert len(grid.get_grid_line_list()) == 5
