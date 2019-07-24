@@ -35,4 +35,4 @@ class TestGrid(TestCase):
 		grid.print_grid_line_list()
 		grid.print_grid_node_list()
 		
-		assert 1 == 1
+		assert len(grid.get_grid_line_list()) == 5
