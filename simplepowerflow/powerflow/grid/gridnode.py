@@ -45,7 +45,7 @@ class GridNode:
 		# 2 = P-U-Knoten (Einspeisung)
 		self.types_index = {1: "slack", 2: "load", 3: "voltage"}
 		self.__types = {"slack": 1, "load": 2, "voltage": 3}
-		self.__typenumber = None
+		self.__typenumber = 2
 		
 		# ***********************
 		# **** Lastparameter ****
