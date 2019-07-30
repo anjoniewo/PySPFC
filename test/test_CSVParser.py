@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from simplepowerflow.powerflow.griddataimport.csvparser import CSVParser
+from simplepowerflow.powerflow.griddataimport.ALT_csvparser import CSVParser
 
 
 class TestCSVParser(TestCase):

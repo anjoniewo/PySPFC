@@ -146,7 +146,7 @@ def create_pdf_report(grid_node_data, grid_line_data, v_nom, s_nom):
     col_width = epw / 11
     text_height = pdf.font_size
 
-    # add table of grid node data
+    # add table of gridelements node data
     table_label = 'Tabelle der Knoten - Angabe in p.u. mit U_ref = ' + str(v_nom / 1e3) + ' kV und S_ref = ' + str(
         s_nom / 1e6) + ' MVA'
     add_table(pdf=pdf, table_label=table_label, tab_lab_height=epw, data=grid_node_data, width=col_width,
@@ -157,7 +157,7 @@ def create_pdf_report(grid_node_data, grid_line_data, v_nom, s_nom):
 
     pdf.ln(18)
 
-    # add table of grid line data
+    # add table of gridelements line data
     table_label = 'Tabelle der Leitungen - Angaben in physikalischen Größen'
     add_table(pdf=pdf, table_label=table_label, tab_lab_height=epw, data=grid_line_data, width=col_width * 2,
               height=2 * text_height)

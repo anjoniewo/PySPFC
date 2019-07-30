@@ -1,8 +1,8 @@
 import os.path
 
-from simplepowerflow.powerflow.grid.admittance import Admittance
-from simplepowerflow.powerflow.grid.grid import Grid
-from simplepowerflow.powerflow.griddataimport.gridimport import GridImport
+from simplepowerflow.powerflow.gridelements.admittance import Admittance
+from simplepowerflow.powerflow.gridelements.grid import Grid
+from simplepowerflow.powerflow.griddataimport.ALT_gridimport import GridImport
 from simplepowerflow.powerflow.powerflow.powerflow import PowerFlow
 
 # Erstelle Dateipfad zu grideline- und gridnode-Dateien

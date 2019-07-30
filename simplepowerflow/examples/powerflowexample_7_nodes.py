@@ -1,7 +1,7 @@
 import os.path
-from simplepowerflow.powerflow.grid.grid import Grid
+from simplepowerflow.powerflow.gridelements.grid import Grid
 from simplepowerflow.powerflow.griddataexport.export_results_to_pdf import create_pdf_report
-from simplepowerflow.powerflow.griddataimport.gridimport import GridImport
+from simplepowerflow.powerflow.griddataimport.ALT_gridimport import GridImport
 
 # Erstelle Dateipfad zu grideline- und gridnode-Dateien
 csv_files_path = os.path.join(os.path.dirname(__file__), '../../test/test_files/7_knoten_mit_trafo')

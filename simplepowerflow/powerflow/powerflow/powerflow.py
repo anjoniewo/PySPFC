@@ -1,29 +1,26 @@
 import numpy as np
 
-from simplepowerflow.powerflow.grid.gridnode import GridNode
-from simplepowerflow.powerflow.griddataexport.electrical_schematic import create_network_schematic
-from simplepowerflow.powerflow.griddataexport.export_gridline_data import export_grid_line_data
+from simplepowerflow.powerflow.gridelements.gridnode import GridNode
 from simplepowerflow.powerflow.powerflow.jacobianmatrix import JacobianMatrix
 from simplepowerflow.powerflow.utils.complexutils import get_polar
-from simplepowerflow.powerflow.utils.create_plot import *
 from .powerflowequations import *
 
 
 class PowerFlow:
 
-    def __init__(self, grid):
+    def __init__(self, **kwargs):
 
-        self.v_nom = grid.v_nom
-        self.s_nom = grid.s_nom
+        self.v_nom = kwargs['v_nom'] if 'v_nom' in kwargs else None
+        self.s_nom = kwargs['s_nom'] if 's_nom' in kwargs else None
 
         # Liste der Leitungen
-        self.grid_line_list = grid.get_grid_line_list()
+        self.grid_line_list = kwargs['gridlines'] if 'gridlines' in kwargs else None
 
         # Liste der Transformatoren
-        self.transformers = grid.get_transformers()
+        self.transformers = kwargs['transformers'] if 'transformers' in kwargs else None
 
         # urspruengliche, eingelesene Knotenliste
-        self.grid_node_list = grid.get_grid_node_list()
+        self.grid_node_list = kwargs['gridnodes'] if 'gridnodes' in kwargs else None
 
         # Knotenliste die sich waehrend der Iterationen aendern kann
         # Beispiel:
@@ -31,11 +28,11 @@ class PowerFlow:
         self.new_grid_node_list = copy.deepcopy(self.grid_node_list)
 
         # initiale Spannungsknotennamen speichern
-        self.initial_injection_node_names_and_indices = self.get_injection_node_names_and_index(self.grid_node_list)
+        self.initial_generator_node_names_and_indices = self.get_generator_node_names_and_index(self.grid_node_list)
 
-        self.bus_admittance_matrix = grid.get_bus_admittance_matrix()
+        self.bus_admittance_matrix = kwargs['bus_admittance_matrix'] if 'bus_admittance_matrix' in kwargs else None
 
-        self.jacobian_matrix = grid.jacobi_matrix
+        self.jacobian_matrix = kwargs['jacobimatrix'] if 'jacobimatrix' in kwargs else None
 
         self.powerflowequations = None
 
@@ -77,16 +74,8 @@ class PowerFlow:
 
         p_q_v_vector = self.calculate_p_q_v_vector(p_q_v_info_vector, Fk_Ek_vector, initial=False)
 
-        self.create_node_results(p_q_v_info_vector, p_q_v_vector, Fk_Ek_vector,
-                                 number_of_nodes)
-
-        self.create_line_results(Fk_Ek_vector)
-
-        self.export_node_voltage_plot()
-        self.export_currents_on_lines_plot()
-
-        create_network_schematic(self.grid_node_results, self.grid_node_list, self.grid_line_results,
-                                 self.grid_line_list, self.transformers)
+        return self.create_node_results(p_q_v_info_vector, p_q_v_vector, Fk_Ek_vector,
+                                        number_of_nodes), self.create_line_results(Fk_Ek_vector)
 
     # iterative Lastflussberechnung mit Newton-Raphson verfahren durchfuehren
     def do_iterations(self, Fk_Ek_vector, sub_Fk_Ek_vector, sub_p_q_v_info_vector):
@@ -111,8 +100,9 @@ class PowerFlow:
 
             sub_Fk_Ek_vector = self.jacobian_matrix.get_sub_Fk_Ek_vector(Fk_Ek_vector)
 
-            new_jacobi = JacobianMatrix(self.new_grid_node_list, self.get_voltage_nodes(self.new_grid_node_list),
-                                        self.bus_admittance_matrix, Fk_Ek_vector)
+            new_jacobi = JacobianMatrix(gridnodes=self.new_grid_node_list,
+                                        voltagenodes=self.get_voltage_nodes(self.new_grid_node_list),
+                                        bus_admittance_matrix=self.bus_admittance_matrix, Fk_Ek_vector=Fk_Ek_vector)
 
             new_sub_jacobian = new_jacobi.Jk
             inverse_sub_jacobian = np.linalg.inv(new_sub_jacobian)
@@ -143,7 +133,7 @@ class PowerFlow:
     # Falls nicht, wird aus einem PU-Knoten ein PQ- respektive Lastknoten
     def check_q_limits(self, Fk_Ek_vector):
 
-        for tup in self.initial_injection_node_names_and_indices:
+        for tup in self.initial_generator_node_names_and_indices:
             index = tup[0]
             grid_node_name = tup[1]
             grid_node = next(
@@ -151,29 +141,28 @@ class PowerFlow:
 
             grid_node_type = grid_node.get_type_number()
             if grid_node_type == 3:
-                q_value_of_injection_node = self.powerflowequations.calculate_reactive_power_at_node(Fk_Ek_vector,
+                q_value_of_generator_node = self.powerflowequations.calculate_reactive_power_at_node(Fk_Ek_vector,
                                                                                                      index)
                 q_min = grid_node.get_q_min()
                 q_max = grid_node.get_q_max()
-                exceeded_q_limit = False if q_min <= q_value_of_injection_node <= q_max else True
+                exceeded_q_limit = False if q_min <= q_value_of_generator_node <= q_max else True
 
                 if exceeded_q_limit:
-                    q_load = q_max if q_value_of_injection_node > q_max else q_min
-                    node_parameters = [grid_node.get_p_load(), q_load]
-                    new_load_node = GridNode(grid_node_name, 2, node_parameters)
+                    q_load = q_max if q_value_of_generator_node > q_max else q_min
+                    new_load_node = GridNode(grid_node_name, typenumber=2, p_load=grid_node.get_p_load(), q_load=q_load)
                     self.new_grid_node_list[index] = new_load_node
 
             elif grid_node_type == 2:
-                if q_min <= q_value_of_injection_node <= q_max:
+                if q_min <= q_value_of_generator_node <= q_max:
                     node_index_in_origin_list, origin_node = self.get_index_and_grid_node_from_list(grid_node.name,
                                                                                                     self.grid_node_list)
                     self.new_grid_node_list[node_index_in_origin_list] = origin_node
 
-                elif q_value_of_injection_node < q_min:
+                elif q_value_of_generator_node < q_min:
                     index, grid_node = self.get_index_and_grid_node_from_list(grid_node_name, self.new_grid_node_list)
                     self.new_grid_node_list[index].set_q_load(q_min)
 
-                elif q_value_of_injection_node > q_max:
+                elif q_value_of_generator_node > q_max:
                     index, grid_node = self.get_index_and_grid_node_from_list(grid_node_name, self.new_grid_node_list)
                     self.new_grid_node_list[index].set_q_load(q_max)
 
@@ -202,7 +191,7 @@ class PowerFlow:
 
         return voltage_nodes_and_index
 
-    def get_injection_node_names_and_index(self, grid_node_list):
+    def get_generator_node_names_and_index(self, grid_node_list):
         voltage_node_names = list(())
         for index, grid_node in enumerate(grid_node_list):
             if grid_node.get_type_number() == 3:
@@ -286,7 +275,7 @@ class PowerFlow:
                     p_load = grid_node.get_p_load()
 
                     self.grid_node_results[grid_node_name]["P_load"] = p_load
-                    self.grid_node_results[grid_node_name]["P_injection"] = p_gross + p_load
+                    self.grid_node_results[grid_node_name]["P_gen"] = p_gross + p_load
                     self.grid_node_results[grid_node_name]["P"] = p_gross
 
                 elif item[3] == "Q":
@@ -294,24 +283,24 @@ class PowerFlow:
 
                     q_load = grid_node.get_q_load()
                     self.grid_node_results[grid_node_name]["Q_load"] = q_load
-                    self.grid_node_results[grid_node_name]["Q_injection"] = q_gross + q_load
+                    self.grid_node_results[grid_node_name]["Q_gen"] = q_gross + q_load
                     self.grid_node_results[grid_node_name]["Q"] = q_gross
 
                 elif item[3] == "U":
                     self.grid_node_results[grid_node_name]["U_magnitude"] = grid_node.get_node_voltage_magnitude()
                     self.grid_node_results[grid_node_name]["U_angle"] = grid_node.get_node_voltage_angle_in_rad()
 
-            elif grid_node.types_index[type_number] == "load":
+            elif grid_node.types_index[type_number] == "PQ":
                 if item[3] == "P":
                     p_load = grid_node.get_p_load()
                     self.grid_node_results[grid_node_name]["P_load"] = p_load
-                    self.grid_node_results[grid_node_name]["P_injection"] = 0
+                    self.grid_node_results[grid_node_name]["P_gen"] = 0
                     self.grid_node_results[grid_node_name]["P"] = p_load
 
                 elif item[3] == "Q":
                     q_load = grid_node.get_q_load()
                     self.grid_node_results[grid_node_name]["Q_load"] = q_load
-                    self.grid_node_results[grid_node_name]["Q_injection"] = 0
+                    self.grid_node_results[grid_node_name]["Q_gen"] = 0
                     self.grid_node_results[grid_node_name]["Q"] = q_load
 
                 elif item[3] == "U":
@@ -319,27 +308,29 @@ class PowerFlow:
                     self.grid_node_results[grid_node_name]["U_magnitude"] = u_result["magnitude"]
                     self.grid_node_results[grid_node_name]["U_angle"] = u_result["angleGrad"]
 
-            elif grid_node.types_index[type_number] == "voltage":
+            elif grid_node.types_index[type_number] == "PV":
                 if item[3] == "P":
                     p_load = grid_node.get_p_load()
-                    p_injection = grid_node.get_p_injection()
+                    p_gen = grid_node.get_p_gen()
                     self.grid_node_results[grid_node_name]["P_load"] = p_load
-                    self.grid_node_results[grid_node_name]["P_injection"] = p_injection
-                    self.grid_node_results[grid_node_name]["P"] = p_load + p_injection
+                    self.grid_node_results[grid_node_name]["P_gen"] = p_gen
+                    self.grid_node_results[grid_node_name]["P"] = p_load + p_gen
 
                 elif item[3] == "Q":
                     q_gross = item[4]
 
                     q_load = grid_node.get_q_load()
-                    q_injection = q_gross - q_load
+                    q_gen = q_gross - q_load
                     self.grid_node_results[grid_node_name]["Q_load"] = q_load
-                    self.grid_node_results[grid_node_name]["Q_injection"] = q_injection
+                    self.grid_node_results[grid_node_name]["Q_gen"] = q_gen
                     self.grid_node_results[grid_node_name]["Q"] = q_gross
 
                 elif item[3] == "U":
                     u_result = get_polar(real=Fk_Ek_vector[item[2] + number_of_nodes], imaginary=Fk_Ek_vector[item[2]])
                     self.grid_node_results[grid_node_name]["U_magnitude"] = u_result["magnitude"]
                     self.grid_node_results[grid_node_name]["U_angle"] = u_result["angleGrad"]
+
+        return self.grid_node_results
 
     def create_line_results(self, Fk_Ek_vector):
 
@@ -383,6 +374,8 @@ class PowerFlow:
                 float(np.absolute(current_from_node_j_to_node_i)),
                 6)
 
+        return self.grid_line_results
+
     def __str__(self):
         result = str("\n")
         for i in range(105):
@@ -414,8 +407,8 @@ class PowerFlow:
 
         for key in self.grid_node_results:
             grid_node_name = key
-            p_injection = self.grid_node_results[key]["P_injection"]
-            q_injection = self.grid_node_results[key]["Q_injection"]
+            p_gen = self.grid_node_results[key]["P_gen"]
+            q_gen = self.grid_node_results[key]["Q_gen"]
             p_load = self.grid_node_results[key]["P_load"]
             q_load = self.grid_node_results[key]["Q_load"]
             u_mag = self.grid_node_results[key]["U_magnitude"]
@@ -424,8 +417,8 @@ class PowerFlow:
             result += str("|")
             result += str("{:^10}".format(str(grid_node_name)))
             result += str("|")
-            result += str("{:^15}".format(str(round(float(p_injection * self.s_nom), 3))))
-            result += str("{:^15}".format(str(round(float(q_injection * self.s_nom), 3))))
+            result += str("{:^15}".format(str(round(float(p_gen * self.s_nom), 3))))
+            result += str("{:^15}".format(str(round(float(q_gen * self.s_nom), 3))))
             result += str("|")
             result += str("{:^15}".format(str(round(float(p_load * self.s_nom), 3))))
             result += str("{:^15}".format(str(round(float(q_load * self.s_nom), 3))))
@@ -442,46 +435,3 @@ class PowerFlow:
             "Die Konvergenzgrenze von Δx = " + str(self.CONVERGENCE_ACCURACY) + " wurde nach " + str(
                 self.iterations) + " Iterationen erreicht.")
         return result
-
-    def export_loadflow_results(self, csv_export_path):
-        p_over_lines = dict((k, v['p_from_i_to_j']) for k, v in self.grid_line_results.items() if 'p_from_i_to_j' in v)
-        q_over_lines = dict((k, v['q_from_i_to_j']) for k, v in self.grid_line_results.items() if 'q_from_i_to_j' in v)
-        s_over_lines = dict((k, v['s_from_i_to_j']) for k, v in self.grid_line_results.items() if 's_from_i_to_j' in v)
-        p_transmission_losses = dict((k, v['p_loss']) for k, v in self.grid_line_results.items() if 'p_loss' in v)
-        q_transmission_losses = dict((k, v['q_loss']) for k, v in self.grid_line_results.items() if 'q_loss' in v)
-        line_currents = dict(
-            (k, v['current_from_i_to_j']) for k, v in self.grid_line_results.items() if 'current_from_i_to_j' in v)
-
-        export_grid_line_data(csv_export_path, "p_lines", p_over_lines)
-        export_grid_line_data(csv_export_path, "q_lines", q_over_lines)
-        export_grid_line_data(csv_export_path, "s_lines", s_over_lines)
-        export_grid_line_data(csv_export_path, "p_transmission_losses", p_transmission_losses)
-        export_grid_line_data(csv_export_path, "q__transmission_losses", q_transmission_losses)
-        export_grid_line_data(csv_export_path, "current_on_lines", line_currents)
-
-    def export_currents_on_lines_plot(self):
-        # die X-Werte:
-        grid_lines = list()
-        # die Y-Werte:
-        current_on_lines = list()
-
-        for grid_line_name in self.grid_line_results:
-            grid_lines.append(grid_line_name)
-            current_on_lines.append(self.grid_line_results[grid_line_name]["current_from_i_to_j"])
-
-        current_nom = self.s_nom / (self.v_nom * math.sqrt(3))
-        current_on_lines = list(map(lambda value: value * current_nom, current_on_lines))
-
-        create_current_plot(grid_lines, current_on_lines, "Strom pro Leitung", "Leitung k", "Strom in A")
-
-    def export_node_voltage_plot(self):
-        # die X-Werte:
-        grid_nodes = list()
-        # die Y-Werte:
-        node_voltages = list()
-
-        for grid_node_name in self.grid_node_results:
-            grid_nodes.append(grid_node_name)
-            node_voltages.append(self.grid_node_results[grid_node_name]["U_magnitude"])
-
-        create_voltage_plot(grid_nodes, node_voltages, "Betrag der Knotenspannung", "Knoten n", "Spannung in pu")

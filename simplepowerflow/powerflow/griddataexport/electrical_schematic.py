@@ -2,7 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 
-def create_network_schematic(grid_node_results, grid_nodes, grid_line_results, grid_lines, transformers):
+def create_network_schematic(grid_lines, transformers):
 	G = nx.Graph()
 	plt.tight_layout()
 	
