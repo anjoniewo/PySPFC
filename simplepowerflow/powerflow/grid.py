@@ -178,9 +178,14 @@ class Grid:
             if gridnode.name == self.__slack_node:
                 v_mag_pu = self.__v_nom / self.__v_nom
                 v_angle = 0
+                p_max_pu = self.__s_nom / self.__s_nom
+                p_min_pu = self.__s_nom / self.__s_nom
+                q_max_pu = self.__s_nom / self.__s_nom
+                q_min_pu = self.__s_nom / self.__s_nom
                 typenumber = gridnode.get_grid_node_type_index_of('slack')
                 gridnode = GridNode(gridnode.name, v_mag=v_mag_pu, v_angle=v_angle, p_load=p_load_pu, q_load=q_load_pu,
-                                    typenumber=typenumber)
+                                    typenumber=typenumber, p_max=p_max_pu, p_min=p_min_pu, q_max=q_max_pu,
+                                    q_min_pu=q_min_pu)
                 gridnodes.append(gridnode)
                 voltagenodes.append(gridnode)
             # transform to a PV node

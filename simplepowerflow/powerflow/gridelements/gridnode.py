@@ -66,8 +66,8 @@ class GridNode:
         self.__p_min = kwargs['p_min'] if 'p_min' in kwargs else None
         self.__p_max = kwargs['p_max'] if 'p_max' in kwargs else None
 
-        self.__q_min = kwargs['q_min'] if 'q_min' in kwargs else None
-        self.__q_max = kwargs['q_max'] if 'q_max' in kwargs else None
+        self.__q_min = kwargs['q_min'] if 'q_min' in kwargs else 100
+        self.__q_max = kwargs['q_max'] if 'q_max' in kwargs else 100
 
         # ***************************
         # ***** Spannungswinkel *****

@@ -110,12 +110,12 @@ class CSVimport:
         generators = list()
         for row in generator_file_df.iterrows():
             row = row[1]
-            generator_name = row['name']
-            grid_node_name = row['node_i']
-            p_min = row['p_min']
-            p_max = row['p_max']
-            q_min = row['q_min']
-            q_max = row['q_max']
+            generator_name = row['name'] if 'name' in row else 'name#'
+            grid_node_name = row['node_i'] if 'node_i' in row else 'node#'
+            p_min = row['p_min'] if not math.isnan(float(row['p_min'])) else 0
+            p_max = row['p_max'] if not math.isnan(float(row['p_max'])) else 100
+            q_min = row['q_min'] if not math.isnan(float(row['q_min'])) else 0
+            q_max = row['q_max'] if not math.isnan(float(row['q_max'])) else 100
             generator = Generator(name=generator_name, node_i=grid_node_name, p_min=p_min, p_max=p_max, q_min=q_min,
                                   q_max=q_max)
             generators.append(generator)

@@ -6,6 +6,7 @@ csv_export_path = os.path.join(os.path.dirname(__file__), '../../test/test_expor
 
 network = Grid()
 network.import_csv_data()
+network.print_bus_admittance_matrix()
 network.do_powerflow()
 print('Fertig')
 # network.export_powerflow_results(csv_export_path=csv_export_path)

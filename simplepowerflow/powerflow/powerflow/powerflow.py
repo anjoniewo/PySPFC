@@ -153,6 +153,8 @@ class PowerFlow:
                     self.new_grid_node_list[index] = new_load_node
 
             elif grid_node_type == 2:
+                q_min = grid_node.get_q_min()
+                q_max = grid_node.get_q_max()
                 if q_min <= q_value_of_generator_node <= q_max:
                     node_index_in_origin_list, origin_node = self.get_index_and_grid_node_from_list(grid_node.name,
                                                                                                     self.grid_node_list)
