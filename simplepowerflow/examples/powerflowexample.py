@@ -16,4 +16,4 @@ network.export_powerflow_results()
 """
 @TODO: not yet customized to time series data
 """
-# network.create_pdf_report()
+network.create_pdf_report()

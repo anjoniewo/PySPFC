@@ -1,6 +1,10 @@
 import os
 
+import math
+import matplotlib.pyplot as plt
+
 from simplepowerflow.powerflow.griddataexport.export_gridline_data import export_data_to_csv
+from simplepowerflow.powerflow.utils.config import LABEL_FONTSIZE, TITLE_FONTSIZE
 
 csv_export_path = os.path.join(os.path.dirname(__file__), '..\\csv_export')
 
@@ -13,42 +17,40 @@ class CSVexport:
 	def __init__(self):
 		pass
 	
-	def export_currents_on_lines_plot(self):
-		1
+	def export_currents_on_lines_plot(self, grid_line_results, s_nom, v_nom):
 		"""
 		@TODO: not yet customized to time series data
 		"""
+		
+		# die X-Werte:
+		grid_lines = list()
+		# die Y-Werte:
+		current_on_lines = list()
+		
+		for grid_line_name in grid_line_results:
+			grid_lines.append(grid_line_name)
+			current_on_lines.append(grid_line_results[grid_line_name]["current_from_i_to_j"])
+		
+		current_nom = s_nom / (v_nom * math.sqrt(3))
+		current_on_lines = list(map(lambda value: value * current_nom, current_on_lines))
+		
+		self.create_current_plot(grid_lines, current_on_lines, "Strom pro Leitung", "Leitung k", "Strom in A")
 	
-	# # die X-Werte:
-	# grid_lines = list()
-	# # die Y-Werte:
-	# current_on_lines = list()
-	#
-	# for grid_line_name in self.grid_line_results:
-	#     grid_lines.append(grid_line_name)
-	#     current_on_lines.append(self.grid_line_results[grid_line_name]["current_from_i_to_j"])
-	#
-	# current_nom = self.s_nom / (self.v_nom * math.sqrt(3))
-	# current_on_lines = list(map(lambda value: value * current_nom, current_on_lines))
-	#
-	# create_current_plot(grid_lines, current_on_lines, "Strom pro Leitung", "Leitung k", "Strom in A")
-	
-	def export_node_voltage_plot(self):
-		1
+	def export_node_voltage_plot(self, grid_node_results, v_nom, s_nom):
 		"""
 		@TODO: not yet customized to time series data
 		"""
-	
-	# # die X-Werte:
-	# grid_nodes = list()
-	# # die Y-Werte:
-	# node_voltages = list()
-	#
-	# for grid_node_name in self.grid_node_results:
-	#     grid_nodes.append(grid_node_name)
-	#     node_voltages.append(self.grid_node_results[grid_node_name]["U_magnitude"])
-	#
-	# create_voltage_plot(grid_nodes, node_voltages, "Betrag der Knotenspannung", "Knoten n", "Spannung in pu")
+		
+		# die X-Werte:
+		grid_nodes = list()
+		# die Y-Werte:
+		node_voltages = list()
+		
+		for grid_node_name in grid_node_results:
+			grid_nodes.append(grid_node_name)
+			node_voltages.append(grid_node_results[grid_node_name]["U_magnitude"])
+		
+		self.create_voltage_plot(grid_nodes, node_voltages, "Betrag der Knotenspannung", "Knoten n", "Spannung in pu")
 	
 	def export_grid_node_results(self, timestamps, grid_node_results, v_nom, s_nom, is_export_pu):
 		"""
@@ -147,7 +149,7 @@ class CSVexport:
 				if 'q_loss' in value:
 					q_transmission_losses[key].append(str(value['q_loss'] * s_nom))
 				if 'current_from_i_to_j' in value:
-					line_currents[key].append(str(value['current_from_i_to_j'] * (s_nom/v_nom)))
+					line_currents[key].append(str(value['current_from_i_to_j'] * (s_nom / v_nom)))
 		
 		export_data_to_csv(csv_export_path, "p_lines", p_over_lines)
 		export_data_to_csv(csv_export_path, "q_lines", q_over_lines)
@@ -155,3 +157,124 @@ class CSVexport:
 		export_data_to_csv(csv_export_path, "p_transmission_losses", p_transmission_losses)
 		export_data_to_csv(csv_export_path, "q__transmission_losses", q_transmission_losses)
 		export_data_to_csv(csv_export_path, "current_on_lines", line_currents)
+		
+		import matplotlib.pyplot as plt
+		
+		plt.rcParams["font.family"] = "Arial"
+	
+	def create_voltage_plot(x_vals=list(), y_vals=list(), title="title", x_axis_label="abscissa",
+	                        y_axis_label="ordinate"):
+		fig, voltage_axes = plt.subplots()
+		
+		# Spannungsband
+		voltage_range_min = 0.9
+		voltage_range_max = 1.1
+		voltage_axes.axhline(voltage_range_max, color='r', linestyle='--', label='Umax')
+		voltage_axes.axhline(voltage_range_min, color='r', linestyle='--', label='Umin')
+		
+		# Balkendiagramm erstellen
+		volt_rects = voltage_axes.bar(x_vals, y_vals, width=0.5, label='Knotenspannung', color='#0090ff')
+		
+		# Titel des Diagramms
+		voltage_axes.set_title(title, fontsize=TITLE_FONTSIZE)
+		
+		# Y-Achsentitel
+		voltage_axes.set_ylabel(y_axis_label, fontsize=LABEL_FONTSIZE, labelpad=15)
+		
+		# min, max Y-Achse
+		temp_y_min = min(y_vals)
+		temp_y_max = max(y_vals)
+		rel_max_delta = 1.1
+		
+		if temp_y_min < voltage_range_min:
+			y_min = temp_y_min - (temp_y_max * (rel_max_delta - 1))
+		else:
+			y_min = voltage_range_min - (voltage_range_max * (rel_max_delta - 1))
+		
+		if temp_y_max < voltage_range_max:
+			y_max = voltage_range_max * rel_max_delta
+		else:
+			y_max = temp_y_max * rel_max_delta
+		
+		voltage_axes.set_ylim(y_min, y_max)
+		
+		# X-Achsentitel
+		voltage_axes.set_xlabel(x_axis_label, fontsize=LABEL_FONTSIZE, labelpad=10)
+		
+		# X-Achsenbeschriftungen
+		voltage_axes.set_xticks(x_vals)
+		
+		# absolute max. Werte der einzelnen Balken
+		autolabel(volt_rects, voltage_axes, 3)
+		
+		labels = ['$\pm$ 10 % ${U}_{ref}$', 'Knotenspannung']
+		handles, _ = voltage_axes.get_legend_handles_labels()
+		
+		# Slice list to remove first handle
+		voltage_axes.legend(handles=handles[1:], labels=labels)
+		
+		plt.subplots_adjust(left=0.175, bottom=0.15)
+		plt.savefig('..\\..\\test\\test_export\\' + title + '.png', format='png', dpi=120)
+		plt.clf()
+		plt.cla()
+	
+	def create_current_plot(x_vals=list(), y_vals=list(), title="title", x_axis_label="abscissa",
+	                        y_axis_label="ordinate"):
+		fig, voltage_axes = plt.subplots()
+		
+		# Balkendiagramm erstellen
+		volt_rects = voltage_axes.bar(x_vals, y_vals, width=0.5, label='Strom', color='#ff8a00')
+		
+		# Titel des Diagramms
+		voltage_axes.set_title(title, fontsize=TITLE_FONTSIZE)
+		
+		# Y-Achsentitel
+		voltage_axes.set_ylabel(y_axis_label, fontsize=LABEL_FONTSIZE, labelpad=15)
+		
+		# min, max Y-Achse
+		temp_y_min = min(y_vals)
+		temp_y_max = max(y_vals)
+		rel_max_delta = 1.1
+		
+		y_min = 0
+		y_max = temp_y_max * rel_max_delta
+		
+		voltage_axes.set_ylim(y_min, y_max)
+		
+		# X-Achsentitel
+		voltage_axes.set_xlabel(x_axis_label, fontsize=LABEL_FONTSIZE, labelpad=10)
+		
+		# X-Achsenbeschriftungen
+		voltage_axes.set_xticks(x_vals)
+		
+		# absolute max. Werte der einzelnen Balken
+		autolabel(volt_rects, voltage_axes, 0)
+		
+		voltage_axes.legend()
+		
+		plt.subplots_adjust(left=0.175, bottom=0.15)
+		plt.savefig('..\\..\\test\\test_export\\' + title + '.png', format='png', dpi=120)
+		plt.clf()
+		plt.cla()
+
+
+def autolabel(rects, axes, decimals=2, xpos='center'):
+	"""
+	Attach a text label above each bar in *rects*, displaying its height.
+
+	*xpos* indicates which side to place the text w.r.t. the center of
+	the bar. It can be one of the following {'center', 'right', 'left'}.
+	"""
+	
+	ha = {'center': 'center', 'right': 'left', 'left': 'right'}
+	offset = {'center': 0, 'right': 1, 'left': -1}
+	
+	for rect in rects:
+		if decimals == 0:
+			height = int(round(float(rect.get_height())))
+		else:
+			height = round(float(rect.get_height()), decimals)
+		axes.annotate('{}'.format(height), xy=(rect.get_x() + rect.get_width() / 2, height),
+		              xytext=(offset[xpos] * 3, 3),  # use 3 points offset
+		              textcoords="offset points",  # in both directions
+		              ha=ha[xpos], va='bottom')
