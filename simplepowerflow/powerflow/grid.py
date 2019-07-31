@@ -1,7 +1,7 @@
 from simplepowerflow.powerflow.csvexport import CSVexport
 from simplepowerflow.powerflow.csvimport import CSVimport
 from simplepowerflow.powerflow.griddataexport.electrical_schematic import create_network_schematic
-from simplepowerflow.powerflow.griddataexport.export_gridline_data import export_data_to_csv
+from simplepowerflow.powerflow.griddataexport.export_results_to_pdf import create_pdf_report
 from simplepowerflow.powerflow.gridelements.busadmittancematrix import BusAdmittanceMatrix
 from simplepowerflow.powerflow.gridelements.gridline import GridLine
 from simplepowerflow.powerflow.gridelements.gridnode import GridNode
@@ -57,6 +57,10 @@ class Grid:
 		return self.__transformer_list
 	
 	def import_csv_data(self):
+		"""
+		imports grid data from 'csv_import' directory
+		:return:
+		"""
 		csv_import = CSVimport()
 		csv_import.import_csv_files()
 		self.__grid_node_list = csv_import.grid_nodes
@@ -250,3 +254,14 @@ class Grid:
 			result += "\n"
 		print("")
 		print(result)
+	
+	def create_pdf_report(self):
+		"""
+		method calls create_pdf_reporter() of export_results_to_pdf.py
+		:return: -
+		"""
+		if len(self.__grid_node_list) < 8:
+			create_pdf_report(self.grid_node_results, self.powerflow.grid_line_results, self.__v_nom, self.__s_nom)
+		else:
+			print(
+				'ATTENTION: Number of buses to large. PDF will not be created due to terms of readibility and overview.')

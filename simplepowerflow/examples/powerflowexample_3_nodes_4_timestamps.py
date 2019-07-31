@@ -1,11 +1,19 @@
-import os.path
-
 from simplepowerflow.powerflow.grid import Grid
 
-csv_export_path = os.path.join(os.path.dirname(__file__), '../../test/test_export/6_knoten_export')
-
+# Grid - object instantiation
 network = Grid()
+
+# import of grid/network data from 'csv_import' directory in the project folder
 network.import_csv_data()
+
+# run of powerflow calculations
 network.do_powerflow()
+
+# export of powerflow calculation results
 network.export_powerflow_results()
-# create_pdf_report(network.powerflow.grid_node_results, network.powerflow.grid_line_results, v_nom, s_nom)
+
+# creation of a PDF - report with significant data
+"""
+@TODO: not yet customized to time series data
+"""
+# network.create_pdf_report()

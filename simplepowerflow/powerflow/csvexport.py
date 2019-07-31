@@ -6,12 +6,18 @@ csv_export_path = os.path.join(os.path.dirname(__file__), '..\\csv_export')
 
 
 class CSVexport:
+	"""
+	class to export powerflow results to csv files
+	"""
 	
 	def __init__(self):
 		pass
 	
 	def export_currents_on_lines_plot(self):
 		1
+		"""
+		@TODO: not yet customized to time series data
+		"""
 	
 	# # die X-Werte:
 	# grid_lines = list()
@@ -29,6 +35,9 @@ class CSVexport:
 	
 	def export_node_voltage_plot(self):
 		1
+		"""
+		@TODO: not yet customized to time series data
+		"""
 	
 	# # die X-Werte:
 	# grid_nodes = list()

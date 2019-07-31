@@ -1,5 +1,0 @@
-name;typenumber;p_load;q_load;p_injection;q_injection;theta in rad;node_voltage;p_min in MW;p_max in MW;q_min in MVar;q_max in MVar;s_nom in MVA;u_nom in kV
-K1;1;0;0;;;0;1;;;-10000;10000;200;20
-K2;2;0.3;0.2;;;;;;;-10000;10000;200;20
-K3;3;0;0;0.3;;;1;;;-10000;10000;200;20
-K4;2;0.2;0.15;;;;;;;-10000;10000;200;20

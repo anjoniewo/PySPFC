@@ -37,6 +37,6 @@ def create_network_schematic(grid_lines, transformers):
 	nx.draw_networkx_edge_labels(G, pos, edge_labels=edges_labels, font_size=14)
 	
 	plt.axis('off')
-	plt.savefig('..\\..\\test\\test_export\\network_schematic.png', format='png', dpi=120)
+	plt.savefig('..\\..\\test\\test_export\\TEST_network_schematic.png', format='png', dpi=120)
 	plt.clf()
 	plt.cla()

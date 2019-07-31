@@ -122,7 +122,7 @@ def create_pdf_report(grid_node_data, grid_line_data, v_nom, s_nom):
     plot_path = '..\\..\\test\\test_export\\'
     current_plot_path = plot_path + 'Strom pro Leitung.png'
     voltage_plot_path = plot_path + 'Betrag der Knotenspannung.png'
-    network_schematic_path = plot_path + 'network_schematic.png'
+    network_schematic_path = plot_path + 'TEST_network_schematic.png'
 
     pdf = PDF()
     pdf.set_margins(top=10, left=16)
@@ -179,7 +179,7 @@ def create_pdf_report(grid_node_data, grid_line_data, v_nom, s_nom):
     # add line currents plot
     pdf.image(current_plot_path, x=x_pos, y=y_pos, w=width, h=height)
 
-    pdf.output('..\\..\\test\\test_export\\loadflow_report.pdf', 'F')
+    pdf.output('..\\..\\test\\test_export\\TEST_powerflow_report.pdf', 'F')
 
 
 def add_table(pdf=PDF, table_label='Table', tab_lab_height=5, data=list(list()), width=5, height=5,
