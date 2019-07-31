@@ -50,12 +50,15 @@ class CSVexport:
 	#
 	# create_voltage_plot(grid_nodes, node_voltages, "Betrag der Knotenspannung", "Knoten n", "Spannung in pu")
 	
-	def export_grid_node_results(self, timestamps, grid_node_results):
+	def export_grid_node_results(self, timestamps, grid_node_results, v_nom, s_nom, is_export_pu):
 		"""
 		method exports node results to csv files in a specified directory (csv_export_path)
 		:param csv_export_path:
 		:return:
 		"""
+		
+		v_nom = 1 if is_export_pu == 1 else v_nom
+		s_nom = 1 if is_export_pu == 1 else s_nom
 		
 		p_load = {'timestamp': list()}
 		q_load = {'timestamp': list()}
@@ -81,15 +84,15 @@ class CSVexport:
 					v_angle[key] = list()
 				
 				if 'p_load' in value:
-					p_load[key].append(str(value['p_load']))
+					p_load[key].append(str(value['p_load'] * s_nom))
 				if 'q_load' in value:
-					q_load[key].append(str(value['q_load']))
+					q_load[key].append(str(value['q_load'] * s_nom))
 				if 'p_gen' in value:
-					p_gen[key].append(str(value['p_gen']))
+					p_gen[key].append(str(value['p_gen'] * s_nom))
 				if 'q_gen' in value:
-					q_gen[key].append(str(value['q_gen']))
+					q_gen[key].append(str(value['q_gen'] * s_nom))
 				if 'v_magnitude' in value:
-					v_mag[key].append(str(value['v_magnitude']))
+					v_mag[key].append(str(value['v_magnitude'] * v_nom))
 				if 'v_angle' in value:
 					v_angle[key].append(str(value['v_angle']))
 		
@@ -100,12 +103,15 @@ class CSVexport:
 		export_data_to_csv(csv_export_path, "v_magnitudes", v_mag)
 		export_data_to_csv(csv_export_path, "v_angles", v_angle)
 	
-	def export_grid_line_results(self, timestamps, grid_line_results):
+	def export_grid_line_results(self, timestamps, grid_line_results, v_nom, s_nom, is_export_pu):
 		"""
 		method exports node results to csv files in a specified directory (csv_export_path)
 		:param csv_export_path:
 		:return:
 		"""
+		
+		v_nom = 1 if is_export_pu == 1 else v_nom
+		s_nom = 1 if is_export_pu == 1 else s_nom
 		
 		p_over_lines = {'timestamp': list()}
 		q_over_lines = {'timestamp': list()}
@@ -131,17 +137,17 @@ class CSVexport:
 					line_currents[key] = list()
 				
 				if 'p_from_i_to_j' in value:
-					p_over_lines[key].append(str(value['p_from_i_to_j']))
+					p_over_lines[key].append(str(value['p_from_i_to_j'] * s_nom))
 				if 'q_from_i_to_j' in value:
-					q_over_lines[key].append(str(value['q_from_i_to_j']))
+					q_over_lines[key].append(str(value['q_from_i_to_j'] * s_nom))
 				if 's_from_i_to_j' in value:
-					s_over_lines[key].append(str(value['s_from_i_to_j']))
+					s_over_lines[key].append(str(value['s_from_i_to_j'] * s_nom))
 				if 'p_loss' in value:
-					p_transmission_losses[key].append(str(value['p_loss']))
+					p_transmission_losses[key].append(str(value['p_loss'] * s_nom))
 				if 'q_loss' in value:
-					q_transmission_losses[key].append(str(value['q_loss']))
+					q_transmission_losses[key].append(str(value['q_loss'] * s_nom))
 				if 'current_from_i_to_j' in value:
-					line_currents[key].append(str(value['current_from_i_to_j']))
+					line_currents[key].append(str(value['current_from_i_to_j'] * (s_nom/v_nom)))
 		
 		export_data_to_csv(csv_export_path, "p_lines", p_over_lines)
 		export_data_to_csv(csv_export_path, "q_lines", q_over_lines)

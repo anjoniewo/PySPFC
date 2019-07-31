@@ -50,9 +50,7 @@ loads_t_series.csv:
 
 simulation_settings.csv:
     - required simulation settings:
-        - in_p_u(required): if 0 = NO => inputs in physical values (v_nom and s_nom required)
-                               1 = YES => input in p.u. (v_nom and s_nom not required)
-        - v_nom(optional): reference voltage (i.o.: 0.4/10/20/50/110/220/380 kV) for internal per unit calculation
-        - s_nom(optional): reference power (i.o.: nominal power of a regulated distributed transformer) for internal per unit calculation
-        - is_time_series(required): can be set to 1 = YES (simulation of time series) or 0 = NO (simulation of a single time)
-        - t_series_type(required): time stamp format i.o.: hh:mm, hh:mm - MM-DD-YYYY etc.
+        - slack(required): name of the slack node
+        - v_nom(required): reference voltage (i.o.: 0.4/10/20/50/110/220/380 kV) for internal per unit calculation
+        - s_nom(required): reference power (i.o.: nominal power of a regulated distributed transformer) for internal per unit calculation
+        - time_stamp_format(optional): specifies the format of time stamps

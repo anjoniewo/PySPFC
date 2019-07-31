@@ -40,6 +40,9 @@ class Grid:
 		
 		self.timestamps = None
 		
+		self.__is_import_pu = 0
+		self.__is_export_pu = 0
+		
 		self.grid_node_results = dict()
 		self.grid_line_results = dict()
 		
@@ -68,6 +71,8 @@ class Grid:
 		self.__slack_node = csv_import.network_settings.slack
 		self.__v_nom = csv_import.network_settings.v_nom
 		self.__s_nom = csv_import.network_settings.s_nom
+		self.__is_import_pu = csv_import.network_settings.is_import_pu
+		self.__is_export_pu = csv_import.network_settings.is_export_pu
 		self.timestamps = csv_import.time_stamp_keys
 		self.create_bus_admittance_matrix()
 	
@@ -145,6 +150,10 @@ class Grid:
 		Method prepares time variant data to perform a powerflow calculation of a single timestamp
 		:return:
 		"""
+		
+		v_nom = 1 if self.__is_import_pu else self.__v_nom
+		s_nom = 1 if self.__is_import_pu else self.__s_nom
+		
 		gridnodes = list()
 		voltagenodes = list()
 		for gridnode in self.__grid_node_list:
@@ -169,31 +178,28 @@ class Grid:
 					sum_of_active_power_load += load.series_data[timestamp]['P']
 					sum_of_reactive_power_load += load.series_data[timestamp]['Q']
 			
-			p_load_pu = sum_of_active_power_load / self.__s_nom
-			q_load_pu = sum_of_reactive_power_load / self.__s_nom
+			p_load_pu = sum_of_active_power_load / s_nom
+			q_load_pu = sum_of_reactive_power_load / s_nom
 			
 			# transform to slack node
 			if gridnode.name == self.__slack_node:
-				v_mag_pu = self.__v_nom / self.__v_nom
+				v_mag_pu = v_nom / v_nom
 				v_angle = 0
-				p_max_pu = self.__s_nom / self.__s_nom
-				p_min_pu = self.__s_nom / self.__s_nom
-				q_max_pu = self.__s_nom / self.__s_nom
-				q_min_pu = self.__s_nom / self.__s_nom
+				p_max_pu = sum_of_p_max / s_nom
+				p_min_pu = sum_of_p_min / s_nom
 				typenumber = gridnode.get_grid_node_type_index_of('slack')
 				gridnode = GridNode(gridnode.name, v_mag=v_mag_pu, v_angle=v_angle, p_load=p_load_pu, q_load=q_load_pu,
-				                    typenumber=typenumber, p_max=p_max_pu, p_min=p_min_pu, q_max=q_max_pu,
-				                    q_min_pu=q_min_pu)
+				                    typenumber=typenumber, p_max=p_max_pu, p_min=p_min_pu)
 				gridnodes.append(gridnode)
 				voltagenodes.append(gridnode)
 			# transform to a PV node
 			elif sum_of_active_power_gen:
-				v_mag_pu = self.__v_nom / self.__v_nom
-				p_gen_pu = sum_of_active_power_gen / self.__s_nom
-				p_max_pu = sum_of_p_max / self.__s_nom
-				p_min_pu = sum_of_p_min / self.__s_nom
-				q_max_pu = sum_of_q_max / self.__s_nom
-				q_min_pu = sum_of_q_min / self.__s_nom
+				v_mag_pu = v_nom / v_nom
+				p_gen_pu = sum_of_active_power_gen / s_nom
+				p_max_pu = sum_of_p_max / s_nom
+				p_min_pu = sum_of_p_min / s_nom
+				q_max_pu = sum_of_q_max / s_nom
+				q_min_pu = sum_of_q_min / s_nom
 				typenumber = gridnode.get_grid_node_type_index_of('PV')
 				gridnode = GridNode(gridnode.name, p_gen=p_gen_pu, v_mag=v_mag_pu, p_load=p_load_pu, q_load=q_load_pu,
 				                    p_min=p_min_pu, p_max=p_max_pu, q_min=q_min_pu, q_max=q_max_pu,
@@ -214,9 +220,12 @@ class Grid:
 		:param csv_export_path: export directory for powerflow results
 		:return: -
 		"""
+		v_nom = self.__v_nom
+		s_nom = self.__s_nom
+		is_export_pu = self.__is_export_pu
 		csv_export = CSVexport()
-		csv_export.export_grid_node_results(self.timestamps, self.grid_node_results)
-		csv_export.export_grid_line_results(self.timestamps, self.grid_line_results)
+		csv_export.export_grid_node_results(self.timestamps, self.grid_node_results, v_nom, s_nom, is_export_pu)
+		csv_export.export_grid_line_results(self.timestamps, self.grid_line_results, v_nom, s_nom, is_export_pu)
 		
 		# create network schematic for PDF report
 		create_network_schematic(self.__grid_line_list, self.__transformer_list)

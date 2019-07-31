@@ -17,6 +17,8 @@ Einspeisung     | PV  |   P_Gi, U_i, P_Li, Q_Li           |     Q_Gi, δ_i     |
 -------------------------------------------------------------------------------------------
 """
 
+Q_MIN_DEFAULT = 1000
+Q_MAX_DEFAULT = 1000
 
 class GridNode:
     """
@@ -66,8 +68,8 @@ class GridNode:
         self.__p_min = kwargs['p_min'] if 'p_min' in kwargs else None
         self.__p_max = kwargs['p_max'] if 'p_max' in kwargs else None
 
-        self.__q_min = kwargs['q_min'] if 'q_min' in kwargs else 100
-        self.__q_max = kwargs['q_max'] if 'q_max' in kwargs else 100
+        self.__q_min = kwargs['q_min'] if 'q_min' in kwargs else Q_MIN_DEFAULT
+        self.__q_max = kwargs['q_max'] if 'q_max' in kwargs else Q_MAX_DEFAULT
 
         # ***************************
         # ***** Spannungswinkel *****
