@@ -276,61 +276,61 @@ class PowerFlow:
                     p_gross = item[4]
                     p_load = grid_node.get_p_load()
 
-                    self.grid_node_results[grid_node_name]["P_load"] = p_load
-                    self.grid_node_results[grid_node_name]["P_gen"] = p_gross + p_load
-                    self.grid_node_results[grid_node_name]["P"] = p_gross
+                    self.grid_node_results[grid_node_name]["p_load"] = p_load
+                    self.grid_node_results[grid_node_name]["p_gen"] = p_gross + p_load
+                    self.grid_node_results[grid_node_name]["p"] = p_gross
 
                 elif item[3] == "Q":
                     q_gross = item[4]
 
                     q_load = grid_node.get_q_load()
-                    self.grid_node_results[grid_node_name]["Q_load"] = q_load
-                    self.grid_node_results[grid_node_name]["Q_gen"] = q_gross + q_load
-                    self.grid_node_results[grid_node_name]["Q"] = q_gross
+                    self.grid_node_results[grid_node_name]["q_load"] = q_load
+                    self.grid_node_results[grid_node_name]["q_gen"] = q_gross + q_load
+                    self.grid_node_results[grid_node_name]["q"] = q_gross
 
                 elif item[3] == "U":
-                    self.grid_node_results[grid_node_name]["U_magnitude"] = grid_node.get_node_voltage_magnitude()
-                    self.grid_node_results[grid_node_name]["U_angle"] = grid_node.get_node_voltage_angle_in_rad()
+                    self.grid_node_results[grid_node_name]["v_magnitude"] = grid_node.get_node_voltage_magnitude()
+                    self.grid_node_results[grid_node_name]["v_angle"] = grid_node.get_node_voltage_angle_in_rad()
 
             elif grid_node.types_index[type_number] == "PQ":
                 if item[3] == "P":
                     p_load = grid_node.get_p_load()
-                    self.grid_node_results[grid_node_name]["P_load"] = p_load
-                    self.grid_node_results[grid_node_name]["P_gen"] = 0
-                    self.grid_node_results[grid_node_name]["P"] = p_load
+                    self.grid_node_results[grid_node_name]["p_load"] = p_load
+                    self.grid_node_results[grid_node_name]["p_gen"] = 0
+                    self.grid_node_results[grid_node_name]["p"] = p_load
 
                 elif item[3] == "Q":
                     q_load = grid_node.get_q_load()
-                    self.grid_node_results[grid_node_name]["Q_load"] = q_load
-                    self.grid_node_results[grid_node_name]["Q_gen"] = 0
-                    self.grid_node_results[grid_node_name]["Q"] = q_load
+                    self.grid_node_results[grid_node_name]["q_load"] = q_load
+                    self.grid_node_results[grid_node_name]["q_gen"] = 0
+                    self.grid_node_results[grid_node_name]["q"] = q_load
 
                 elif item[3] == "U":
                     u_result = get_polar(real=Fk_Ek_vector[item[2] + number_of_nodes], imaginary=Fk_Ek_vector[item[2]])
-                    self.grid_node_results[grid_node_name]["U_magnitude"] = u_result["magnitude"]
-                    self.grid_node_results[grid_node_name]["U_angle"] = u_result["angleGrad"]
+                    self.grid_node_results[grid_node_name]["v_magnitude"] = u_result["magnitude"]
+                    self.grid_node_results[grid_node_name]["v_angle"] = u_result["angleGrad"]
 
             elif grid_node.types_index[type_number] == "PV":
                 if item[3] == "P":
                     p_load = grid_node.get_p_load()
                     p_gen = grid_node.get_p_gen()
-                    self.grid_node_results[grid_node_name]["P_load"] = p_load
-                    self.grid_node_results[grid_node_name]["P_gen"] = p_gen
-                    self.grid_node_results[grid_node_name]["P"] = p_load + p_gen
+                    self.grid_node_results[grid_node_name]["p_load"] = p_load
+                    self.grid_node_results[grid_node_name]["p_gen"] = p_gen
+                    self.grid_node_results[grid_node_name]["p"] = p_load + p_gen
 
                 elif item[3] == "Q":
                     q_gross = item[4]
 
                     q_load = grid_node.get_q_load()
                     q_gen = q_gross - q_load
-                    self.grid_node_results[grid_node_name]["Q_load"] = q_load
-                    self.grid_node_results[grid_node_name]["Q_gen"] = q_gen
-                    self.grid_node_results[grid_node_name]["Q"] = q_gross
+                    self.grid_node_results[grid_node_name]["q_load"] = q_load
+                    self.grid_node_results[grid_node_name]["q_gen"] = q_gen
+                    self.grid_node_results[grid_node_name]["q"] = q_gross
 
                 elif item[3] == "U":
                     u_result = get_polar(real=Fk_Ek_vector[item[2] + number_of_nodes], imaginary=Fk_Ek_vector[item[2]])
-                    self.grid_node_results[grid_node_name]["U_magnitude"] = u_result["magnitude"]
-                    self.grid_node_results[grid_node_name]["U_angle"] = u_result["angleGrad"]
+                    self.grid_node_results[grid_node_name]["v_magnitude"] = u_result["magnitude"]
+                    self.grid_node_results[grid_node_name]["v_angle"] = u_result["angleGrad"]
 
         return self.grid_node_results
 
