@@ -7,6 +7,7 @@ from simplepowerflow.powerflow.griddataexport.export_gridline_data import export
 from simplepowerflow.powerflow.utils.config import LABEL_FONTSIZE, TITLE_FONTSIZE
 
 csv_export_path = os.path.join(os.path.dirname(__file__), '..\\csv_export')
+MAX_NUM_OF_NODES = 100
 
 
 class CSVexport:
@@ -14,8 +15,8 @@ class CSVexport:
 	class to export powerflow results to csv files
 	"""
 	
-	def __init__(self):
-		pass
+	def __init__(self, settings=None):
+		self.__settings = settings
 	
 	def export_currents_on_lines_plot(self, grid_line_results, s_nom, v_nom):
 		"""
@@ -36,31 +37,33 @@ class CSVexport:
 		
 		self.create_current_plot(grid_lines, current_on_lines, "Strom pro Leitung", "Leitung k", "Strom in A")
 	
-	def export_node_voltage_plot(self, grid_node_results, v_nom, s_nom):
+	def export_node_voltage_plot(self, grid_node_results):
 		"""
 		@TODO: not yet customized to time series data
 		"""
 		
-		# die X-Werte:
-		grid_nodes = list()
-		# die Y-Werte:
-		node_voltages = list()
+		if grid_node_results['timestamp']:
+			timestamps = dict([(key, value) for key, value in grid_node_results.items() if key == 'timestamp'])
+			del grid_node_results['timestamp']
+			node_voltages = grid_node_results
+			
+			x_label = "Timestamps"
+			y_label = "Knotenspannungen in pu" if self.__settings.is_export_pu else "Knotenspannungen in kV"
 		
-		for grid_node_name in grid_node_results:
-			grid_nodes.append(grid_node_name)
-			node_voltages.append(grid_node_results[grid_node_name]["U_magnitude"])
-		
-		self.create_voltage_plot(grid_nodes, node_voltages, "Betrag der Knotenspannung", "Knoten n", "Spannung in pu")
+		self.create_voltage_plot(x_vals=timestamps, y_vals=node_voltages, title="Betrag der Knotenspannung",
+		                         x_axis_label=x_label,
+		                         y_axis_label=y_label)
 	
-	def export_grid_node_results(self, timestamps, grid_node_results, v_nom, s_nom, is_export_pu):
+	def export_gridnode_results(self, timestamps, grid_node_results):
+		
 		"""
 		method exports node results to csv files in a specified directory (csv_export_path)
 		:param csv_export_path:
 		:return:
 		"""
 		
-		v_nom = 1 if is_export_pu == 1 else v_nom
-		s_nom = 1 if is_export_pu == 1 else s_nom
+		settings = self.__settings
+		v_nom, s_nom = 1 if settings.is_export_pu == 1 else settings.v_nom, settings.s_nom
 		
 		p_load = {'timestamp': list()}
 		q_load = {'timestamp': list()}
@@ -104,16 +107,17 @@ class CSVexport:
 		export_data_to_csv(csv_export_path, "q_generators", q_gen)
 		export_data_to_csv(csv_export_path, "v_magnitudes", v_mag)
 		export_data_to_csv(csv_export_path, "v_angles", v_angle)
+		
+		return v_mag
 	
-	def export_grid_line_results(self, timestamps, grid_line_results, v_nom, s_nom, is_export_pu):
+	def export_gridline_results(self, timestamps, grid_line_results):
 		"""
 		method exports node results to csv files in a specified directory (csv_export_path)
 		:param csv_export_path:
 		:return:
 		"""
 		
-		v_nom = 1 if is_export_pu == 1 else v_nom
-		s_nom = 1 if is_export_pu == 1 else s_nom
+		v_nom, s_nom = 1 if self.__settings.is_export_pu == 1 else self.__settings.v_nom, self.__settings.s_nom
 		
 		p_over_lines = {'timestamp': list()}
 		q_over_lines = {'timestamp': list()}
@@ -162,7 +166,7 @@ class CSVexport:
 		
 		plt.rcParams["font.family"] = "Arial"
 	
-	def create_voltage_plot(x_vals=list(), y_vals=list(), title="title", x_axis_label="abscissa",
+	def create_voltage_plot(self, x_vals=dict(), y_vals=dict(), title="title", x_axis_label="abscissa",
 	                        y_axis_label="ordinate"):
 		fig, voltage_axes = plt.subplots()
 		
@@ -172,46 +176,53 @@ class CSVexport:
 		voltage_axes.axhline(voltage_range_max, color='r', linestyle='--', label='Umax')
 		voltage_axes.axhline(voltage_range_min, color='r', linestyle='--', label='Umin')
 		
-		# Balkendiagramm erstellen
-		volt_rects = voltage_axes.bar(x_vals, y_vals, width=0.5, label='Knotenspannung', color='#0090ff')
+		if len(y_vals) < MAX_NUM_OF_NODES:
+			
+			x_vals = x_vals['timestamp']
+			
+			for key, value in y_vals.items():
+				plt.plot(x_vals, value, '-', label=str(key))
 		
-		# Titel des Diagramms
-		voltage_axes.set_title(title, fontsize=TITLE_FONTSIZE)
-		
-		# Y-Achsentitel
-		voltage_axes.set_ylabel(y_axis_label, fontsize=LABEL_FONTSIZE, labelpad=15)
-		
-		# min, max Y-Achse
-		temp_y_min = min(y_vals)
-		temp_y_max = max(y_vals)
-		rel_max_delta = 1.1
-		
-		if temp_y_min < voltage_range_min:
-			y_min = temp_y_min - (temp_y_max * (rel_max_delta - 1))
-		else:
-			y_min = voltage_range_min - (voltage_range_max * (rel_max_delta - 1))
-		
-		if temp_y_max < voltage_range_max:
-			y_max = voltage_range_max * rel_max_delta
-		else:
-			y_max = temp_y_max * rel_max_delta
-		
-		voltage_axes.set_ylim(y_min, y_max)
-		
-		# X-Achsentitel
-		voltage_axes.set_xlabel(x_axis_label, fontsize=LABEL_FONTSIZE, labelpad=10)
-		
-		# X-Achsenbeschriftungen
-		voltage_axes.set_xticks(x_vals)
-		
-		# absolute max. Werte der einzelnen Balken
-		autolabel(volt_rects, voltage_axes, 3)
-		
-		labels = ['$\pm$ 10 % ${U}_{ref}$', 'Knotenspannung']
-		handles, _ = voltage_axes.get_legend_handles_labels()
-		
-		# Slice list to remove first handle
-		voltage_axes.legend(handles=handles[1:], labels=labels)
+		# 	# Balkendiagramm erstellen
+		# 	volt_rects = voltage_axes.bar(x_vals, y_vals, width=0.5, label='Knotenspannung', color='#0090ff')
+		#
+		# 	# Titel des Diagramms
+		# 	voltage_axes.set_title(title, fontsize=TITLE_FONTSIZE)
+		#
+		# 	# Y-Achsentitel
+		# 	voltage_axes.set_ylabel(y_axis_label, fontsize=LABEL_FONTSIZE, labelpad=15)
+		#
+		# 	# min, max Y-Achse
+		# 	temp_y_min = min(y_vals)
+		# 	temp_y_max = max(y_vals)
+		# 	rel_max_delta = 1.1
+		#
+		# 	if temp_y_min < voltage_range_min:
+		# 		y_min = temp_y_min - (temp_y_max * (rel_max_delta - 1))
+		# 	else:
+		# 		y_min = voltage_range_min - (voltage_range_max * (rel_max_delta - 1))
+		#
+		# 	if temp_y_max < voltage_range_max:
+		# 		y_max = voltage_range_max * rel_max_delta
+		# 	else:
+		# 		y_max = temp_y_max * rel_max_delta
+		#
+		# 	voltage_axes.set_ylim(y_min, y_max)
+		#
+		# 	# X-Achsentitel
+		# 	voltage_axes.set_xlabel(x_axis_label, fontsize=LABEL_FONTSIZE, labelpad=10)
+		#
+		# 	# X-Achsenbeschriftungen
+		# 	voltage_axes.set_xticks(x_vals)
+		#
+		# 	# absolute max. Werte der einzelnen Balken
+		# 	autolabel(volt_rects, voltage_axes, 3)
+		#
+		# 	labels = ['$\pm$ 10 % ${U}_{ref}$', 'Knotenspannung']
+		# 	handles, _ = voltage_axes.get_legend_handles_labels()
+		#
+		# # Slice list to remove first handle
+		# voltage_axes.legend(handles=handles[1:], labels=labels)
 		
 		plt.subplots_adjust(left=0.175, bottom=0.15)
 		plt.savefig('..\\..\\test\\test_export\\' + title + '.png', format='png', dpi=120)

@@ -21,11 +21,8 @@ class Grid:
 		"""
 		definition of class attributes and initializing with default values
 		"""
-		self.__v_nom = 0.4
-		self.__s_nom = 630
 		
-		# name of slack node, defined in simulation_settings.csv
-		self.__slack_node = None
+		self.__settings = None
 		
 		# Liste von Knoten und Liste von Leitungen
 		self.__grid_node_list = list()
@@ -39,9 +36,6 @@ class Grid:
 		self.powerflow = None
 		
 		self.timestamps = None
-		
-		self.__is_import_pu = 0
-		self.__is_export_pu = 0
 		
 		self.grid_node_results = dict()
 		self.grid_line_results = dict()
@@ -68,15 +62,33 @@ class Grid:
 		csv_import.import_csv_files()
 		self.__grid_node_list = csv_import.grid_nodes
 		self.__grid_line_list = csv_import.grid_lines
-		self.__slack_node = csv_import.network_settings.slack
-		self.__v_nom = csv_import.network_settings.v_nom
-		self.__s_nom = csv_import.network_settings.s_nom
-		self.__is_import_pu = csv_import.network_settings.is_import_pu
-		self.__is_export_pu = csv_import.network_settings.is_export_pu
+		self.__settings = csv_import.network_settings
 		self.timestamps = csv_import.time_stamp_keys
 		self.create_bus_admittance_matrix()
 	
 	def create_bus_admittance_matrix(self):
+		"""
+		instantiation of a BusAdmittanceMatrix object
+		:return:
+		"""
+		
+		settings = self.__settings
+		
+		if not settings.is_resistance_pu:
+			# reference admittance value
+			y_nom = (settings.s_nom / settings.v_nom ** 2)
+			
+			for index, gridline in enumerate(self.__grid_line_list):
+				admittance = gridline.get_admittance()
+				real_part_pu = admittance.get_real_part() / y_nom
+				imag_part_pu = admittance.get_imaginary_part() / y_nom
+				self.__grid_line_list[index].set_admittance(real_part_pu, imag_part_pu)
+				
+				transverse_admittance = gridline.get_transverse_admittance_on_node()
+				real_part_pu = transverse_admittance.get_real_part() / y_nom
+				imag_part_pu = transverse_admittance.get_imaginary_part() / y_nom
+				self.__grid_line_list[index].set_transverse_admittance(real_part_pu, imag_part_pu)
+		
 		# Instanzierung der BusAdmittanceMatrix-Klasse
 		self.bus_admittance_matrix = BusAdmittanceMatrix(self.__grid_node_list, self.__grid_line_list,
 		                                                 self.__transformer_list)
@@ -138,7 +150,7 @@ class Grid:
 			self.jacobi_matrix = JacobianMatrix(gridnodes=gridnodes, voltagenodes=voltagenodes,
 			                                    bus_admittance_matrix=self.bus_admittance_matrix.matrix)
 			
-			self.powerflow = PowerFlow(v_nom=self.__v_nom, s_nom=self.__s_nom,
+			self.powerflow = PowerFlow(v_nom=self.__settings.v_nom, s_nom=self.__settings.s_nom,
 			                           bus_admittance_matrix=self.bus_admittance_matrix.matrix,
 			                           jacobimatrix=self.jacobi_matrix, gridnodes=gridnodes,
 			                           gridlines=self.__grid_line_list, transformers=self.__transformer_list)
@@ -151,8 +163,9 @@ class Grid:
 		:return:
 		"""
 		
-		v_nom = 1 if self.__is_import_pu else self.__v_nom
-		s_nom = 1 if self.__is_import_pu else self.__s_nom
+		settings = self.__settings
+		
+		v_nom, s_nom = 1 if settings.is_import_pu else settings.v_nom, self.__settings.s_nom
 		
 		gridnodes = list()
 		voltagenodes = list()
@@ -182,7 +195,7 @@ class Grid:
 			q_load_pu = sum_of_reactive_power_load / s_nom
 			
 			# transform to slack node
-			if gridnode.name == self.__slack_node:
+			if gridnode.name == settings.slack:
 				v_mag_pu = v_nom / v_nom
 				v_angle = 0
 				p_max_pu = sum_of_p_max / s_nom
@@ -220,18 +233,19 @@ class Grid:
 		:param csv_export_path: export directory for powerflow results
 		:return: -
 		"""
-		v_nom = self.__v_nom
-		s_nom = self.__s_nom
-		is_export_pu = self.__is_export_pu
-		csv_export = CSVexport()
-		csv_export.export_grid_node_results(self.timestamps, self.grid_node_results, v_nom, s_nom, is_export_pu)
-		csv_export.export_grid_line_results(self.timestamps, self.grid_line_results, v_nom, s_nom, is_export_pu)
+		
+		settings = self.__settings
+		v_nom, s_nom, is_export_pu = settings.v_nom, settings.s_nom, settings.is_export_pu
+		
+		csv_export = CSVexport(settings)
+		v_mag_data = csv_export.export_gridnode_results(self.timestamps, self.grid_node_results)
+		csv_export.export_gridline_results(self.timestamps, self.grid_line_results)
+		
+		csv_export.export_node_voltage_plot(grid_node_results=v_mag_data)
+		csv_export.export_currents_on_lines_plot()
 		
 		# create network schematic for PDF report
 		create_network_schematic(self.__grid_line_list, self.__transformer_list)
-	
-	# self.export_node_voltage_plot()
-	# self.export_currents_on_lines_plot()
 	
 	def print_loadflow_results(self):
 		if self.powerflow.grid_node_results:

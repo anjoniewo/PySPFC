@@ -14,14 +14,8 @@ file_names = get_file_names()
 
 cols_generators = ['name', 'node_i', 'p_max', 'p_min', 'q_max', 'q_min']
 cols_gridnodes = ['name']
-cols_lines = ['name', 'node_i', 'node_j', 'r', 'x', 'g_shunt', 'b_shunt', 'r_l', 'x_l', 'g_shunt_l', 'b_shunt_l',
-              'length']
-cols_loads = []
-cols_settings = ['slack', 'v_nom', 's_nom', 'is_import_pu', 'is_export_pu', 'time_stamp_format']
-cols_transformers = []
-
-cols_generators_t_series = []
-cols_loads_t_series = []
+cols_lines = ['name', 'node_i', 'node_j', 'r_l', 'x_l', 'g_shunt_l', 'b_shunt_l', 'length']
+cols_settings = ['slack', 'v_nom', 's_nom', 'is_import_pu', 'is_export_pu', 'is_resistance_pu', 'time_stamp_format']
 
 
 class CSVimport:
@@ -228,7 +222,10 @@ class CSVimport:
 		"""
 		settings_file_df = self.df_import[file_names['sim_settings']]
 		settings_file_columns = settings_file_df.columns.values.tolist()
+		
+		# validation of column names
 		self.validator.validate_columns(cols_settings, settings_file_columns)
+		
 		slack = settings_file_df['slack'].iloc[0] if isinstance(settings_file_df['slack'].iloc[0], str) else None
 		v_nom = settings_file_df['v_nom'].iloc[0] if not math.isnan(settings_file_df['v_nom'].iloc[0]) else None
 		s_nom = settings_file_df['s_nom'].iloc[0] if not math.isnan(settings_file_df['s_nom'].iloc[0]) else None
@@ -236,13 +233,15 @@ class CSVimport:
 			settings_file_df['is_import_pu'].iloc[0]) else 0
 		is_export_pu = settings_file_df['is_export_pu'].iloc[0] if not math.isnan(
 			settings_file_df['is_export_pu'].iloc[0]) else 0
+		is_resistance_pu = settings_file_df['is_resistance_pu'].iloc[0] if not math.isnan(
+			settings_file_df['is_resistance_pu'].iloc[0]) else 0
 		time_stamp_format = settings_file_df['time_stamp_format'].iloc[0] if isinstance(
 			settings_file_df['time_stamp_format'].iloc[0], str) else None
 		if not (slack and v_nom and s_nom and time_stamp_format):
 			print('\nProgram was aborted. Entries are missing in "simulation_settings.csv"')
 			raise SystemExit(1)
 		
-		return Settings(slack, v_nom, s_nom, is_import_pu, is_export_pu, time_stamp_format)
+		return Settings(slack, v_nom, s_nom, is_import_pu, is_export_pu, is_resistance_pu, time_stamp_format)
 	
 	def import_files_as_dfs(self):
 		"""
@@ -303,12 +302,14 @@ class Settings:
 		imported settings from 'simulation_settings.csv' are saved in a Settings() object
 	"""
 	
-	def __init__(self, slack, v_nom=None, s_nom=None, is_import_pu=None, is_export_pu=None, time_stamp_format=None):
+	def __init__(self, slack, v_nom=None, s_nom=None, is_import_pu=None, is_export_pu=None, is_resistance_pu=None,
+	             time_stamp_format=None):
 		self.__slack = slack
 		self.__v_nom = v_nom
 		self.__s_nom = s_nom
 		self.__is_import_pu = is_import_pu
 		self.__is_export_pu = is_export_pu
+		self.__is_resistance_pu = is_resistance_pu
 		self.__time_stamp_format = time_stamp_format
 	
 	def __get_slack_node(self):
@@ -326,6 +327,9 @@ class Settings:
 	def __get_is_export(self):
 		return self.__is_export_pu
 	
+	def __get_is_resistance_pu(self):
+		return self.__is_resistance_pu
+	
 	def __get_tim_stamp_format(self):
 		return self.__time_stamp_format
 	
@@ -334,6 +338,7 @@ class Settings:
 	v_nom = property(__get_v_nom)
 	is_import_pu = property(__get_is_import)
 	is_export_pu = property(__get_is_export)
+	is_resistance_pu = property(__get_is_resistance_pu)
 	time_stamp_format = property(__get_tim_stamp_format)
 
 

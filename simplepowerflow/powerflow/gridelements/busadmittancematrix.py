@@ -1,8 +1,9 @@
+import copy
+
 import numpy as np
+
 from simplepowerflow.powerflow.gridelements.admittance import Admittance
 from simplepowerflow.powerflow.gridelements.gridline import GridLine
-from simplepowerflow.powerflow.gridelements.transformer import Transformer
-import copy
 
 
 # Klasse fuer die Erstellung der Knotenadmittanzmatrix
@@ -20,13 +21,20 @@ class BusAdmittanceMatrix:
 		
 		self.calc_matrix(grid_node_list)
 	
-	# Methode zur Aufsummierung aller Admittanzen an einem Knoten
-	# Parameter:
-	# Knotennamen,
-	# [Optional] Modus: True|False (all_admittances), Wenn True: werden alle Laengs- und Queradmittanzen aufsummiert. Wenn False: werden nur die Längsadmittanzen aufsummiert (Queradmittanzen werden igoniert)
-	# Rückgabewert: kummulierter Admittanzenwert
-	# Quelle: E. Handschin, Elektrische Energieübertragungssysteme. Teil 1: Stationaerer Betriebszustand. Heidelberg: Hueting, 1983, Seite 51
 	def __get_sum_of_grid_lines_on_node(self, node_name_i, node_name_j):
+		"""
+		Methode zur Aufsummierung aller Admittanzen an einem Knoten
+		Parameter:
+		Knotennamen,
+		[Optional] Modus: True|False (all_admittances), Wenn True: werden alle Laengs- und Queradmittanzen aufsummiert.
+		Wenn False: werden nur die Längsadmittanzen aufsummiert (Queradmittanzen werden igoniert)
+		Rückgabewert: kummulierter Admittanzenwert
+		Quelle: E. Handschin, Elektrische Energieübertragungssysteme. Teil 1: Stationaerer Betriebszustand.
+		Heidelberg: Hueting, 1983, Seite 51
+		:param node_name_i:
+		:param node_name_j:
+		:return:
+		"""
 		
 		# Summenadmittanz an Knoten i und entspricht einem Element der Knotenadmittanzmatrix (KAM)
 		sum_admittance = Admittance(g=0, b=0)
