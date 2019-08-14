@@ -20,6 +20,7 @@ Einspeisung     | PV  |   P_Gi, U_i, P_Li, Q_Li           |     Q_Gi, δ_i     |
 Q_MIN_DEFAULT = 1000
 Q_MAX_DEFAULT = 1000
 
+
 class GridNode:
     """
         Objects to define gridelements nodes of a network
