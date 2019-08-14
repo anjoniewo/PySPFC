@@ -1,18 +1,19 @@
-from simplepowerflow.powerflow.csvexport import CSVexport
-from simplepowerflow.powerflow.csvimport import CSVimport
-from simplepowerflow.powerflow.griddataexport.electrical_schematic import create_network_schematic
-from simplepowerflow.powerflow.griddataexport.export_results_to_pdf import create_pdf_report
-from simplepowerflow.powerflow.gridelements.busadmittancematrix import BusAdmittanceMatrix
-from simplepowerflow.powerflow.gridelements.gridline import GridLine
-from simplepowerflow.powerflow.gridelements.gridnode import GridNode
-from simplepowerflow.powerflow.powerflow.jacobianmatrix import JacobianMatrix
-from simplepowerflow.powerflow.powerflow.powerflow import PowerFlow
-from simplepowerflow.powerflow.powerflow.powerflowreporter import LoadFlowReporter
+from simplepowerflow.simplepowerflow.csvexport import CSVexport
+from simplepowerflow.simplepowerflow.csvimport import CSVimport
+from simplepowerflow.simplepowerflow.electrical_schematic import create_network_schematic
+from simplepowerflow.simplepowerflow.export_plots import Plotter
+from simplepowerflow.simplepowerflow.export_results_to_pdf import create_pdf_report
+from simplepowerflow.simplepowerflow.gridelements.busadmittancematrix import BusAdmittanceMatrix
+from simplepowerflow.simplepowerflow.gridelements.gridline import GridLine
+from simplepowerflow.simplepowerflow.gridelements.gridnode import GridNode
+from simplepowerflow.simplepowerflow.powerflow.jacobianmatrix import JacobianMatrix
+from simplepowerflow.simplepowerflow.powerflow.powerflow import PowerFlow
+from simplepowerflow.simplepowerflow.powerflow.powerflowreporter import LoadFlowReporter
 
 
 class Grid:
     """
-    the main class to perform imports of network data and powerflow calculations
+    the main class to perform imports of network data and simplepowerflow calculations
     """
 
     # Initialisierungskonstruktor
@@ -37,8 +38,8 @@ class Grid:
 
         self.timestamps = None
 
-        self.grid_node_results = dict()
-        self.grid_line_results = dict()
+        self.gridnode_results = dict()
+        self.gridline_results = dict()
 
         # Instanzierung der LoadFlowReporter-Klasse
         self.load_flow_reporter = LoadFlowReporter()
@@ -155,16 +156,15 @@ class Grid:
                                        jacobimatrix=self.jacobi_matrix, gridnodes=gridnodes,
                                        gridlines=self.__grid_line_list, transformers=self.__transformer_list)
 
-            self.grid_node_results[timestamp], self.grid_line_results[timestamp] = self.powerflow.do_powerflow()
+            self.gridnode_results[timestamp], self.gridline_results[timestamp] = self.powerflow.do_powerflow()
 
     def prepare_data_for_powerflow(self, timestamp):
         """
-        Method prepares time variant data to perform a powerflow calculation of a single timestamp
+        Method prepares time variant data to perform a simplepowerflow calculation of a single timestamp
         :return:
         """
 
         settings = self.__settings
-
         v_nom, s_nom = (1, 1) if settings.is_import_pu else (settings.v_nom, settings.s_nom)
 
         gridnodes = list()
@@ -230,7 +230,7 @@ class Grid:
     def export_powerflow_results(self):
         """
 
-        :param csv_export_path: export directory for powerflow results
+        :param csv_export_path: export directory for simplepowerflow results
         :return: -
         """
 
@@ -238,12 +238,13 @@ class Grid:
         settings = self.__settings
 
         csv_export = CSVexport(settings)
-        v_mag_data = csv_export.export_gridnode_results(self.timestamps, self.grid_node_results)
-        line_currents = csv_export.export_gridline_results(self.timestamps, self.grid_line_results)
+        plotter = Plotter(settings)
+        v_mag_data = csv_export.export_gridnode_results(self.timestamps, self.gridnode_results)
+        line_currents = csv_export.export_gridline_results(self.timestamps, self.gridline_results)
 
         # create result plots for node bus voltages and line currents
-        csv_export.export_node_voltage_plot(grid_node_results=v_mag_data)
-        # csv_export.export_currents_on_lines_plot(grid_line_results=line_currents)
+        plotter.export_node_voltage_plot(grid_node_results=v_mag_data)
+        plotter.export_currents_on_lines_plot(grid_line_results=line_currents)
 
         # create network schematic for PDF report
         create_network_schematic(self.__grid_line_list, self.__transformer_list)
@@ -284,8 +285,55 @@ class Grid:
         method calls create_pdf_reporter() of export_results_to_pdf.py
         :return: -
         """
+
+        settings = self.__settings
+
         if len(self.__grid_node_list) < 8:
-            create_pdf_report(self.grid_node_results, self.powerflow.grid_line_results, self.__v_nom, self.__s_nom)
+            gridnode_results_for_pdf, gridline_results_for_pdf = self.get_worstcase_results()
+            create_pdf_report(gridnode_results_for_pdf, gridline_results_for_pdf, settings.v_nom, settings.s_nom)
         else:
             print(
                 'ATTENTION: Number of buses to large. PDF will not be created due to terms of readibility and overview.')
+
+    def get_worstcase_results(self):
+        """
+        determine the timestamp with the highest or lowest voltage derivation of the reference voltage range
+        :return:
+        """
+
+        settings = self.__settings
+        v_nom, s_nom = (1, 1) if settings.is_export_pu else (settings.v_nom, settings.s_nom)
+        min_voltage = 1e20
+        max_voltage = 0
+        min_worstcase_timestamp = 0
+        max_worstcase_timestamp = 0
+
+        v_mag = {'timestamp': list()}
+        for timestamp in self.timestamps:
+            v_mag['timestamp'].append(timestamp)
+            timestamp_data = self.gridnode_results[timestamp]
+            for key, value in timestamp_data.items():
+                if key not in v_mag:
+                    v_mag[key] = list()
+                if 'v_magnitude' in value:
+                    temp_min_voltage = value['v_magnitude']
+                    temp_max_voltage = value['v_magnitude']
+                    if temp_min_voltage < min_voltage:
+                        min_voltage = temp_min_voltage
+                        min_worstcase_timestamp = timestamp
+                    if temp_max_voltage > max_voltage:
+                        max_voltage = temp_max_voltage
+                        max_worstcase_timestamp = timestamp
+
+                    v_mag[key].append(str(value['v_magnitude'] * v_nom))
+
+        min_worstcase = 'min'
+        max_worstcase = 'max'
+        min_max_gridnode_results = dict()
+        min_max_gridline_results = dict()
+        min_max_gridnode_results[min_worstcase] = self.gridnode_results[min_worstcase_timestamp]
+        min_max_gridnode_results[max_worstcase] = self.gridnode_results[max_worstcase_timestamp]
+        min_max_gridline_results[min_worstcase] = self.gridline_results[min_worstcase_timestamp]
+        min_max_gridline_results[max_worstcase] = self.gridline_results[max_worstcase_timestamp]
+
+        return min_max_gridnode_results, min_max_gridline_results

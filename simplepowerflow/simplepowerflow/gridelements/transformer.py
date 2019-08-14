@@ -1,6 +1,6 @@
-from simplepowerflow.powerflow.powerflow.powerflowreporter import LoadFlowReporter
-from simplepowerflow.powerflow.gridelements.impedance import Impedance
-from simplepowerflow.powerflow.gridelements.admittance import Admittance
+from simplepowerflow.simplepowerflow.powerflow.powerflowreporter import LoadFlowReporter
+from simplepowerflow.simplepowerflow.gridelements.impedance import Impedance
+from simplepowerflow.simplepowerflow.gridelements.admittance import Admittance
 
 
 # ein Transformator wird als Knotenverbindendes Netzelement definiert

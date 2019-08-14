@@ -1,8 +1,8 @@
 import numpy as np
 
-from simplepowerflow.powerflow.gridelements.gridnode import GridNode
-from simplepowerflow.powerflow.powerflow.jacobianmatrix import JacobianMatrix
-from simplepowerflow.powerflow.utils.complexutils import get_polar
+from simplepowerflow.simplepowerflow.gridelements.gridnode import GridNode
+from simplepowerflow.simplepowerflow.powerflow.jacobianmatrix import JacobianMatrix
+from simplepowerflow.simplepowerflow.utils.complexutils import get_polar
 from .powerflowequations import *
 
 
@@ -358,6 +358,8 @@ class PowerFlow:
 
             if not (grid_line_name in self.grid_node_results):
                 self.grid_line_results[grid_line_name] = {}
+                self.grid_line_results[grid_line_name]['bus_i'] = grid_node_name_i
+                self.grid_line_results[grid_line_name]['bus_j'] = grid_node_name_j
 
             self.grid_line_results[grid_line_name]["s_from_i_to_j"] = round(float(np.absolute(s_from_node_i_to_node_j)),
                                                                             6)

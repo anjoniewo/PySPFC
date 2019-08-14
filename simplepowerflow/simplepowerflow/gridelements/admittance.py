@@ -1,4 +1,4 @@
-from simplepowerflow.powerflow.utils.complexutils import *
+from simplepowerflow.simplepowerflow.utils.complexutils import *
 
 
 class Admittance:
