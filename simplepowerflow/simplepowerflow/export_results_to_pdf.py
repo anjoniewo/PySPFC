@@ -51,7 +51,7 @@ class PDF(FPDF):
         # with open(name, 'rb') as fh:
         #     txt = fh.read().decode('latin-1')
         # Times 12
-        self.set_font('Times', '', 12)
+        self.set_font('Arial', 'B', 12)
         # Output justified text
         self.multi_cell(0, 5, txt)
         # Line break
@@ -59,15 +59,21 @@ class PDF(FPDF):
         # Mention in italics
         self.set_font('', 'I')
 
-    def print_chapter(self, num, title, name, has_body=False):
+    def print_chapter(self, num, title, name, has_body=False, pdf=None):
         self.add_page()
         self.chapter_title(num, title)
-        if has_body: self.chapter_body(name)
+        if has_body:
+            pdf.ln(4)
+            self.chapter_body(name)
 
 
 def create_pdf_report(grid_node_data=dict(), grid_line_data=dict(), v_nom=0, s_nom=0):
-    current_plot_path = PLOT_EXPORT_PATH + 'Current on lines.png'
-    voltage_plot_path = PLOT_EXPORT_PATH + 'Bus voltage.png'
+    timeseries_current_plot_path = PLOT_EXPORT_PATH + 'Time variant Current on lines.png'
+    timeseries_voltage_plot_path = PLOT_EXPORT_PATH + 'Time variant Bus voltages.png'
+    min_voltage_plot_path = PLOT_EXPORT_PATH + 'Bus Voltages at minimal Grid Load.png'
+    max_voltage_plot_path = PLOT_EXPORT_PATH + 'Bus Voltages at maximal Grid Load.png'
+    min_line_plot_path = PLOT_EXPORT_PATH + 'Current on Lines at minimal Grid Load.png'
+    max_line_plot_path = PLOT_EXPORT_PATH + 'Current on Lines at maximal Grid Load.png'
     network_schematic_path = SCHEMATIC_EXPORT_PATH + 'network_schematic.png'
 
     pdf = PDF()
@@ -76,53 +82,77 @@ def create_pdf_report(grid_node_data=dict(), grid_line_data=dict(), v_nom=0, s_n
     pdf.set_author('Christian Klosterhalfen, Anjo Niewöhner')
 
     # chapter 1
-    pdf.print_chapter(1, title='Grid', name='', has_body=True)
-    pdf.ln(16)
+    pdf.print_chapter(1, title='Grid', name='', has_body=True, pdf=pdf)
 
     # add network schematic
     x_pos = pdf.w / 5
-    y_pos = 42
+    y_pos = 50
     width = pdf.w / 2
     height = 80
     pdf.image(network_schematic_path, x=x_pos, y=y_pos, w=width, h=height)
     pdf.ln(70)
+
+    # chapter 2
+    pdf.print_chapter(2, title='Results', name='')
+    pdf.ln(7)
 
     # effective page width, or just epw
     epw = pdf.w - 2 * pdf.l_margin
     col_width = epw / 11
     text_height = pdf.font_size
 
-    # add table of gridnodes
-    for key, value in grid_node_data.items():
-        grid_node_sub_data = convert_data_to_table_data(value)
-        # ------------------------------------------------------------------------------------------------------------------
-        table_label = 'Table of buses ' + str(key) + ' - V_ref = ' + str(v_nom / 1e3) + ' kV and S_ref = ' + str(
-            s_nom / 1e6) + ' MVA'
-        add_table(pdf=pdf, table_label=table_label, tab_lab_height=epw, data=grid_node_sub_data, width=col_width,
-                  height=2 * text_height)
-        pdf.ln(1)
-        table_legend = 'L: load, G: generation'
-        pdf.cell(epw, text_height, str(table_legend), align='L')
-        # ------------------------------------------------------------------------------------------------------------------
+    # add tables of minimal grid load penetration
+    min_grid_node_data = convert_data_to_table_data(grid_node_data['max'])
+    # ------------------------------------------------------------------------------------------------------------------
+    table_label = 'Table of buses at minimal Grid Load - V_ref = ' + str(v_nom) + ' kV and S_ref = ' + str(
+        int(s_nom / 1e3)) + ' MVA'
+    add_table(pdf=pdf, table_label=table_label, tab_lab_height=epw, data=min_grid_node_data, width=col_width,
+              height=2 * text_height)
+    pdf.ln(1)
+    table_legend = 'L: load, G: generation'
+    pdf.cell(epw, text_height, str(table_legend), align='L')
+    # ------------------------------------------------------------------------------------------------------------------
 
-        pdf.ln(18)
+    pdf.ln(14)
 
-    # add table of gridlines
-    for key, value in grid_line_data.items():
-        grid_line_sub_data = convert_data_to_table_data(value, type='line', v_nom=v_nom, s_nom=s_nom)
-        # ------------------------------------------------------------------------------------------------------------------
-        table_label = 'Table of lines ' + str(key) + ' - data in physical values'
-        add_table(pdf=pdf, table_label=table_label, tab_lab_height=epw, data=grid_line_sub_data, width=col_width * 2,
-                  height=2 * text_height)
-        pdf.ln(1)
-        table_legend = 'i: bus at start, j: bus at end'
-        pdf.cell(epw, text_height, str(table_legend), align='L')
-        # ------------------------------------------------------------------------------------------------------------------
+    min_grid_line_data = convert_data_to_table_data(grid_line_data['max'], type='line', v_nom=v_nom, s_nom=s_nom)
+    # ------------------------------------------------------------------------------------------------------------------
+    table_label = 'Table of lines minimal Grid Load - data in physical values'
+    add_table(pdf=pdf, table_label=table_label, tab_lab_height=epw, data=min_grid_line_data, width=col_width * 2,
+              height=2 * text_height)
+    pdf.ln(1)
+    table_legend = 'i: bus at start, j: bus at end'
+    pdf.cell(epw, text_height, str(table_legend), align='L')
+    # ------------------------------------------------------------------------------------------------------------------
 
-        pdf.ln(18)
+    pdf.ln(14)
 
-    # chapter 2
-    pdf.print_chapter(2, title='Plots', name='')
+    # add tables of maximal grid load penetration
+    max_grid_node_data = convert_data_to_table_data(grid_node_data['min'])
+    # ------------------------------------------------------------------------------------------------------------------
+    table_label = 'Table of buses at maximal Grid Load - V_ref = ' + str(v_nom) + ' kV and S_ref = ' + str(
+        int(s_nom / 1e3)) + ' MVA'
+    add_table(pdf=pdf, table_label=table_label, tab_lab_height=epw, data=max_grid_node_data, width=col_width,
+              height=2 * text_height)
+    pdf.ln(1)
+    table_legend = 'L: load, G: generation'
+    pdf.cell(epw, text_height, str(table_legend), align='L')
+    # ------------------------------------------------------------------------------------------------------------------
+
+    pdf.ln(14)
+
+    max_grid_line_data = convert_data_to_table_data(grid_line_data['min'], type='line', v_nom=v_nom, s_nom=s_nom)
+    # ------------------------------------------------------------------------------------------------------------------
+    table_label = 'Table of lines maximal Grid Load - data in physical values'
+    add_table(pdf=pdf, table_label=table_label, tab_lab_height=epw, data=max_grid_line_data, width=col_width * 2,
+              height=2 * text_height)
+    pdf.ln(1)
+    table_legend = 'i: bus at start, j: bus at end'
+    pdf.cell(epw, text_height, str(table_legend), align='L')
+    # ------------------------------------------------------------------------------------------------------------------
+
+    # chapter 3 --------------------------------------------------------------------------------------------------------
+    pdf.print_chapter(3, title='Time variant Plots', name='')
 
     x_pos = pdf.w / 6.95
     y_pos = 32
@@ -130,11 +160,43 @@ def create_pdf_report(grid_node_data=dict(), grid_line_data=dict(), v_nom=0, s_n
     height = 125
 
     # add node voltages plot
-    pdf.image(voltage_plot_path, x=x_pos, y=y_pos, w=width, h=height)
+    pdf.image(timeseries_voltage_plot_path, x=x_pos, y=y_pos, w=width, h=height)
 
     y_pos = pdf.h / 1.9
     # add line currents plot
-    pdf.image(current_plot_path, x=x_pos, y=y_pos, w=width, h=height)
+    pdf.image(timeseries_current_plot_path, x=x_pos, y=y_pos, w=width, h=height)
+    # ------------------------------------------------------------------------------------------------------------------
+
+    # chapter 4 --------------------------------------------------------------------------------------------------------
+    pdf.print_chapter(4, title='Plots at minimal Grid Load', name='')
+
+    x_pos = pdf.w / 6.95
+    y_pos = 32
+    width = 150
+    height = 125
+
+    # add node voltages plot
+    pdf.image(min_voltage_plot_path, x=x_pos, y=y_pos, w=width, h=height)
+
+    y_pos = pdf.h / 1.9
+    # add line currents plot
+    pdf.image(min_line_plot_path, x=x_pos, y=y_pos, w=width, h=height)
+    # ------------------------------------------------------------------------------------------------------------------
+
+    # chapter 5 --------------------------------------------------------------------------------------------------------
+    pdf.print_chapter(5, title='Plots at maximal Grid Load', name='')
+
+    x_pos = pdf.w / 6.95
+    y_pos = 32
+    width = 150
+    height = 125
+
+    # add node voltages plot
+    pdf.image(max_voltage_plot_path, x=x_pos, y=y_pos, w=width, h=height)
+
+    y_pos = pdf.h / 1.9
+    # add line currents plot
+    pdf.image(max_line_plot_path, x=x_pos, y=y_pos, w=width, h=height)
 
     pdf.output(PDF_EXPORT_PATH + 'PowerFlow_Report.pdf', 'F')
 
@@ -151,9 +213,9 @@ def convert_data_to_table_data(data, type='node', v_nom=0, s_nom=0):
     is_linedata = True if type == 'line' else False
 
     if not is_linedata:
-        header = ['name', 'type', 'P_L', 'P_G', 'P', 'Q_L', 'Q_G', 'Q', '|U|', 'theta in °']
+        header = ['name', 'type', '|P_L|', '|P_G|', 'P', '|Q_L|', '|Q_G|', 'Q', '|U|', 'theta in °']
     elif is_linedata:
-        header = ['name', 'bus i', 'bus j', 'P_loss in W', 'I_ij in A']
+        header = ['name', 'bus i', 'bus j', 'P_loss in W', '|I_ij| in A']
 
         keys_to_delete = list()
         first_key = list(data.keys())[0]
@@ -192,7 +254,7 @@ def convert_data_to_table_data(data, type='node', v_nom=0, s_nom=0):
 
 
 def add_table(pdf=PDF, table_label='Table', tab_lab_height=5, data=list(list()), width=5, height=5,
-              font_family='Times'):
+              font_family='Arial'):
     """
         Method adds a table to a PDF object
 
@@ -207,11 +269,11 @@ def add_table(pdf=PDF, table_label='Table', tab_lab_height=5, data=list(list()),
     """
 
     # set the label of the table
-    pdf.set_font(font_family, 'B', 13.0)
+    pdf.set_font(font_family, 'B', 12.0)
     pdf.cell(tab_lab_height, 0.0, table_label, align='L')
     pdf.ln(4)
 
-    pdf.set_font(font_family, 'B', 11.0)
+    pdf.set_font(font_family, 'B', 10.0)
 
     # create header of table
     header_voltage = data.pop(0)

@@ -41,6 +41,9 @@ class Grid:
         self.gridnode_results = dict()
         self.gridline_results = dict()
 
+        self.gridnode_results_for_pdf = dict()
+        self.gridline_results_for_pdf = dict()
+
         # Instanzierung der LoadFlowReporter-Klasse
         self.load_flow_reporter = LoadFlowReporter()
 
@@ -196,8 +199,8 @@ class Grid:
 
             # transform to slack node
             if gridnode.name == settings.slack:
-                v_mag_pu = v_nom / v_nom
-                v_angle = 0
+                v_mag_pu = 1.0
+                v_angle = 0.0
                 p_max_pu = sum_of_p_max / s_nom
                 p_min_pu = sum_of_p_min / s_nom
                 typenumber = gridnode.get_grid_node_type_index_of('slack')
@@ -242,9 +245,17 @@ class Grid:
         v_mag_data = csv_export.export_gridnode_results(self.timestamps, self.gridnode_results)
         line_currents = csv_export.export_gridline_results(self.timestamps, self.gridline_results)
 
+        # filtered results for pdf report
+        self.gridnode_results_for_pdf, self.gridline_results_for_pdf = self.get_worstcase_results()
+
+        if len(self.gridnode_results_for_pdf) > 10:
+            print("Number of grid nodes is significantly high. Readibility of plots might be bad.")
+
         # create result plots for node bus voltages and line currents
-        plotter.export_node_voltage_plot(grid_node_results=v_mag_data)
-        plotter.export_currents_on_lines_plot(grid_line_results=line_currents)
+        plotter.export_node_voltage_plots(grid_node_timeseries_results=v_mag_data,
+                                          grid_node_min_max_results=self.gridnode_results_for_pdf)
+        plotter.export_currents_on_lines_plots(grid_line_timeseries_results=line_currents,
+                                               grid_line_min_max_results=self.gridline_results_for_pdf)
 
         # create network schematic for PDF report
         create_network_schematic(self.__grid_line_list, self.__transformer_list)
@@ -286,14 +297,11 @@ class Grid:
         :return: -
         """
 
-        settings = self.__settings
+        if len(self.gridnode_results_for_pdf) > 10:
+            print("Number of grid nodes is significantly high. Readibility of PDF report might be bad.")
 
-        if len(self.__grid_node_list) < 8:
-            gridnode_results_for_pdf, gridline_results_for_pdf = self.get_worstcase_results()
-            create_pdf_report(gridnode_results_for_pdf, gridline_results_for_pdf, settings.v_nom, settings.s_nom)
-        else:
-            print(
-                'ATTENTION: Number of buses to large. PDF will not be created due to terms of readibility and overview.')
+        settings = self.__settings
+        create_pdf_report(self.gridnode_results_for_pdf, self.gridline_results_for_pdf, settings.v_nom, settings.s_nom)
 
     def get_worstcase_results(self):
         """
@@ -301,8 +309,6 @@ class Grid:
         :return:
         """
 
-        settings = self.__settings
-        v_nom, s_nom = (1, 1) if settings.is_export_pu else (settings.v_nom, settings.s_nom)
         min_voltage = 1e20
         max_voltage = 0
         min_worstcase_timestamp = 0
@@ -314,23 +320,21 @@ class Grid:
             timestamp_data = self.gridnode_results[timestamp]
             for key, value in timestamp_data.items():
                 if key not in v_mag:
-                    v_mag[key] = list()
-                if 'v_magnitude' in value:
-                    temp_min_voltage = value['v_magnitude']
-                    temp_max_voltage = value['v_magnitude']
-                    if temp_min_voltage < min_voltage:
-                        min_voltage = temp_min_voltage
-                        min_worstcase_timestamp = timestamp
-                    if temp_max_voltage > max_voltage:
-                        max_voltage = temp_max_voltage
-                        max_worstcase_timestamp = timestamp
-
-                    v_mag[key].append(str(value['v_magnitude'] * v_nom))
+                    if 'v_magnitude' in value:
+                        temp_min_voltage = value['v_magnitude']
+                        temp_max_voltage = value['v_magnitude']
+                        if temp_min_voltage < min_voltage:
+                            min_voltage = temp_min_voltage
+                            min_worstcase_timestamp = timestamp
+                        if temp_max_voltage > max_voltage:
+                            max_voltage = temp_max_voltage
+                            max_worstcase_timestamp = timestamp
 
         min_worstcase = 'min'
         max_worstcase = 'max'
         min_max_gridnode_results = dict()
         min_max_gridline_results = dict()
+
         min_max_gridnode_results[min_worstcase] = self.gridnode_results[min_worstcase_timestamp]
         min_max_gridnode_results[max_worstcase] = self.gridnode_results[max_worstcase_timestamp]
         min_max_gridline_results[min_worstcase] = self.gridline_results[min_worstcase_timestamp]

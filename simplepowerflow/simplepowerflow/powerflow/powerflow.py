@@ -249,7 +249,9 @@ class PowerFlow:
         return p_q_v_vector
 
     def create_node_results(self, p_q_v_info_vector, p_q_v_vector, Fk_Ek_vector, number_of_nodes):
-
+        """
+        creates bus value datastructures of the powerflow results
+        """
         for index, item in enumerate(p_q_v_info_vector):
 
             grid_node_name = item[0]
@@ -297,13 +299,13 @@ class PowerFlow:
                     p_load = grid_node.get_p_load()
                     self.grid_node_results[grid_node_name]["p_load"] = p_load
                     self.grid_node_results[grid_node_name]["p_gen"] = 0
-                    self.grid_node_results[grid_node_name]["p"] = p_load
+                    self.grid_node_results[grid_node_name]["p"] = - p_load
 
                 elif item[3] == "Q":
                     q_load = grid_node.get_q_load()
                     self.grid_node_results[grid_node_name]["q_load"] = q_load
                     self.grid_node_results[grid_node_name]["q_gen"] = 0
-                    self.grid_node_results[grid_node_name]["q"] = q_load
+                    self.grid_node_results[grid_node_name]["q"] = - q_load
 
                 elif item[3] == "U":
                     u_result = get_polar(real=Fk_Ek_vector[item[2] + number_of_nodes], imaginary=Fk_Ek_vector[item[2]])
@@ -335,7 +337,9 @@ class PowerFlow:
         return self.grid_node_results
 
     def create_line_results(self, Fk_Ek_vector):
-
+        """
+        creates line value datastructures of the powerflow results
+        """
         for grid_line in self.grid_line_list:
             grid_line_name = grid_line.name
 

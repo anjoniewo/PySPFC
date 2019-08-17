@@ -1,5 +1,7 @@
 import csv
 
+import math
+
 from simplepowerflow.simplepowerflow.constants_config import *
 
 MAX_NUM_OF_NODES = 100
@@ -79,6 +81,7 @@ class CSVexport:
 
         settings = self.__settings
         v_nom, s_nom = (1, 1) if settings.is_export_pu == 1 else (settings.v_nom, settings.s_nom)
+        current_nom = s_nom / (v_nom * math.sqrt(3))
 
         p_over_lines = {'timestamp': list()}
         q_over_lines = {'timestamp': list()}
@@ -114,7 +117,7 @@ class CSVexport:
                 if 'q_loss' in value:
                     q_transmission_losses[key].append(str(value['q_loss'] * s_nom))
                 if 'current_from_i_to_j' in value:
-                    line_currents[key].append(str(value['current_from_i_to_j'] * (s_nom / v_nom)))
+                    line_currents[key].append(str(value['current_from_i_to_j'] * current_nom))
 
         self.export_data_to_csv(CSV_EXPORT_PATH, "p_lines", p_over_lines)
         self.export_data_to_csv(CSV_EXPORT_PATH, "q_lines", q_over_lines)
