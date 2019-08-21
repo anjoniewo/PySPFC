@@ -1,7 +1,7 @@
 import os
 from unittest import TestCase
 
-from simplepowerflow.powerflow.griddataimport.ALT_gridlineparser import GridLineParser
+from simplepowerflow import GridLineParser
 
 
 class TestGridLineParser(TestCase):
