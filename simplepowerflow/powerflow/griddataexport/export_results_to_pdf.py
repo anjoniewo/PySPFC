@@ -1,6 +1,5 @@
-import copy
-
 import math
+
 from fpdf import FPDF
 
 title = 'Lastflussberechnung-Ergebnisse'

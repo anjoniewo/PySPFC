@@ -215,13 +215,13 @@ class Grid:
 		:return: -
 		"""
 		csv_export = CSVexport()
-		csv_export.export_grid_node_results(self.timestamps, self.grid_node_results)
+		v_mag = csv_export.export_grid_node_results(self.timestamps, self.grid_node_results)
 		csv_export.export_grid_line_results(self.timestamps, self.grid_line_results)
 		
 		# create network schematic for PDF report
 		create_network_schematic(self.__grid_line_list, self.__transformer_list)
 	
-	# self.export_node_voltage_plot()
+		csv_export.export_node_voltage_plot(v_mag)
 	# self.export_currents_on_lines_plot()
 	
 	def print_loadflow_results(self):
