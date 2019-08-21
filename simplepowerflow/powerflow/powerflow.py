@@ -108,7 +108,7 @@ class PowerFlow:
 			inverse_sub_jacobian = np.linalg.inv(new_sub_jacobian)
 			
 			iteration += 1
-			reached_max_iteration = True if iteration == MAX_ITERATIONS else False
+			reached_max_iteration = True if iteration >= MAX_ITERATIONS else False
 			reached_convergence_limit = self.check_convergency(delta_p_q_v_vector)
 		
 		return Fk_Ek_vector, sub_Fk_Ek_vector, iteration
@@ -132,7 +132,6 @@ class PowerFlow:
 	# Methode prueft ob die Blindleistungsgrenzen der Spannungsgeregelten Knoten in jeder Iteraion eingehalten werden.
 	# Falls nicht, wird aus einem PU-Knoten ein PQ- respektive Lastknoten
 	def check_q_limits(self, Fk_Ek_vector):
-		
 		for tup in self.initial_generator_node_names_and_indices:
 			index = tup[0]
 			grid_node_name = tup[1]
@@ -149,10 +148,14 @@ class PowerFlow:
 				
 				if exceeded_q_limit:
 					q_load = q_max if q_value_of_generator_node > q_max else q_min
-					new_load_node = GridNode(grid_node_name, typenumber=2, p_load=grid_node.get_p_load(), q_load=q_load)
+					new_load_node = GridNode(grid_node_name, typenumber=2, p_load=grid_node.get_p_load(), q_load=q_load,
+					                         q_max=q_max, q_min=q_min)
+					
 					self.new_grid_node_list[index] = new_load_node
 			
 			elif grid_node_type == 2:
+				q_value_of_generator_node = self.powerflowequations.calculate_reactive_power_at_node(Fk_Ek_vector,
+				                                                                                     index)
 				q_min = grid_node.get_q_min()
 				q_max = grid_node.get_q_max()
 				if q_min <= q_value_of_generator_node <= q_max:
