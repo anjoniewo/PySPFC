@@ -1,10 +1,10 @@
 from unittest import TestCase
 import numpy as np
-from simplepowerflow.powerflowtool.grid.grid import Grid
-from simplepowerflow.powerflowtool.grid.gridnode import GridNode
-from simplepowerflow.powerflowtool.grid.gridline import GridLine
-from simplepowerflow.powerflowtool.powerflow.jacobianmatrix import JacobianMatrix
-from simplepowerflow.powerflowtool.utils import print_matrix
+from simplepowerflow2.powerflowtool.grid.grid import Grid
+from simplepowerflow2.powerflowtool.grid.gridnode import GridNode
+from simplepowerflow2.powerflowtool.grid.gridline import GridLine
+from simplepowerflow2.powerflowtool.powerflow.jacobianmatrix import JacobianMatrix
+from simplepowerflow2.powerflowtool.utils import print_matrix
 
 from .test_gridNode import TestGridNode
 from .test_gridline import TestGridLine

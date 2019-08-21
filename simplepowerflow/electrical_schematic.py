@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from simplepowerflow.simplepowerflow.constants_config import SCHEMATIC_EXPORT_PATH
+from simplepowerflow.constants_config import SCHEMATIC_EXPORT_PATH
 
 
 def create_network_schematic(grid_lines, transformers):

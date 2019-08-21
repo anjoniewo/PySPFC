@@ -15,8 +15,8 @@ def check_dir(dir):
 
 def get_file_names():
     """
-    reads a defined list of required file names for running the simplepowerflow tool
-    :param file_path: simplepowerflow/import_file_names.csv
+    reads a defined list of required file names for running the simplepowerflow2 tool
+    :param file_path: simplepowerflow2/import_file_names.csv
     :return: a set of the file names
     """
     file_path = os.path.join(os.path.dirname(__file__), '../../import_file_names.csv')

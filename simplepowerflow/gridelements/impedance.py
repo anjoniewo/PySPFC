@@ -1,6 +1,3 @@
-from simplepowerflow.simplepowerflow.utils.complexutils import *
-
-
 class Impedance:
 	# Parameter: r -> Realteil, x -> Imaginärteil, in_serie -> sind Real- und Imaginärteil in serie oder parallel [default: in serie]
 	def __init__(self, r, x, in_series=True, admittance=None):

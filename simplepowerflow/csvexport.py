@@ -2,14 +2,14 @@ import csv
 
 import math
 
-from simplepowerflow.simplepowerflow.constants_config import *
+from simplepowerflow.constants_config import *
 
 MAX_NUM_OF_NODES = 100
 
 
 class CSVexport:
     """
-    class to export simplepowerflow results to csv files
+    class to export simplepowerflow2 results to csv files
     """
 
     def __init__(self, settings=None):

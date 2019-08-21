@@ -1,4 +1,4 @@
-from simplepowerflow.simplepowerflow.gridelements.generator import Generator
+from simplepowerflow.gridelements.generator import Generator
 
 
 class Load(Generator):

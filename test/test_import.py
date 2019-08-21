@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from simplepowerflow.simplepowerflow.csvimport import *
+from simplepowerflow.csvimport import *
 
 
 class TestImport(TestCase):

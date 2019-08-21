@@ -1,6 +1,6 @@
 import os
 
-from simplepowerflow.simplepowerflow.utils.config import check_dir
+from simplepowerflow.utils.config import check_dir
 
 TITLE_FONTSIZE = 16
 LABEL_FONTSIZE = 14
