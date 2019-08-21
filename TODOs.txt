@@ -10,7 +10,7 @@ LoadFlowTool - STAND: IST
 LoadFlowTool - TODOs:
 
 PRIO 1:
-	- alles erledigt
+	- alles erledigt!
 
 PRIO 2:
     - Prüfung der Wirkleistungsgrenzen der Generatoren, Hinweis wenn überschritten
