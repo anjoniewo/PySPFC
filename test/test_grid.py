@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from simplepowerflow.simplepowerflow.gridelements.grid import Grid
+from simplepowerflow.gridelements import Grid
 
 
 class TestGrid(TestCase):

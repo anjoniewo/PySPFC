@@ -1,7 +1,7 @@
 import math
 from fpdf import FPDF
 
-from simplepowerflow.simplepowerflow.constants_config import PDF_EXPORT_PATH, PLOT_EXPORT_PATH, SCHEMATIC_EXPORT_PATH
+from simplepowerflow.constants_config import PDF_EXPORT_PATH, PLOT_EXPORT_PATH, SCHEMATIC_EXPORT_PATH
 
 title = 'PowerFlow - Results'
 

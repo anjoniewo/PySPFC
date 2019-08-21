@@ -1,5 +1,5 @@
 from unittest import TestCase
-from simplepowerflow.powerflowtool.grid.gridnode import GridNode
+from simplepowerflow2.powerflowtool.grid.gridnode import GridNode
 
 
 class TestGridNode(TestCase):

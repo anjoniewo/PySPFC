@@ -3,11 +3,11 @@ import os
 import math
 import pandas as pd
 
-from simplepowerflow.simplepowerflow.gridelements.generator import Generator
-from simplepowerflow.simplepowerflow.gridelements.gridline import GridLine
-from simplepowerflow.simplepowerflow.gridelements.gridnode import GridNode
-from simplepowerflow.simplepowerflow.gridelements.load import Load
-from simplepowerflow.simplepowerflow.utils.config import get_file_names
+from simplepowerflow.gridelements.generator import Generator
+from simplepowerflow.gridelements.gridline import GridLine
+from simplepowerflow.gridelements.gridnode import GridNode
+from simplepowerflow.gridelements.load import Load
+from simplepowerflow.utils.config import get_file_names
 
 csv_import_path = os.path.join(os.path.dirname(__file__), '..\\csv_import')
 file_names = get_file_names()

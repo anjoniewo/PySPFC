@@ -2,7 +2,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
-from simplepowerflow.simplepowerflow.csvexport import MAX_NUM_OF_NODES, TITLE_FONTSIZE, LABEL_FONTSIZE, PLOT_EXPORT_PATH
+from simplepowerflow.csvexport import MAX_NUM_OF_NODES, TITLE_FONTSIZE, LABEL_FONTSIZE, PLOT_EXPORT_PATH
 
 
 class Plotter:
