@@ -3,13 +3,14 @@ LoadFlowTool - STAND: IST
 	- Liest Netzdaten aus CSV-Dateien ein
 	- Führt für einen einzelnen stationären Betriebspunkt eine Lastflussberechnung durch
 	- Gibt die Ergebnisse der Berechnungen in bezogenen Größen in CSV-Dateien und einem PDF-Bericht aus
+    - Einzelne Lasten und Einspeiser zu Knoten hinzufügen [und löschen] können
+	- Zeitreihen erfassen und simulieren
+	- Eingabe der Parameter in physikalischen ODER bezogenen Größen ermöglichen
 
 LoadFlowTool - TODOs:
 
 PRIO 1:
-	- Einzelne Lasten und Einspeiser zu Knoten hinzufügen [und löschen] können
-	- Zeitreihen erfassen und simulieren
-	- Eingabe der Parameter in physikalischen ODER bezogenen Größen ermöglichen
+	- alles erledigt!
 
 PRIO 2:
     - Prüfung der Wirkleistungsgrenzen der Generatoren, Hinweis wenn überschritten
