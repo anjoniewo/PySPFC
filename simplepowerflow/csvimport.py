@@ -9,7 +9,7 @@ from simplepowerflow.gridelements.gridnode import GridNode
 from simplepowerflow.gridelements.load import Load
 from simplepowerflow.utils.config import get_file_names
 
-csv_import_path = "/Users/anjo/Desktop/Coding/Python/PySPFC/simplepowerflow/csv_import"
+csv_import_path = os.path.join(os.path.dirname(__file__), '..\\csv_import')
 file_names = get_file_names()
 
 cols_generators = ['name', 'node_i', 'p_max', 'p_min', 'q_max', 'q_min']
