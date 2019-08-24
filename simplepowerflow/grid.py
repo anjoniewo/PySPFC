@@ -1,4 +1,4 @@
-from simplepowerflow.csvexport import CSVexport
+from simplepowerflow.csvexport import CSVexport, TIMESTAMP
 from simplepowerflow.csvimport import CSVimport
 from simplepowerflow.electrical_schematic import create_network_schematic
 from simplepowerflow.export_plots import Plotter
@@ -314,9 +314,9 @@ class Grid:
 		min_worstcase_timestamp = 0
 		max_worstcase_timestamp = 0
 		
-		v_mag = {'timestamp': list()}
+		v_mag = {TIMESTAMP: list()}
 		for timestamp in self.timestamps:
-			v_mag['timestamp'].append(timestamp)
+			v_mag[TIMESTAMP].append(timestamp)
 			timestamp_data = self.gridnode_results[timestamp]
 			for key, value in timestamp_data.items():
 				if key not in v_mag:

@@ -1,8 +1,10 @@
 import math
+
 import matplotlib.pyplot as plt
 import numpy as np
 
-from simplepowerflow.csvexport import MAX_NUM_OF_NODES, TITLE_FONTSIZE, LABEL_FONTSIZE, PLOT_EXPORT_PATH
+from constants import *
+from simplepowerflow.csvexport import MAX_NUM_OF_NODES
 
 
 class Plotter:
@@ -20,10 +22,10 @@ class Plotter:
 
         y_label = 'Voltage in pu \u2192' if settings.is_export_pu else 'Voltage in kV \u2192'
 
-        if grid_node_timeseries_results['timestamp']:
+        if grid_node_timeseries_results[TIMESTAMP]:
             timestamps = dict(
-                [(key, value) for key, value in grid_node_timeseries_results.items() if key == 'timestamp'])
-            del grid_node_timeseries_results['timestamp']
+                [(key, value) for key, value in grid_node_timeseries_results.items() if key == TIMESTAMP])
+            del grid_node_timeseries_results[TIMESTAMP]
             node_voltages = grid_node_timeseries_results
 
             title = 'Time variant Bus voltages'
@@ -74,10 +76,10 @@ class Plotter:
 
         y_label = 'Current in A \u2192'
 
-        if grid_line_timeseries_results['timestamp']:
+        if grid_line_timeseries_results[TIMESTAMP]:
             timestamps = dict(
-                [(key, value) for key, value in grid_line_timeseries_results.items() if key == 'timestamp'])
-            del grid_line_timeseries_results['timestamp']
+                [(key, value) for key, value in grid_line_timeseries_results.items() if key == TIMESTAMP])
+            del grid_line_timeseries_results[TIMESTAMP]
             line_currents = grid_line_timeseries_results
 
             title = 'Time variant Current on lines'
@@ -141,7 +143,7 @@ class Plotter:
 
         if len(y_vals) < MAX_NUM_OF_NODES:
 
-            x_vals = x_vals['timestamp']
+            x_vals = x_vals[TIMESTAMP]
             line_labels = ['$\pm$ 10 % ${U}_{ref}$']
 
             # min, max Y-Achse
@@ -194,7 +196,9 @@ class Plotter:
         plt.subplots_adjust(left=0.15, bottom=0.18)
         voltage_axes.legend(legend_entries, line_labels, loc="upper right", borderaxespad=0.3, fancybox=True,
                             prop={'size': 8})
-        plt.savefig(PLOT_EXPORT_PATH + '\\' + title + '.png', format='png', dpi=120)
+        file_name = str(title + PNG_FILE_EXTENSION)
+        file_path_name = os.path.join(PLOT_EXPORT_PATH, file_name)
+        plt.savefig(file_path_name, format='png', dpi=120)
         plt.clf()
         plt.cla()
 
@@ -211,7 +215,7 @@ class Plotter:
 
         if len(y_vals) < MAX_NUM_OF_NODES:
 
-            x_vals = x_vals['timestamp']
+            x_vals = x_vals[TIMESTAMP]
 
             # max Y-Achse
             temp_y_max = float(min(y_vals[(list(y_vals.keys())[0])]))
@@ -254,7 +258,9 @@ class Plotter:
         plt.subplots_adjust(left=0.15, bottom=0.18)
         current_axes.legend(legend_entries, line_labels, loc="upper right", borderaxespad=0.3, fancybox=True,
                             prop={'size': 8})
-        plt.savefig(PLOT_EXPORT_PATH + '\\' + title + '.png', format='png', dpi=120)
+        file_name = str(title + PNG_FILE_EXTENSION)
+        file_path_name = os.path.join(PLOT_EXPORT_PATH, file_name)
+        plt.savefig(file_path_name, format='png', dpi=120)
         plt.clf()
         plt.cla()
 
@@ -313,7 +319,9 @@ class Plotter:
         voltage_axes.legend(handles=handles[1:], labels=labels)
         plt.grid(True, linewidth=0.3)
         plt.subplots_adjust(left=0.15, bottom=0.18)
-        plt.savefig(PLOT_EXPORT_PATH + '\\' + title + '.png', format='png', dpi=120)
+        file_name = str(title + PNG_FILE_EXTENSION)
+        file_path_name = os.path.join(PLOT_EXPORT_PATH, file_name)
+        plt.savefig(file_path_name, format='png', dpi=120)
         plt.clf()
         plt.cla()
 
@@ -353,7 +361,9 @@ class Plotter:
         voltage_axes.legend()
         plt.grid(True, linewidth=0.3)
         plt.subplots_adjust(left=0.15, bottom=0.18)
-        plt.savefig(PLOT_EXPORT_PATH + '\\' + title + '.png', format='png', dpi=120)
+        file_name = str(title + PNG_FILE_EXTENSION)
+        file_path_name = os.path.join(PLOT_EXPORT_PATH, file_name)
+        plt.savefig(file_path_name, format='png', dpi=120)
         plt.clf()
         plt.cla()
 

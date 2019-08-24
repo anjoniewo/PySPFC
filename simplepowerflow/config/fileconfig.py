@@ -8,9 +8,8 @@ def check_dir(dir):
     :param dir:
     :return:
     """
-    directory = os.path.dirname(dir)
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    if not os.path.exists(dir):
+        os.makedirs(dir)
 
 
 def get_file_names():
@@ -19,8 +18,8 @@ def get_file_names():
     :param file_path: simplepowerflow2/import_file_names.csv
     :return: a set of the file names
     """
-    file_path = os.path.join(os.path.dirname(__file__), '../../import_file_names.csv')
-    with open(file_path, mode='r') as csv_file:
+    from constants import FILENAMES_CSV_PATH
+    with open(FILENAMES_CSV_PATH, mode='r') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=";")
 
         file_names = dict()

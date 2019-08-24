@@ -1,7 +1,9 @@
 import math
+import os
+
 from fpdf import FPDF
 
-from simplepowerflow.constants_config import PDF_EXPORT_PATH, PLOT_EXPORT_PATH, SCHEMATIC_EXPORT_PATH
+from constants import PDF_FILE_EXTENSION, PDF_EXPORT_PATH, PLOT_EXPORT_PATH, SCHEMATIC_EXPORT_PATH
 
 title = 'PowerFlow - Results'
 
@@ -68,13 +70,13 @@ class PDF(FPDF):
 
 
 def create_pdf_report(grid_node_data=dict(), grid_line_data=dict(), v_nom=0, s_nom=0):
-    timeseries_current_plot_path = PLOT_EXPORT_PATH + 'Time variant Current on lines.png'
-    timeseries_voltage_plot_path = PLOT_EXPORT_PATH + 'Time variant Bus voltages.png'
-    min_voltage_plot_path = PLOT_EXPORT_PATH + 'Bus Voltages at minimal Grid Load.png'
-    max_voltage_plot_path = PLOT_EXPORT_PATH + 'Bus Voltages at maximal Grid Load.png'
-    min_line_plot_path = PLOT_EXPORT_PATH + 'Current on Lines at minimal Grid Load.png'
-    max_line_plot_path = PLOT_EXPORT_PATH + 'Current on Lines at maximal Grid Load.png'
-    network_schematic_path = SCHEMATIC_EXPORT_PATH + 'network_schematic.png'
+    timeseries_current_plot_path = os.path.join(PLOT_EXPORT_PATH, 'Time variant Current on lines.png')
+    timeseries_voltage_plot_path = os.path.join(PLOT_EXPORT_PATH, 'Time variant Bus voltages.png')
+    min_voltage_plot_path = os.path.join(PLOT_EXPORT_PATH, 'Bus Voltages at minimal Grid Load.png')
+    max_voltage_plot_path = os.path.join(PLOT_EXPORT_PATH, 'Bus Voltages at maximal Grid Load.png')
+    min_line_plot_path = os.path.join(PLOT_EXPORT_PATH, 'Current on Lines at minimal Grid Load.png')
+    max_line_plot_path = os.path.join(PLOT_EXPORT_PATH, 'Current on Lines at maximal Grid Load.png')
+    network_schematic_path = os.path.join(SCHEMATIC_EXPORT_PATH, 'network_schematic.png')
 
     pdf = PDF()
     pdf.set_margins(top=10, left=16)
@@ -197,15 +199,19 @@ def create_pdf_report(grid_node_data=dict(), grid_line_data=dict(), v_nom=0, s_n
     y_pos = pdf.h / 1.9
     # add line currents plot
     pdf.image(max_line_plot_path, x=x_pos, y=y_pos, w=width, h=height)
-
-    pdf.output(PDF_EXPORT_PATH + 'PowerFlow_Report.pdf', 'F')
+    pdf_title = 'PowerFlow_Report'
+    file_name = pdf_title + PDF_FILE_EXTENSION
+    file_path_name = os.path.join(PDF_EXPORT_PATH, file_name)
+    pdf.output(file_path_name, 'F')
 
 
 def convert_data_to_table_data(data, type='node', v_nom=0, s_nom=0):
     """
         Funktion konvertiert ein Dictionary von Dictionaries in eine Liste von Listen
-    :param data:
+    :param data: data of grid lines or grid nodes to display in a table
     :param type: defines the type of data, can be set to either 'node' or 'line' and affects the header
+    :param v_nom: nominal base voltage of the system
+    :param s_nom: nominal base power of the system
     :return:
     """
 
@@ -228,8 +234,8 @@ def convert_data_to_table_data(data, type='node', v_nom=0, s_nom=0):
             for key_to_delete in keys_to_delete:
                 del value[key_to_delete]
 
-    list_of_lists = list(list())
-    list_of_lists.append(header)
+    table_data_list = list(list())
+    table_data_list.append(header)
 
     for key, value in data.items():
         sub_list = list()
@@ -248,9 +254,9 @@ def convert_data_to_table_data(data, type='node', v_nom=0, s_nom=0):
                     sub_value = round(float(sub_value), 3)
                 sub_list.append(sub_value)
 
-        list_of_lists.append(sub_list)
+        table_data_list.append(sub_list)
 
-    return list_of_lists
+    return table_data_list
 
 
 def add_table(pdf=PDF, table_label='Table', tab_lab_height=5, data=list(list()), width=5, height=5,

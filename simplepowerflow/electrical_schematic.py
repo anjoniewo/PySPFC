@@ -1,7 +1,9 @@
+import os
+
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from simplepowerflow.constants_config import SCHEMATIC_EXPORT_PATH
+from constants import SCHEMATIC_EXPORT_PATH, PNG_FILE_EXTENSION
 
 
 def create_network_schematic(grid_lines, transformers):
@@ -39,6 +41,9 @@ def create_network_schematic(grid_lines, transformers):
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edges_labels, font_size=14)
 
     plt.axis('off')
-    plt.savefig(SCHEMATIC_EXPORT_PATH + 'network_schematic.png', format='png', dpi=120)
+    title = 'network_schematic'
+    file_name = str(title + PNG_FILE_EXTENSION)
+    file_path_name = os.path.join(SCHEMATIC_EXPORT_PATH, file_name)
+    plt.savefig(file_path_name, format='png', dpi=120)
     plt.clf()
     plt.cla()

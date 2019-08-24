@@ -1,8 +1,7 @@
 import csv
-
 import math
 
-from simplepowerflow.constants_config import *
+from constants import *
 
 MAX_NUM_OF_NODES = 100
 
@@ -26,19 +25,19 @@ class CSVexport:
         settings = self.__settings
         v_nom, s_nom = (1, 1) if settings.is_export_pu == 1 else (settings.v_nom, settings.s_nom)
 
-        p_load = {'timestamp': list()}
-        q_load = {'timestamp': list()}
-        p_gen = {'timestamp': list()}
-        q_gen = {'timestamp': list()}
-        v_mag = {'timestamp': list()}
-        v_angle = {'timestamp': list()}
+        p_load = {TIMESTAMP: list()}
+        q_load = {TIMESTAMP: list()}
+        p_gen = {TIMESTAMP: list()}
+        q_gen = {TIMESTAMP: list()}
+        v_mag = {TIMESTAMP: list()}
+        v_angle = {TIMESTAMP: list()}
         for timestamp in timestamps:
-            p_load['timestamp'].append(timestamp)
-            q_load['timestamp'].append(timestamp)
-            p_gen['timestamp'].append(timestamp)
-            q_gen['timestamp'].append(timestamp)
-            v_mag['timestamp'].append(timestamp)
-            v_angle['timestamp'].append(timestamp)
+            p_load[TIMESTAMP].append(timestamp)
+            q_load[TIMESTAMP].append(timestamp)
+            p_gen[TIMESTAMP].append(timestamp)
+            q_gen[TIMESTAMP].append(timestamp)
+            v_mag[TIMESTAMP].append(timestamp)
+            v_angle[TIMESTAMP].append(timestamp)
             timestamp_data = grid_node_results[timestamp]
             for key, value in timestamp_data.items():
                 if key not in p_load:
@@ -63,12 +62,12 @@ class CSVexport:
                     v_angle[key].append(str(value['v_angle']))
 
         # data export to csv files
-        self.export_data_to_csv(CSV_EXPORT_PATH, "p_loads", p_load)
-        self.export_data_to_csv(CSV_EXPORT_PATH, "q_loads", q_load)
-        self.export_data_to_csv(CSV_EXPORT_PATH, "p_generators", p_gen)
-        self.export_data_to_csv(CSV_EXPORT_PATH, "q_generators", q_gen)
-        self.export_data_to_csv(CSV_EXPORT_PATH, "v_magnitudes", v_mag)
-        self.export_data_to_csv(CSV_EXPORT_PATH, "v_angles", v_angle)
+        self.export_data_to_csv(file_name="p_loads", data_dict=p_load)
+        self.export_data_to_csv(file_name="q_loads", data_dict=q_load)
+        self.export_data_to_csv(file_name='p_generators', data_dict=p_gen)
+        self.export_data_to_csv(file_name='q_generators', data_dict=q_gen)
+        self.export_data_to_csv(file_name='v_magnitudes', data_dict=v_mag)
+        self.export_data_to_csv(file_name='v_angles', data_dict=v_angle)
 
         return v_mag
 
@@ -83,19 +82,19 @@ class CSVexport:
         v_nom, s_nom = (1, 1) if settings.is_export_pu == 1 else (settings.v_nom, settings.s_nom)
         current_nom = s_nom / (v_nom * math.sqrt(3))
 
-        p_over_lines = {'timestamp': list()}
-        q_over_lines = {'timestamp': list()}
-        s_over_lines = {'timestamp': list()}
-        p_transmission_losses = {'timestamp': list()}
-        q_transmission_losses = {'timestamp': list()}
-        line_currents = {'timestamp': list()}
+        p_over_lines = {TIMESTAMP: list()}
+        q_over_lines = {TIMESTAMP: list()}
+        s_over_lines = {TIMESTAMP: list()}
+        p_transmission_losses = {TIMESTAMP: list()}
+        q_transmission_losses = {TIMESTAMP: list()}
+        line_currents = {TIMESTAMP: list()}
         for timestamp in timestamps:
-            p_over_lines['timestamp'].append(timestamp)
-            q_over_lines['timestamp'].append(timestamp)
-            s_over_lines['timestamp'].append(timestamp)
-            p_transmission_losses['timestamp'].append(timestamp)
-            q_transmission_losses['timestamp'].append(timestamp)
-            line_currents['timestamp'].append(timestamp)
+            p_over_lines[TIMESTAMP].append(timestamp)
+            q_over_lines[TIMESTAMP].append(timestamp)
+            s_over_lines[TIMESTAMP].append(timestamp)
+            p_transmission_losses[TIMESTAMP].append(timestamp)
+            q_transmission_losses[TIMESTAMP].append(timestamp)
+            line_currents[TIMESTAMP].append(timestamp)
             timestamp_data = grid_line_results[timestamp]
             for key, value in timestamp_data.items():
                 if key not in p_over_lines:
@@ -119,23 +118,24 @@ class CSVexport:
                 if 'current_from_i_to_j' in value:
                     line_currents[key].append(str(value['current_from_i_to_j'] * current_nom))
 
-        self.export_data_to_csv(CSV_EXPORT_PATH, "p_lines", p_over_lines)
-        self.export_data_to_csv(CSV_EXPORT_PATH, "q_lines", q_over_lines)
-        self.export_data_to_csv(CSV_EXPORT_PATH, "s_lines", s_over_lines)
-        self.export_data_to_csv(CSV_EXPORT_PATH, "p_transmission_losses", p_transmission_losses)
-        self.export_data_to_csv(CSV_EXPORT_PATH, "q__transmission_losses", q_transmission_losses)
-        self.export_data_to_csv(CSV_EXPORT_PATH, "current_on_lines", line_currents)
+        self.export_data_to_csv(file_name='p_lines', data_dict=p_over_lines)
+        self.export_data_to_csv(file_name='q_lines', data_dict=q_over_lines)
+        self.export_data_to_csv(file_name='s_lines', data_dict=s_over_lines)
+        self.export_data_to_csv(file_name='p_transmission_losses', data_dict=p_transmission_losses)
+        self.export_data_to_csv(file_name='q__transmission_losses', data_dict=q_transmission_losses)
+        self.export_data_to_csv(file_name='current_on_lines', data_dict=line_currents)
 
         return line_currents
 
-    def export_data_to_csv(self, csv_export_path, file_name, data_dict):
+    def export_data_to_csv(self, file_name, data_dict):
         """
         exports data to csv file
         :param file_name:
         :param data_dict:
         :return:
         """
-        file_path_name = os.path.join(csv_export_path, file_name + ".csv")
+        file_name = str(file_name + CSV_FILE_EXTENSION)
+        file_path_name = os.path.join(CSV_EXPORT_PATH, file_name)
 
         with open(file_path_name, 'w', newline='') as csvFile:
             writer = csv.writer(csvFile)
