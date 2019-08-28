@@ -13,7 +13,7 @@ from simplepowerflow.powerflow.powerflowreporter import LoadFlowReporter
 
 class Grid:
 	"""
-	the main class to perform imports of network data and simplepowerflow2 calculations
+	the main class to perform imports of network data and performing power flow calculations
 	"""
 	
 	# Initialisierungskonstruktor
@@ -60,7 +60,7 @@ class Grid:
 	def import_csv_data(self):
 		"""
 		imports grid data from 'csv_import' directory
-		:return:
+		:return: void
 		"""
 		csv_import = CSVimport()
 		csv_import.import_csv_files()
@@ -97,56 +97,84 @@ class Grid:
 		self.bus_admittance_matrix = BusAdmittanceMatrix(self.__grid_node_list, self.__grid_line_list,
 		                                                 self.__transformer_list)
 	
-	# Methode erstellt einen neuen Netzknoten und fuegt diesen der Knotenliste hinzu
-	def create_grid_node(self, name, type, node_parameters):
-		# Instanzierung eines neuen GridNode Objektes
-		node = GridNode(name, type, node_parameters)
+	def create_grid_node(self, name, node_parameters):
+		"""
+		method creates a grid node element and adds it to the grid
+		:param name: name of grid node
+		:param node_parameters: physical grid node parameters, e.g. loads, generators
+		:return: void
+		"""
+		node = GridNode(name, node_parameters)
 		self.add_grid_node(node)
 	
-	# Methode fuegt der Netzknotenliste einen Knoten hinzu
 	def add_grid_node(self, grid_node):
+		"""
+		method adds a grid node element to the grid
+		:param grid_node: grid node object
+		:return: void
+		"""
 		self.__grid_node_list.append(grid_node)
 	
-	# Methode erstellt einen neuen Netzzweig und fuegt diese der Leitungsliste hinzu
 	def create_grid_line(self, node_i, node_j, line_parameters):
-		# Instanzierung eines neuen GridNode Objektes
-		line = GridLine(node_i, node_j, line_parameters)
-		self.add_grid_line(line)
+		"""
+		method creates a grid line element and adds it to the grid
+		:param node_i: name of first grid node connected to the grid line
+		:param node_j: name of second grid node connected to the grid line
+		:param line_parameters: physical grid line parameters, e.g. R, X_l, length
+		:return: void
+		"""
+		grid_line = GridLine(node_i, node_j, line_parameters)
+		self.add_grid_line(grid_line)
 	
-	# Methode fuegt der Leitungsliste einen Netzzweig hinzu
 	def add_grid_line(self, grid_line):
+		"""
+		method adds a grid line element to the grid
+		:param grid_line:
+		:return: void
+		"""
 		self.__grid_line_list.append(grid_line)
 	
-	# Gibt alle Knoten des Netzes in der Konsole aus
 	def print_grid_node_list(self):
+		"""
+		console output of grid node elements
+		:return: void
+		"""
 		if not len(self.__grid_node_list):
 			print("\nKeine Knoten in Liste")
 		else:
 			for i in range(0, len(self.__grid_node_list)):
 				print(self.__grid_node_list[i])
 	
-	# Gibt alle Knoten des Netzes in der Konsole aus
-	
 	def print_grid_line_list(self):
+		"""
+		console output of grid line elements
+		:return: void
+		"""
 		if not len(self.__grid_line_list):
 			print("\nKeine Leitungen in Liste")
 		else:
 			for i in range(0, len(self.__grid_line_list)):
 				print(self.__grid_line_list[i])
 	
-	# Methode gibt die aktuelle Knotenadmittanzmatrix zurück
 	def get_bus_admittance_matrix(self):
+		"""
+		getter of bus admittance matrix object
+		:return:
+		"""
 		return self.bus_admittance_matrix.matrix
 	
-	# Inverse der Knotenadmittanzmatrix berechnen
 	def get_inverse_of_bus_admittance_matrix(self):
+		"""
+		calculates the inverse of the bus admittance matrix and returns it
+		:return: inverse of bus admittance matrix
+		"""
 		return self.__bus_admittance_matrix.calc_inverse()
 	
-	# Lastflussberechnung durchfuehren
+	# perform powerflow using newton-raphson algorithm
 	def do_powerflow(self):
 		"""
-		Methods calls the do_powerflow() method of the PowerFlow class after
-		:return:
+		method calls the do_powerflow() method of the PowerFlow class after preparing grid data for power flow calculation
+		:return: void
 		"""
 		for timestamp in self.timestamps:
 			gridnodes, voltagenodes = self.prepare_data_for_powerflow(timestamp=timestamp)
@@ -163,8 +191,8 @@ class Grid:
 	
 	def prepare_data_for_powerflow(self, timestamp):
 		"""
-		Method prepares time variant data to perform a simplepowerflow2 calculation of a single timestamp
-		:return:
+		Method prepares time variant data to perform power flow calculation of a single timestamp
+		:return: list of grid nodes and list voltage nodes for power flow calculation
 		"""
 		
 		settings = self.__settings
@@ -234,7 +262,7 @@ class Grid:
 		"""
 
 		:param csv_export_path: export directory for simplepowerflow2 results
-		:return: -
+		:return: void
 		"""
 		
 		# save settings locally
@@ -260,17 +288,11 @@ class Grid:
 		# create network schematic for PDF report
 		create_network_schematic(self.__grid_line_list, self.__transformer_list)
 	
-	def print_loadflow_results(self):
-		if self.powerflow.grid_node_results:
-			print(self.powerflow)
-		else:
-			print("Lastflussberechnung wurde noch nicht durchgefuehrt!")
-	
 	# Methode gibt die aktuelle Knotenadmittanzmatrix zurück
 	def print_bus_admittance_matrix(self):
 		"""
 		Method prints busadmittance matrix in console
-		:return: -
+		:return: void
 		"""
 		result = ""
 		matrix = self.bus_admittance_matrix.matrix
