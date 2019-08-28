@@ -16,7 +16,6 @@ class Grid:
 	the main class to perform imports of network data and performing power flow calculations
 	"""
 	
-	# Initialisierungskonstruktor
 	def __init__(self):
 		
 		"""

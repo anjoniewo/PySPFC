@@ -67,7 +67,7 @@ class Plotter:
 
     def export_currents_on_lines_plots(self, grid_line_timeseries_results, grid_line_min_max_results):
         """
-        calls create_current_plot() and ... with specified parameters
+        calls create_current_plot() with specified parameters
         """
 
         settings = self.__settings
@@ -205,7 +205,8 @@ class Plotter:
     def create_current_plot_timeseries(self, x_vals=list(), y_vals=list(), title="title", x_axis_label="abscissa",
                                        y_axis_label="ordinate"):
         settings = self.__settings
-        v_nom, s_nom = (1, 1) if settings.is_export_pu else (settings.v_nom, settings.s_nom)
+        v_nom, s_nom = (settings.v_nom, settings.s_nom) if settings.is_export_pu else (1, 1)
+        current_nom = s_nom / v_nom
         fig, current_axes = plt.subplots()
 
         # Stromrange
@@ -222,8 +223,8 @@ class Plotter:
             line_labels = list()
 
             for key, value in y_vals.items():
-                line_currents = list(map(lambda voltage: float(voltage), value))
-                line_currents = list(map(lambda voltage: round(voltage, 3), line_currents))
+                line_currents = list(map(lambda current: float(current) * current_nom, value))
+                line_currents = list(map(lambda current: round(current, 3), line_currents))
                 legend_entries.append(current_axes.plot(x_vals, line_currents, '-', linewidth=1, label=key)[0])
                 line_labels.append(key)
 
@@ -278,7 +279,7 @@ class Plotter:
         voltage_axes.axhline(voltage_range_min, color='r', linestyle='--', label='Umin')
 
         # Balkendiagramm erstellen
-        volt_rects = voltage_axes.bar(x_vals, y_vals, width=0.5, label='Knotenspannung', color='#0090ff')
+        volt_rects = voltage_axes.bar(x_vals, y_vals, width=0.5, label='Nodevoltage', color='#0090ff')
 
         # Titel des Diagramms
         voltage_axes.set_title(title, fontsize=TITLE_FONTSIZE)
@@ -331,7 +332,7 @@ class Plotter:
         fig, voltage_axes = plt.subplots()
 
         # Balkendiagramm erstellen
-        volt_rects = voltage_axes.bar(x_vals, y_vals, width=0.5, label='Strom', color='#ff8a00')
+        volt_rects = voltage_axes.bar(x_vals, y_vals, width=0.5, label='Current', color='#ff8a00')
 
         # Titel des Diagramms
         voltage_axes.set_title(title, fontsize=TITLE_FONTSIZE)
