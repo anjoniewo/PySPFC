@@ -36,5 +36,5 @@ check_dir(CONFIG_PATH)
 FILENAMES_CSV_PATH = os.path.join(CONFIG_PATH, 'import_file_names.csv')
 CSV_FILE_EXTENSION = '.csv'
 PDF_FILE_EXTENSION = '.pdf'
-PNG_FILE_EXTENSION = '.png'
+IMG_FILE_EXTENSION = '.png'
 TIMESTAMP = str('timestamp')

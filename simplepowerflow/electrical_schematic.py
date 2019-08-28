@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from constants import SCHEMATIC_EXPORT_PATH, PNG_FILE_EXTENSION
+from constants import SCHEMATIC_EXPORT_PATH, IMG_FILE_EXTENSION
 
 
 def create_network_schematic(grid_lines, transformers):
@@ -42,7 +42,7 @@ def create_network_schematic(grid_lines, transformers):
 
     plt.axis('off')
     title = 'network_schematic'
-    file_name = str(title + PNG_FILE_EXTENSION)
+    file_name = str(title + IMG_FILE_EXTENSION)
     file_path_name = os.path.join(SCHEMATIC_EXPORT_PATH, file_name)
     plt.savefig(file_path_name, format='png', dpi=120)
     plt.clf()
