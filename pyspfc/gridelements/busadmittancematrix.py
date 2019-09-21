@@ -2,8 +2,8 @@ import copy
 
 import numpy as np
 
-from simplepowerflow.gridelements.admittance import Admittance
-from simplepowerflow.gridelements.gridline import GridLine
+from pyspfc.gridelements.admittance import Admittance
+from pyspfc.gridelements.gridline import GridLine
 
 
 # Klasse fuer die Erstellung der Knotenadmittanzmatrix

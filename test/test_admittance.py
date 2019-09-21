@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from simplepowerflow.gridelements.admittance import Admittance
-from simplepowerflow.gridelements.impedance import Impedance
+from pyspfc.gridelements.admittance import Admittance
+from pyspfc.gridelements.impedance import Impedance
 
 
 class TestAdmittance(TestCase):

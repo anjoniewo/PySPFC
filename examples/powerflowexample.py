@@ -1,16 +1,17 @@
-from simplepowerflow.grid import Grid
+import pyspfc
 
 # Grid - object instantiation
-network = Grid()
+grid = pyspfc.Grid()
 
 # import of grid/network data from 'csv_import' directory in the project folder
-network.import_csv_data()
+import_path = 'C:\\Users\\Admin\\Desktop\\Neuer Ordner'
+grid.import_csv_data(import_path)
 
 # run of powerflow calculations
-network.do_powerflow()
+grid.do_powerflow()
 
 # export of powerflow calculation results
-network.export_powerflow_results()
+grid.export_powerflow_results()
 
 # creation of a PDF - report with significant data
-network.create_pdf_report()
+grid.create_pdf_report()

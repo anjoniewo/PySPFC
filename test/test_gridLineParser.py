@@ -1,7 +1,7 @@
 import os
 from unittest import TestCase
 
-from simplepowerflow import GridLineParser
+from pyspfc import GridLineParser
 
 
 class TestGridLineParser(TestCase):

@@ -1,8 +1,8 @@
 import numpy as np
 
-from simplepowerflow.gridelements.gridnode import GridNode
-from simplepowerflow.powerflow.jacobianmatrix import JacobianMatrix
-from simplepowerflow.utils.complexutils import get_polar
+from pyspfc.gridelements.gridnode import GridNode
+from pyspfc.powerflow.jacobianmatrix import JacobianMatrix
+from pyspfc.utils.complexutils import get_polar
 from .powerflowequations import *
 
 

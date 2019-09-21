@@ -1,7 +1,7 @@
 import csv
 import math
 
-from constants import *
+from pyspfc.directories import *
 
 MAX_NUM_OF_NODES = 100
 
@@ -135,7 +135,7 @@ class CSVexport:
         :return:
         """
         file_name = str(file_name + CSV_FILE_EXTENSION)
-        file_path_name = os.path.join(CSV_EXPORT_PATH, file_name)
+        file_path_name = os.path.join(get_csv_export_path(), file_name)
 
         with open(file_path_name, 'w', newline='') as csvFile:
             writer = csv.writer(csvFile)

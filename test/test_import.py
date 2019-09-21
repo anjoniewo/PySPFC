@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from simplepowerflow.csvimport import *
+from pyspfc.csvimport import *
 
 
 class TestImport(TestCase):

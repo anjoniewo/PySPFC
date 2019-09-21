@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from simplepowerflow.grid import Grid
+from pyspfc.grid import Grid
 
 
 class TestGrid(TestCase):
