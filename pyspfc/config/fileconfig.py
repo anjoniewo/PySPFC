@@ -18,8 +18,8 @@ def get_file_names():
     :param file_path: simplepowerflow2/import_file_names.csv
     :return: a set of the file names
     """
-    from constants import FILENAMES_CSV_PATH
-    with open(FILENAMES_CSV_PATH, mode='r') as csv_file:
+    from pyspfc.directories import get_filenames_path
+    with open(get_filenames_path(), mode='r') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=";")
 
         file_names = dict()

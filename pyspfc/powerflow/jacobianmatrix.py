@@ -1,6 +1,6 @@
 import numpy as np
 
-from simplepowerflow.utils.complexutils import get_cartesian_from_euler
+from pyspfc.utils.complexutils import get_cartesian_from_euler
 
 """
 Quelle:  E. Handschin, "Elektrische Energieübertragunssysteme",

@@ -1,5 +1,5 @@
 from unittest import TestCase
-from simplepowerflow.gridelements.gridline import GridLine
+from pyspfc.gridelements.gridline import GridLine
 
 
 # Klasse fuer GridLine-Tests

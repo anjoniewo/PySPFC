@@ -1,6 +1,6 @@
-from simplepowerflow.powerflow.powerflowreporter import LoadFlowReporter
-from simplepowerflow.gridelements.impedance import Impedance
-from simplepowerflow.gridelements.admittance import Admittance
+from pyspfc.powerflow.powerflowreporter import LoadFlowReporter
+from pyspfc.gridelements.impedance import Impedance
+from pyspfc.gridelements.admittance import Admittance
 
 
 # ein Transformator wird als Knotenverbindendes Netzelement definiert

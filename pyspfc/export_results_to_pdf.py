@@ -3,7 +3,7 @@ import os
 
 from fpdf import FPDF
 
-from constants import PDF_FILE_EXTENSION, PDF_EXPORT_PATH, PLOT_EXPORT_PATH, SCHEMATIC_EXPORT_PATH
+from pyspfc.directories import PDF_FILE_EXTENSION, get_pdf_export_path, get_plot_export_path, get_schematic_export_path
 
 title = 'PySPFC - Results Report'
 
@@ -70,13 +70,13 @@ class PDF(FPDF):
 
 
 def create_pdf_report(grid_node_data=dict(), grid_line_data=dict(), v_nom=0, s_nom=0):
-    timeseries_current_plot_path = os.path.join(PLOT_EXPORT_PATH, 'Time variant Current on lines.png')
-    timeseries_voltage_plot_path = os.path.join(PLOT_EXPORT_PATH, 'Time variant Bus voltages.png')
-    min_voltage_plot_path = os.path.join(PLOT_EXPORT_PATH, 'Bus Voltages at minimal Grid Load.png')
-    max_voltage_plot_path = os.path.join(PLOT_EXPORT_PATH, 'Bus Voltages at maximal Grid Load.png')
-    min_line_plot_path = os.path.join(PLOT_EXPORT_PATH, 'Current on Lines at minimal Grid Load.png')
-    max_line_plot_path = os.path.join(PLOT_EXPORT_PATH, 'Current on Lines at maximal Grid Load.png')
-    network_schematic_path = os.path.join(SCHEMATIC_EXPORT_PATH, 'network_schematic.png')
+    timeseries_current_plot_path = os.path.join(get_plot_export_path(), 'Time variant Current on lines.png')
+    timeseries_voltage_plot_path = os.path.join(get_plot_export_path(), 'Time variant Bus voltages.png')
+    min_voltage_plot_path = os.path.join(get_plot_export_path(), 'Bus Voltages at minimal Grid Load.png')
+    max_voltage_plot_path = os.path.join(get_plot_export_path(), 'Bus Voltages at maximal Grid Load.png')
+    min_line_plot_path = os.path.join(get_plot_export_path(), 'Current on Lines at minimal Grid Load.png')
+    max_line_plot_path = os.path.join(get_plot_export_path(), 'Current on Lines at maximal Grid Load.png')
+    network_schematic_path = os.path.join(get_schematic_export_path(), 'network_schematic.png')
 
     pdf = PDF()
     pdf.set_margins(top=10, left=16)
@@ -201,7 +201,7 @@ def create_pdf_report(grid_node_data=dict(), grid_line_data=dict(), v_nom=0, s_n
     pdf.image(max_line_plot_path, x=x_pos, y=y_pos, w=width, h=height)
     pdf_title = 'PowerFlow_Report'
     file_name = pdf_title + PDF_FILE_EXTENSION
-    file_path_name = os.path.join(PDF_EXPORT_PATH, file_name)
+    file_path_name = os.path.join(get_pdf_export_path(), file_name)
     pdf.output(file_path_name, 'F')
 
 

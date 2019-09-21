@@ -1,5 +1,5 @@
 name = 'pyspfc'
 
-__all__ = ['simplepowerflow', 'constants']
+__all__ = ['pyspfc', 'constants']
 
-from . import simplepowerflow, constants
+from . import pyspfc, constants

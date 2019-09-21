@@ -1,6 +1,6 @@
-from simplepowerflow.gridelements.admittance import Admittance
-from simplepowerflow.gridelements.impedance import Impedance
-from simplepowerflow.powerflow.powerflowreporter import LoadFlowReporter
+from pyspfc.gridelements.admittance import Admittance
+from pyspfc.gridelements.impedance import Impedance
+from pyspfc.powerflow.powerflowreporter import LoadFlowReporter
 
 
 # eine Leitung wird als Knotenverbindendes Netzelement definiert

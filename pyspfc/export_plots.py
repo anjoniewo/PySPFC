@@ -3,8 +3,8 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
-from constants import *
-from simplepowerflow.csvexport import MAX_NUM_OF_NODES
+from pyspfc.directories import *
+from pyspfc.csvexport import MAX_NUM_OF_NODES
 
 
 class Plotter:
@@ -198,7 +198,7 @@ class Plotter:
         voltage_axes.legend(legend_entries, line_labels, loc="upper right", borderaxespad=0.3, fancybox=True,
                             prop={'size': 8})
         file_name = str(title + IMG_FILE_EXTENSION)
-        file_path_name = os.path.join(PLOT_EXPORT_PATH, file_name)
+        file_path_name = os.path.join(get_plot_export_path(), file_name)
         plt.savefig(file_path_name, format='png', dpi=120)
         plt.clf()
         plt.cla()
@@ -261,7 +261,7 @@ class Plotter:
         current_axes.legend(legend_entries, line_labels, loc="upper right", borderaxespad=0.3, fancybox=True,
                             prop={'size': 8})
         file_name = str(title + IMG_FILE_EXTENSION)
-        file_path_name = os.path.join(PLOT_EXPORT_PATH, file_name)
+        file_path_name = os.path.join(get_plot_export_path(), file_name)
         plt.savefig(file_path_name, format='png', dpi=120)
         plt.clf()
         plt.cla()
@@ -322,7 +322,7 @@ class Plotter:
         plt.grid(True, linewidth=0.3)
         plt.subplots_adjust(left=0.15, bottom=0.18)
         file_name = str(title + IMG_FILE_EXTENSION)
-        file_path_name = os.path.join(PLOT_EXPORT_PATH, file_name)
+        file_path_name = os.path.join(get_plot_export_path(), file_name)
         plt.savefig(file_path_name, format='png', dpi=120)
         plt.clf()
         plt.cla()
@@ -364,7 +364,7 @@ class Plotter:
         plt.grid(True, linewidth=0.3)
         plt.subplots_adjust(left=0.15, bottom=0.18)
         file_name = str(title + IMG_FILE_EXTENSION)
-        file_path_name = os.path.join(PLOT_EXPORT_PATH, file_name)
+        file_path_name = os.path.join(get_plot_export_path(), file_name)
         plt.savefig(file_path_name, format='png', dpi=120)
         plt.clf()
         plt.cla()

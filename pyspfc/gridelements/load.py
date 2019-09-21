@@ -1,4 +1,4 @@
-from simplepowerflow.gridelements.generator import Generator
+from pyspfc.gridelements.generator import Generator
 
 
 class Load(Generator):

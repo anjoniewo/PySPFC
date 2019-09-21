@@ -1,4 +1,4 @@
-from simplepowerflow.utils import calculate_complex_reciprocal, get_complex_magnitude
+from pyspfc.utils import calculate_complex_reciprocal, get_complex_magnitude
 
 
 class Admittance:

@@ -3,14 +3,13 @@ import os
 
 import pandas as pd
 
-from constants import ROOT_PATH, OS_SLASH
-from simplepowerflow.config.fileconfig import get_file_names
-from simplepowerflow.gridelements.generator import Generator
-from simplepowerflow.gridelements.gridline import GridLine
-from simplepowerflow.gridelements.gridnode import GridNode
-from simplepowerflow.gridelements.load import Load
+from pyspfc.config.fileconfig import get_file_names
+from pyspfc.directories import get_import_path
+from pyspfc.gridelements.generator import Generator
+from pyspfc.gridelements.gridline import GridLine
+from pyspfc.gridelements.gridnode import GridNode
+from pyspfc.gridelements.load import Load
 
-csv_import_path = ROOT_PATH + OS_SLASH + 'csv_import'
 file_names = get_file_names()
 
 cols_generators = ['name', 'node_i', 'p_max', 'p_min', 'q_max', 'q_min']
@@ -244,11 +243,15 @@ class CSVimport:
 
         return Settings(slack, v_nom, s_nom, is_import_pu, is_export_pu, is_resistance_pu, time_stamp_format)
 
-    def import_files_as_dfs(self):
+    def import_files_as_dfs(self, root_path=''):
         """
-            imports all csv files from 'csv_import' path to dataframes
+            imports all csv files from default 'csv_import' path in the project root directory or from a specified
+            directory
+            @:param root_path
+            all files will be imported an parsed into pandas dataframes
         :return: -
         """
+        csv_import_path = get_import_path()
         assert os.path.isdir(csv_import_path), 'Path {} does not exist.'.format(csv_import_path)
 
         files = os.listdir(csv_import_path)
@@ -264,7 +267,8 @@ class CSVimport:
             raise SystemExit(1)
         else:
             for file_name in files:
-                self.df_import[file_name] = pd.read_csv(os.path.join(csv_import_path, file_name), delimiter=";")
+                if file_name != 'export':
+                    self.df_import[file_name] = pd.read_csv(os.path.join(csv_import_path, file_name), delimiter=";")
 
 
 class ImportValidator:
