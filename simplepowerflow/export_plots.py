@@ -34,36 +34,37 @@ class Plotter:
         self.create_voltage_plot_timeseries(x_vals=timestamps, y_vals=node_voltages, title=title, x_axis_label=x_label,
                                             y_axis_label=y_label)
 
-        # die X-Werte:
-        grid_nodes = list()
-        # die Y-Werte:
-        node_voltages = list()
-
-        grid_node_min_results = grid_node_min_max_results['max']
-        for grid_node_name in grid_node_min_results:
-            grid_nodes.append(grid_node_name)
-            node_voltages.append(grid_node_min_results[grid_node_name]['v_magnitude'] * v_nom)
-
-        title = 'Bus Voltages at minimal Grid Load'
-        x_label = 'Grid Nodes'
-
-        self.create_voltage_plot(x_vals=grid_nodes, y_vals=node_voltages, title=title, x_axis_label=x_label,
-                                 y_axis_label=y_label)
-
-        # die X-Werte:
-        grid_nodes = list()
-        # die Y-Werte:
-        node_voltages = list()
-
-        grid_node_max_results = grid_node_min_max_results['min']
-        for grid_node_name in grid_node_max_results:
-            grid_nodes.append(grid_node_name)
-            node_voltages.append(grid_node_max_results[grid_node_name]['v_magnitude'] * v_nom)
-
-        title = 'Bus Voltages at maximal Grid Load'
-
-        self.create_voltage_plot(x_vals=grid_nodes, y_vals=node_voltages, title=title, x_axis_label=x_label,
-                                 y_axis_label=y_label)
+        if len(timestamps) > 1:
+            # die X-Werte:
+            grid_nodes = list()
+            # die Y-Werte:
+            node_voltages = list()
+    
+            grid_node_min_results = grid_node_min_max_results['max']
+            for grid_node_name in grid_node_min_results:
+                grid_nodes.append(grid_node_name)
+                node_voltages.append(grid_node_min_results[grid_node_name]['v_magnitude'] * v_nom)
+    
+            title = 'Bus Voltages At Minimal Grid Load'
+            x_label = 'Grid Nodes'
+    
+            self.create_voltage_plot(x_vals=grid_nodes, y_vals=node_voltages, title=title, x_axis_label=x_label,
+                                     y_axis_label=y_label)
+    
+            # die X-Werte:
+            grid_nodes = list()
+            # die Y-Werte:
+            node_voltages = list()
+    
+            grid_node_max_results = grid_node_min_max_results['min']
+            for grid_node_name in grid_node_max_results:
+                grid_nodes.append(grid_node_name)
+                node_voltages.append(grid_node_max_results[grid_node_name]['v_magnitude'] * v_nom)
+    
+            title = 'Bus Voltages At Maximal Grid Load'
+    
+            self.create_voltage_plot(x_vals=grid_nodes, y_vals=node_voltages, title=title, x_axis_label=x_label,
+                                     y_axis_label=y_label)
 
     def export_currents_on_lines_plots(self, grid_line_timeseries_results, grid_line_min_max_results):
         """
@@ -88,42 +89,42 @@ class Plotter:
             self.create_current_plot_timeseries(x_vals=timestamps, y_vals=line_currents, title=title,
                                                 x_axis_label=x_label,
                                                 y_axis_label=y_label)
-
-            # die X-Werte:
-            grid_lines = list()
-            # die Y-Werte:
-            current_on_lines = list()
-
-            grid_line_min_results = grid_line_min_max_results['max']
-            for grid_line_name in grid_line_min_results:
-                grid_lines.append(grid_line_name)
-                current_on_lines.append(grid_line_min_results[grid_line_name]['current_from_i_to_j'])
-
-            current_on_lines = list(map(lambda value: value * current_nom, current_on_lines))
-
-            title = 'Current on Lines at minimal Grid Load'
-            x_label = 'Grid Lines'
-
-            self.create_current_plot(x_vals=grid_lines, y_vals=current_on_lines, title=title,
-                                     x_axis_label=x_label, y_axis_label=y_label)
-
-            # die X-Werte:
-            grid_lines = list()
-            # die Y-Werte:
-            current_on_lines = list()
-
-            grid_line_max_results = grid_line_min_max_results['min']
-            for grid_line_name in grid_line_max_results:
-                grid_lines.append(grid_line_name)
-                current_on_lines.append(grid_line_max_results[grid_line_name]['current_from_i_to_j'])
-
-            current_nom = settings.s_nom / (settings.v_nom * math.sqrt(3))
-            current_on_lines = list(map(lambda value: value * current_nom, current_on_lines))
-
-            title = 'Current on Lines at maximal Grid Load'
-
-            self.create_current_plot(x_vals=grid_lines, y_vals=current_on_lines, title=title,
-                                     x_axis_label=x_label, y_axis_label=y_label)
+            if len(timestamps) > 1:
+                # die X-Werte:
+                grid_lines = list()
+                # die Y-Werte:
+                current_on_lines = list()
+    
+                grid_line_min_results = grid_line_min_max_results['max']
+                for grid_line_name in grid_line_min_results:
+                    grid_lines.append(grid_line_name)
+                    current_on_lines.append(grid_line_min_results[grid_line_name]['current_from_i_to_j'])
+    
+                current_on_lines = list(map(lambda value: value * current_nom, current_on_lines))
+    
+                title = 'Current On Lines At Minimal Grid Load'
+                x_label = 'Grid Lines'
+    
+                self.create_current_plot(x_vals=grid_lines, y_vals=current_on_lines, title=title,
+                                         x_axis_label=x_label, y_axis_label=y_label)
+    
+                # die X-Werte:
+                grid_lines = list()
+                # die Y-Werte:
+                current_on_lines = list()
+    
+                grid_line_max_results = grid_line_min_max_results['min']
+                for grid_line_name in grid_line_max_results:
+                    grid_lines.append(grid_line_name)
+                    current_on_lines.append(grid_line_max_results[grid_line_name]['current_from_i_to_j'])
+    
+                current_nom = settings.s_nom / (settings.v_nom * math.sqrt(3))
+                current_on_lines = list(map(lambda value: value * current_nom, current_on_lines))
+    
+                title = 'Current On Lines At Maximal Grid Load'
+    
+                self.create_current_plot(x_vals=grid_lines, y_vals=current_on_lines, title=title,
+                                         x_axis_label=x_label, y_axis_label=y_label)
 
     def create_voltage_plot_timeseries(self, x_vals=dict(), y_vals=dict(), title='title', x_axis_label='abscissa',
                                        y_axis_label='ordinate'):
@@ -313,7 +314,7 @@ class Plotter:
         # absolute max. Werte der einzelnen Balken
         self.autolabel(volt_rects, voltage_axes, 3)
 
-        labels = ['$\pm$ 10 % ${U}_{ref}$', 'Knotenspannung']
+        labels = ['$\pm$ 10 % ${U}_{ref}$', 'voltage at nodes']
         handles, _ = voltage_axes.get_legend_handles_labels()
 
         # Slice list to remove first handle

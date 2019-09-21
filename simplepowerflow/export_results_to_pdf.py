@@ -5,7 +5,7 @@ from fpdf import FPDF
 
 from constants import PDF_FILE_EXTENSION, PDF_EXPORT_PATH, PLOT_EXPORT_PATH, SCHEMATIC_EXPORT_PATH
 
-title = 'PowerFlow - Results'
+title = 'PySPFC - Results Report'
 
 
 class PDF(FPDF):
@@ -95,7 +95,7 @@ def create_pdf_report(grid_node_data=dict(), grid_line_data=dict(), v_nom=0, s_n
     pdf.ln(70)
 
     # chapter 2
-    pdf.print_chapter(2, title='Results', name='')
+    pdf.print_chapter(2, title='Stationary Load Flow Calculation Results', name='')
     pdf.ln(7)
 
     # effective page width, or just epw
@@ -170,7 +170,7 @@ def create_pdf_report(grid_node_data=dict(), grid_line_data=dict(), v_nom=0, s_n
     # ------------------------------------------------------------------------------------------------------------------
 
     # chapter 4 --------------------------------------------------------------------------------------------------------
-    pdf.print_chapter(4, title='Plots at minimal Grid Load', name='')
+    pdf.print_chapter(4, title='Plots At Minimal Grid Load', name='')
 
     x_pos = pdf.w / 6.95
     y_pos = 32
@@ -186,7 +186,7 @@ def create_pdf_report(grid_node_data=dict(), grid_line_data=dict(), v_nom=0, s_n
     # ------------------------------------------------------------------------------------------------------------------
 
     # chapter 5 --------------------------------------------------------------------------------------------------------
-    pdf.print_chapter(5, title='Plots at maximal Grid Load', name='')
+    pdf.print_chapter(5, title='Plots At maximal Grid Load', name='')
 
     x_pos = pdf.w / 6.95
     y_pos = 32
@@ -243,15 +243,18 @@ def convert_data_to_table_data(data, type='node', v_nom=0, s_nom=0):
         for sub_key, sub_value in value.items():
             if sub_key == 'p_loss':
                 if isinstance(sub_value, float):
-                    sub_value = round(float(sub_value * s_nom), 3)
+                    rounded_value = round(float(sub_value * s_nom), 3)
+                    sub_value = 0 if abs(rounded_value) == 0 else rounded_value
                 sub_list.append(sub_value)
             elif sub_key == 'current_from_i_to_j':
                 if isinstance(sub_value, float):
-                    sub_value = round(float(sub_value * (s_nom / (v_nom * math.sqrt(3)))), 3)
+                    rounded_value = round(float(sub_value * (s_nom / (v_nom * math.sqrt(3)))), 3)
+                    sub_value = 0 if abs(rounded_value) else rounded_value
                 sub_list.append(sub_value)
             else:
                 if isinstance(sub_value, float):
-                    sub_value = round(float(sub_value), 3)
+                    rounded_value = round(float(sub_value), 3)
+                    sub_value = 0 if abs(rounded_value) == 0.0 else rounded_value
                 sub_list.append(sub_value)
 
         table_data_list.append(sub_list)
