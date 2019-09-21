@@ -4,7 +4,7 @@ import pyspfc
 grid = pyspfc.Grid()
 
 # import of grid/network data from 'csv_import' directory in the project folder
-import_path = 'C:\\Users\\Admin\\Desktop\\Neuer Ordner'
+import_path = ''
 grid.import_csv_data(import_path)
 
 # run of powerflow calculations
