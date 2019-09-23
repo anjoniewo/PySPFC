@@ -198,6 +198,7 @@ class Grid:
     def prepare_data_for_powerflow(self, timestamp):
         """
         Method prepares time variant data to perform power flow calculation of a single timestamp
+        :param timestamp: data will be prepared to run power flow calculation for the specific time stamp
         :return: list of grid nodes and list voltage nodes for power flow calculation
         """
 
@@ -266,8 +267,7 @@ class Grid:
 
     def export_powerflow_results(self):
         """
-
-        :param csv_export_path: export directory for simplepowerflow2 results
+        method exports voltage and currents plots with significant data from power flow calculation
         :return: void
         """
 

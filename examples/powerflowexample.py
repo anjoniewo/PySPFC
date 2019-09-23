@@ -21,3 +21,6 @@ grid.export_powerflow_results()
 # creation of a PDF - report with significant data
 # a pdf file with significant results will automatically be exported to an 'export' folder int the import directory
 grid.create_pdf_report()
+
+
+

@@ -15,7 +15,7 @@ file_names = get_file_names()
 cols_generators = ['name', 'node_i', 'p_max', 'p_min', 'q_max', 'q_min']
 cols_gridnodes = ['name']
 cols_lines = ['name', 'node_i', 'node_j', 'r_l', 'x_l', 'g_shunt_l', 'b_shunt_l', 'length']
-cols_settings = ['slack', 'v_nom', 's_nom', 'is_import_pu', 'is_export_pu', 'time_stamp_format']
+cols_settings = ['slack', 'v_nom_kV', 's_nom_MVA', 'is_import_pu', 'is_export_pu', 'time_stamp_format']
 
 
 class CSVimport:
@@ -42,25 +42,13 @@ class CSVimport:
         self.simulation_settings = self.get_settings()
         self.get_lines()
         self.get_nodes()
-        self.check_consistency()
         self.get_time_stamp_keys()
-
-    def check_consistency(self):
-        """
-        methode validates the imported data
-        check if:
-            - all gridnodes are connected via gridlines
-            - no admittances/impedances of the gridlines are singular
-            - every gridnode has at least one generator or one load
-            - all time stamps are identical
-        :return:
-        """
-        1
+        self.validator.check_consistency(self)
 
     def get_time_stamp_keys(self):
         """
-        method creates a list of time stamp keys
-        :return:
+        method creates a list of time stamp keys and sets it in the attribute self.time_stamp_keys
+        :return: none
         """
         time_stamp_keys = None
         for grid_node in self.grid_nodes:
@@ -72,6 +60,9 @@ class CSVimport:
                 load = next((x for x in grid_node.loads if len(x.series_data)), None)
                 time_stamp_keys = load.series_data
                 break
+            else:
+                print('\nWARNING: Program was aborted. No generators neither loads are specified!\n')
+                raise SystemExit(1)
 
         for key in time_stamp_keys:
             self.time_stamp_keys.append(key)
@@ -101,7 +92,7 @@ class CSVimport:
         """
         settings = self.simulation_settings
         default_max = 1000 if settings.is_import_pu == 1 else settings.s_nom
-        default_min = -1000 if settings.is_import_pu ==1 else float(settings.s_nom * -1)
+        default_min = -1000 if settings.is_import_pu == 1 else float(settings.s_nom * -1)
         generator_file_df = self.df_import[file_names['generators']]
         generators = list()
         for row in generator_file_df.iterrows():
@@ -119,7 +110,7 @@ class CSVimport:
         self.set_generators_data(generators)
 
         return generators
-    
+
     @staticmethod
     def set_series_data(elements, p_series_df, q_series_df):
         """
@@ -206,6 +197,12 @@ class CSVimport:
             grid_line_name = row['name']
             node_i = row['node_i']
             node_j = row['node_j']
+
+            if node_i == node_j:
+                print('\nProgram was aborted. The following grid line has the same start and end bus:')
+                print(grid_line_name)
+                raise SystemExit(1)
+
             r_l = row['r_l'] if not math.isnan(row['r_l']) else None
             x_l = row['x_l'] if not math.isnan(row['x_l']) else None
             g_shunt_l = row['g_shunt_l'] if not math.isnan(row['g_shunt_l']) else 0
@@ -233,8 +230,8 @@ class CSVimport:
         self.validator.validate_columns(cols_settings, settings_file_columns)
 
         slack = settings_file_df['slack'].iloc[0] if isinstance(settings_file_df['slack'].iloc[0], str) else None
-        v_nom = settings_file_df['v_nom'].iloc[0] if not math.isnan(settings_file_df['v_nom'].iloc[0]) else None
-        s_nom = settings_file_df['s_nom'].iloc[0] if not math.isnan(settings_file_df['s_nom'].iloc[0]) else None
+        v_nom = settings_file_df['v_nom_kV'].iloc[0] if not math.isnan(settings_file_df['v_nom_kV'].iloc[0]) else None
+        s_nom = settings_file_df['s_nom_MVA'].iloc[0] * 1000 if not math.isnan(settings_file_df['s_nom_MVA'].iloc[0]) else None
         is_import_pu = settings_file_df['is_import_pu'].iloc[0] if not math.isnan(
             settings_file_df['is_import_pu'].iloc[0]) else 0
         is_export_pu = settings_file_df['is_export_pu'].iloc[0] if not math.isnan(
@@ -283,11 +280,52 @@ class ImportValidator:
     def __init__(self):
         pass
 
-    def validate_series_data(self, data):
-        1
+    def check_consistency(self, csv_import):
+        """
+        methode validates the imported data
+        check if:
+            - all gridnodes are connected via gridlines
+            - no admittances/impedances of the gridlines are singular
+            - every gridnode has at least one generator or one load
+            - all time stamps are identical
+        :return: none
+        """
+        self.check_grid_nodes_are_connected(csv_import.grid_nodes, csv_import.grid_lines)
+        self.check_grid_nodes_have_loads_ord_generators(csv_import.grid_nodes)
 
-    def validate_time_stamp_data(self):
-        1
+    @staticmethod
+    def check_grid_nodes_are_connected(grid_nodes, grid_lines):
+        """
+        method checks if all grid nodes are connected via grid lines
+        :param grid_nodes: list of grid node objects
+        :param grid_lines: list of grid line objects
+        :return: none
+        """
+
+        grid_node_names = [grid_node.name for grid_node in grid_nodes]
+        grid_nodes_i = [grid_line.get_node_name_i() for grid_line in grid_lines]
+        grid_nodes_j = [grid_line.get_node_name_j() for grid_line in grid_lines]
+        grid_nodes_from_lines = set(grid_nodes_i + grid_nodes_j)
+
+        for grid_node_name in grid_node_names:
+            if grid_node_name not in grid_nodes_from_lines:
+                print('\nProgram was aborted. Following grid node is not connected: ')
+                print(grid_node_name)
+                raise SystemExit(1)
+
+    @staticmethod
+    def check_grid_nodes_have_loads_ord_generators(grid_nodes):
+        """
+        method checks if every grid node has at least a generator or load element
+        :param grid_nodes: list of grid nodes
+        :return: none
+        """
+        for grid_node in grid_nodes:
+            if not len(grid_node.generators) and not len(grid_node.loads):
+                print('\nProgram was aborted. Following grid node has neither generators nor loads: ')
+                print(grid_node.name)
+                raise SystemExit(1)
+
 
     def validate_columns(self, ref_columns, column_names):
         success = False
