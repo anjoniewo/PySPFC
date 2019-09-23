@@ -6,7 +6,7 @@ from pyspfc.directories import reset_root_path
 from pyspfc.electrical_schematic import create_network_schematic
 from pyspfc.export_plots import Plotter
 from pyspfc.export_results_to_pdf import create_pdf_report
-from pyspfc.gridelements.busadmittancematrix import BusAdmittanceMatrix
+from pyspfc.powerflow.busadmittancematrix import BusAdmittanceMatrix
 from pyspfc.gridelements.gridline import GridLine
 from pyspfc.gridelements.gridnode import GridNode
 from pyspfc.powerflow.jacobianmatrix import JacobianMatrix
@@ -72,7 +72,7 @@ class Grid:
         csv_import.import_csv_files()
         self.__grid_node_list = csv_import.grid_nodes
         self.__grid_line_list = csv_import.grid_lines
-        self.__settings = csv_import.network_settings
+        self.__settings = csv_import.simulation_settings
         self.timestamps = csv_import.time_stamp_keys
         self.create_bus_admittance_matrix()
 
@@ -84,8 +84,8 @@ class Grid:
 
         settings = self.__settings
 
-        if not settings.is_resistance_pu:
-            # reference admittance value
+        if not settings.is_import_pu:
+            # reference nominal admittance value
             y_nom = (settings.s_nom / settings.v_nom ** 2)
 
             for index, gridline in enumerate(self.__grid_line_list):

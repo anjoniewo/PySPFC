@@ -6,6 +6,8 @@ grid = pyspfc.Grid()
 # import of grid/network data
 # if import_path = '' the default directory 'csv_import' in the project folder will be set
 # else the chosen directory will be set
+# HINT: if the operating system is Windows you have to replace a single "\" by "\\"
+# Example: "C:\Desktop\folder" --> "C:\\Desktop\\folder"
 import_path = ''
 grid.import_csv_data(import_path)
 

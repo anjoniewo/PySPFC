@@ -15,7 +15,7 @@ file_names = get_file_names()
 cols_generators = ['name', 'node_i', 'p_max', 'p_min', 'q_max', 'q_min']
 cols_gridnodes = ['name']
 cols_lines = ['name', 'node_i', 'node_j', 'r_l', 'x_l', 'g_shunt_l', 'b_shunt_l', 'length']
-cols_settings = ['slack', 'v_nom', 's_nom', 'is_import_pu', 'is_export_pu', 'is_resistance_pu', 'time_stamp_format']
+cols_settings = ['slack', 'v_nom', 's_nom', 'is_import_pu', 'is_export_pu', 'time_stamp_format']
 
 
 class CSVimport:
@@ -27,7 +27,7 @@ class CSVimport:
         self.import_logger = ImportLogger()
         self.validator = ImportValidator()
         self.df_import = dict()
-        self.network_settings = None
+        self.simulation_settings = None
         self.grid_lines = list()
         self.grid_nodes = list()
         self.time_stamp_keys = list()
@@ -39,7 +39,7 @@ class CSVimport:
         :return: none
         """
         self.import_files_as_dfs()
-        self.network_settings = self.get_settings()
+        self.simulation_settings = self.get_settings()
         self.get_lines()
         self.get_nodes()
         self.check_consistency()
@@ -97,18 +97,21 @@ class CSVimport:
     def get_generators(self):
         """
         creates a list of generators
-        :return:
+        :return: list of generators
         """
+        settings = self.simulation_settings
+        default_max = 1000 if settings.is_import_pu == 1 else settings.s_nom
+        default_min = -1000 if settings.is_import_pu ==1 else float(settings.s_nom * -1)
         generator_file_df = self.df_import[file_names['generators']]
         generators = list()
         for row in generator_file_df.iterrows():
             row = row[1]
             generator_name = row['name'] if 'name' in row else 'name#'
             grid_node_name = row['node_i'] if 'node_i' in row else 'node#'
-            p_min = row['p_min'] if not math.isnan(float(row['p_min'])) else 0
-            p_max = row['p_max'] if not math.isnan(float(row['p_max'])) else 100
-            q_min = row['q_min'] if not math.isnan(float(row['q_min'])) else 0
-            q_max = row['q_max'] if not math.isnan(float(row['q_max'])) else 100
+            p_min = row['p_min'] if not math.isnan(float(row['p_min'])) else default_min
+            p_max = row['p_max'] if not math.isnan(float(row['p_max'])) else default_max
+            q_min = row['q_min'] if not math.isnan(float(row['q_min'])) else default_min
+            q_max = row['q_max'] if not math.isnan(float(row['q_max'])) else default_max
             generator = Generator(name=generator_name, node_i=grid_node_name, p_min=p_min, p_max=p_max, q_min=q_min,
                                   q_max=q_max)
             generators.append(generator)
@@ -116,12 +119,15 @@ class CSVimport:
         self.set_generators_data(generators)
 
         return generators
-
-    def set_series_data(self, elements, p_series_df, q_series_df):
+    
+    @staticmethod
+    def set_series_data(elements, p_series_df, q_series_df):
         """
-        get all time varying generator data
-        :return: a dictionary with key = <elements name>
-        value = dictionary with key = timestamp, value = {'P': <active power>, 'Q': <reactive power>}
+        set all time varying generator data
+        :return: none
+        :param elements: list of objects, in this case either generators oder loads
+        :param p_series_df: data frame with active power time series data
+        :param q_series_df: data frame with reactive power time series data
         """
         for element in elements:
             time_stamps_p = p_series_df['time_stamp']
@@ -149,8 +155,8 @@ class CSVimport:
     def set_generators_data(self, generators):
         """
         call of self.get_series_data with defined parameters
-        :return: a dictionary with key = <generator name>
-        value = dictionary with key = timestamp, value = {'P': <active power>, 'Q': <reactive power>}
+        :return: none
+        :param generators: list of generator objects
         """
         generators_p_series_df = self.df_import[file_names['generators_p_series']]
         generators_q_series_df = self.df_import[file_names['generators_q_series']]
@@ -233,17 +239,15 @@ class CSVimport:
             settings_file_df['is_import_pu'].iloc[0]) else 0
         is_export_pu = settings_file_df['is_export_pu'].iloc[0] if not math.isnan(
             settings_file_df['is_export_pu'].iloc[0]) else 0
-        is_resistance_pu = settings_file_df['is_resistance_pu'].iloc[0] if not math.isnan(
-            settings_file_df['is_resistance_pu'].iloc[0]) else 0
         time_stamp_format = settings_file_df['time_stamp_format'].iloc[0] if isinstance(
             settings_file_df['time_stamp_format'].iloc[0], str) else None
         if not (slack and v_nom and s_nom and time_stamp_format):
             print('\nProgram was aborted. Entries are missing in "simulation_settings.csv"')
             raise SystemExit(1)
 
-        return Settings(slack, v_nom, s_nom, is_import_pu, is_export_pu, is_resistance_pu, time_stamp_format)
+        return Settings(slack, v_nom, s_nom, is_import_pu, is_export_pu, time_stamp_format)
 
-    def import_files_as_dfs(self, root_path=''):
+    def import_files_as_dfs(self):
         """
             imports all csv files from default 'csv_import' path in the project root directory or from a specified
             directory
@@ -307,14 +311,12 @@ class Settings:
         imported settings from 'simulation_settings.csv' are saved in a Settings() object
     """
 
-    def __init__(self, slack, v_nom=None, s_nom=None, is_import_pu=None, is_export_pu=None, is_resistance_pu=None,
-                 time_stamp_format=None):
+    def __init__(self, slack, v_nom=None, s_nom=None, is_import_pu=None, is_export_pu=None, time_stamp_format=None):
         self.__slack = slack
         self.__v_nom = v_nom
         self.__s_nom = s_nom
         self.__is_import_pu = is_import_pu
         self.__is_export_pu = is_export_pu
-        self.__is_resistance_pu = is_resistance_pu
         self.__time_stamp_format = time_stamp_format
 
     def __get_slack_node(self):
@@ -332,9 +334,6 @@ class Settings:
     def __get_is_export(self):
         return self.__is_export_pu
 
-    def __get_is_resistance_pu(self):
-        return self.__is_resistance_pu
-
     def __get_tim_stamp_format(self):
         return self.__time_stamp_format
 
@@ -343,7 +342,6 @@ class Settings:
     v_nom = property(__get_v_nom)
     is_import_pu = property(__get_is_import)
     is_export_pu = property(__get_is_export)
-    is_resistance_pu = property(__get_is_resistance_pu)
     time_stamp_format = property(__get_tim_stamp_format)
 
 
