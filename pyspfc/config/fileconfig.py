@@ -17,20 +17,6 @@ import csv
 import os
 
 
-def check_dir_and_delete(directory):
-    """
-    check if directory exists, if not, create it
-    :param directory: directory that will be checked
-    :return: none
-    """
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-    else:
-        files = os.listdir(directory)
-        for file in files:
-            os.remove(os.path.join(directory, file))
-
-
 def check_dir(directory):
     """
     check if directory exists, if not, create it

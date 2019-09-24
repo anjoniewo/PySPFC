@@ -1,7 +1,7 @@
 import os
 import platform
 
-from .config.fileconfig import check_dir, check_dir_and_delete
+from .config.fileconfig import check_dir
 
 """
 defined constants for PySPFC
