@@ -1,45 +1,32 @@
+#   Copyright (C) 2019  Christian Klosterhalfen (TH Köln), Anjo Niewöhner (TH Köln)
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
 class Generator:
     """
-        class to model generators connected to a gridelements node
+        class to model generators connected to a grid node
     """
 
-    def __init__(self, name, node_i, p_min=100, p_max=100, q_min=100, q_max=100):
-        self.__name = name
-        self.__node_i = node_i
-        self.__p_q_series = None
-        self.__p_min = p_min
-        self.__p_max = p_max
-        self.__q_min = q_min
-        self.__q_max = q_max
-
-    def __get_name(self):
-        return self.__name
-
-    def __get_node_name(self):
-        return self.__node_i
-
-    def __get_p_max(self):
-        return self.__p_max
-
-    def __get_p_min(self):
-        return self.__p_min
-
-    def __get_q_max(self):
-        return self.__q_max
-
-    def __get_q_min(self):
-        return self.__q_min
-
-    def __get_series_data(self):
-        return self.__p_q_series
-
-    name = property(__get_name)
-    node = property(__get_node_name)
-    p_max = property(__get_p_max)
-    p_min = property(__get_p_min)
-    q_max = property(__get_q_max)
-    q_min = property(__get_q_min)
-    series_data = property(__get_series_data)
+    def __init__(self, name, node, p_min, p_max, q_min, q_max):
+        self.name = name
+        self.node = node
+        self.p_q_series = None
+        self.p_min = p_min
+        self.p_max = p_max
+        self.q_min = q_min
+        self.q_max = q_max
 
     def set_p_q_series(self, p_q_series):
-        self.__p_q_series = p_q_series
+        self.p_q_series = p_q_series

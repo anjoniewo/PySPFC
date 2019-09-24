@@ -53,12 +53,12 @@ class CSVimport:
         time_stamp_keys = None
         for grid_node in self.grid_nodes:
             if len(grid_node.generators):
-                generator = next((x for x in grid_node.generators if len(x.series_data)), None)
-                time_stamp_keys = generator.series_data
+                generator = next((x for x in grid_node.generators if len(x.p_q_series)), None)
+                time_stamp_keys = generator.p_q_series
                 break
             elif len(grid_node.loads):
-                load = next((x for x in grid_node.loads if len(x.series_data)), None)
-                time_stamp_keys = load.series_data
+                load = next((x for x in grid_node.loads if len(x.p_q_series)), None)
+                time_stamp_keys = load.p_q_series
                 break
             else:
                 print('\nWARNING: Program was aborted. No generators neither loads are specified!\n')
@@ -78,7 +78,7 @@ class CSVimport:
             row = row[1]
             load_name = row['name']
             grid_node_name = row['node_i']
-            load = Load(name=load_name, node_i=grid_node_name)
+            load = Load(name=load_name, node=grid_node_name)
             loads.append(load)
 
         self.set_loads_data(loads)
@@ -103,7 +103,7 @@ class CSVimport:
             p_max = row['p_max'] if not math.isnan(float(row['p_max'])) else default_max
             q_min = row['q_min'] if not math.isnan(float(row['q_min'])) else default_min
             q_max = row['q_max'] if not math.isnan(float(row['q_max'])) else default_max
-            generator = Generator(name=generator_name, node_i=grid_node_name, p_min=p_min, p_max=p_max, q_min=q_min,
+            generator = Generator(name=generator_name, node=grid_node_name, p_min=p_min, p_max=p_max, q_min=q_min,
                                   q_max=q_max)
             generators.append(generator)
 
@@ -170,7 +170,7 @@ class CSVimport:
         """
         node_file_df = self.df_import[file_names['gridnodes']]
         node_file_columns = node_file_df.columns.values.tolist()
-        self.validator.validate_columns(cols_gridnodes, node_file_columns)
+        self.validator.validate_columns(file_names['gridnodes'], cols_gridnodes, node_file_columns)
         for row in node_file_df.iterrows():
             row = row[1]
             grid_node_name = row['name']
@@ -191,7 +191,7 @@ class CSVimport:
         """
         line_file_df = self.df_import[file_names['lines']]
         line_file_columns = line_file_df.columns.values.tolist()
-        self.validator.validate_columns(cols_lines, line_file_columns)
+        self.validator.validate_columns(file_names['lines'], cols_lines, line_file_columns)
         for row in line_file_df.iterrows():
             row = row[1]
             grid_line_name = row['name']
@@ -227,11 +227,12 @@ class CSVimport:
         settings_file_columns = settings_file_df.columns.values.tolist()
 
         # validation of column names
-        self.validator.validate_columns(cols_settings, settings_file_columns)
+        self.validator.validate_columns(file_names['sim_settings'], cols_settings, settings_file_columns)
 
         slack = settings_file_df['slack'].iloc[0] if isinstance(settings_file_df['slack'].iloc[0], str) else None
         v_nom = settings_file_df['v_nom_kV'].iloc[0] if not math.isnan(settings_file_df['v_nom_kV'].iloc[0]) else None
-        s_nom = settings_file_df['s_nom_MVA'].iloc[0] * 1000 if not math.isnan(settings_file_df['s_nom_MVA'].iloc[0]) else None
+        s_nom = settings_file_df['s_nom_MVA'].iloc[0] * 1000 if not math.isnan(
+            settings_file_df['s_nom_MVA'].iloc[0]) else None
         is_import_pu = settings_file_df['is_import_pu'].iloc[0] if not math.isnan(
             settings_file_df['is_import_pu'].iloc[0]) else 0
         is_export_pu = settings_file_df['is_export_pu'].iloc[0] if not math.isnan(
@@ -291,7 +292,7 @@ class ImportValidator:
         :return: none
         """
         self.check_grid_nodes_are_connected(csv_import.grid_nodes, csv_import.grid_lines)
-        self.check_grid_nodes_have_loads_ord_generators(csv_import.grid_nodes)
+        self.check_grid_nodes_have_loads_or_generators(csv_import.grid_nodes)
 
     @staticmethod
     def check_grid_nodes_are_connected(grid_nodes, grid_lines):
@@ -314,7 +315,7 @@ class ImportValidator:
                 raise SystemExit(1)
 
     @staticmethod
-    def check_grid_nodes_have_loads_ord_generators(grid_nodes):
+    def check_grid_nodes_have_loads_or_generators(grid_nodes):
         """
         method checks if every grid node has at least a generator or load element
         :param grid_nodes: list of grid nodes
@@ -326,8 +327,15 @@ class ImportValidator:
                 print(grid_node.name)
                 raise SystemExit(1)
 
-
-    def validate_columns(self, ref_columns, column_names):
+    @staticmethod
+    def validate_columns(filename, ref_columns, column_names):
+        """
+        method validates if the column headings in the first row of a csv file corresponds to the default values
+        :param filename: filename of the file to be validated
+        :param ref_columns: default column headings
+        :param column_names: actual column headings of the file
+        :return:
+        """
         success = False
 
         nonexistent_cols = list()
@@ -337,7 +345,8 @@ class ImportValidator:
                 nonexistent_cols.append(col)
 
         if len(nonexistent_cols):
-            print('\nProgram was aborted. Following columns are missing:\n')
+            print('\nProgram was aborted. Following columns are missing in:\n')
+            print(filename)
             print(nonexistent_cols)
             raise SystemExit(1)
         else:
