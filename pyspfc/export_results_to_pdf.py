@@ -69,7 +69,102 @@ class PDF(FPDF):
             self.chapter_body(name)
 
 
-def create_pdf_report(grid_node_data=dict(), grid_line_data=dict(), v_nom=0, s_nom=0):
+def create_pdf_report_for_single_point(grid_node_data=dict(), grid_line_data=dict(), v_nom=0, s_nom=0):
+    """
+    method creates a pdf report with power flow results of a single point
+    :param grid_node_data: power flow results of grid nodes
+    :param grid_line_data: power flow results of grid lines
+    :param v_nom: reference nominal voltage
+    :param s_nom: reference nominal power
+    :return: none
+    """
+
+    max_voltage_plot_path = os.path.join(get_plot_export_path(), 'Bus Voltages Magnitudes.png')
+    max_line_plot_path = os.path.join(get_plot_export_path(), 'Current On Lines Magnitudes.png')
+    network_schematic_path = os.path.join(get_schematic_export_path(), 'network_schematic.png')
+
+    pdf = PDF()
+    pdf.set_margins(top=10, left=16)
+    pdf.set_title(title)
+    pdf.set_author('Christian Klosterhalfen, Anjo Niewöhner')
+
+    # chapter 1 --------------------------------------------------------------------------------------------------------
+    pdf.print_chapter(1, title='Grid', name='', has_body=True, pdf=pdf)
+
+    # add network schematic
+    x_pos = pdf.w / 5
+    y_pos = 50
+    width = pdf.w / 2
+    height = 80
+    pdf.image(network_schematic_path, x=x_pos, y=y_pos, w=width, h=height)
+    pdf.ln(70)
+    # ------------------------------------------------------------------------------------------------------------------
+
+    # chapter 2 --------------------------------------------------------------------------------------------------------
+    pdf.print_chapter(2, title='Stationary Load Flow Calculation Results', name='')
+    pdf.ln(7)
+
+    # effective page width, or just epw
+    epw = pdf.w - 2 * pdf.l_margin
+    col_width = epw / 11
+    text_height = pdf.font_size
+
+    # add tables of minimal grid load penetration
+    min_grid_node_data = convert_data_to_table_data(grid_node_data['max'])
+    # ------------------------------------------------------------------------------------------------------------------
+    table_label = 'Table of bus results - V_ref = ' + str(v_nom) + ' kV and S_ref = ' + str(
+        int(s_nom / 1e3)) + ' MVA'
+    add_table(pdf=pdf, table_label=table_label, tab_lab_height=epw, data=min_grid_node_data, width=col_width,
+              height=2 * text_height)
+    pdf.ln(1)
+    table_legend = 'L: load, G: generation'
+    pdf.cell(epw, text_height, str(table_legend), align='L')
+    # ------------------------------------------------------------------------------------------------------------------
+
+    pdf.ln(14)
+
+    min_grid_line_data = convert_data_to_table_data(grid_line_data['max'], type='line', v_nom=v_nom, s_nom=s_nom)
+    # ------------------------------------------------------------------------------------------------------------------
+    table_label = 'Table of line results - data in physical values'
+    add_table(pdf=pdf, table_label=table_label, tab_lab_height=epw, data=min_grid_line_data, width=col_width * 2,
+              height=2 * text_height)
+    pdf.ln(1)
+    table_legend = 'i: bus at start, j: bus at end'
+    pdf.cell(epw, text_height, str(table_legend), align='L')
+    # ------------------------------------------------------------------------------------------------------------------
+
+    # chapter 3 --------------------------------------------------------------------------------------------------------
+    pdf.print_chapter(3, title='Plots of bus voltage and line currents', name='')
+
+    x_pos = pdf.w / 6.95
+    y_pos = 32
+    width = 150
+    height = 125
+
+    # add node voltages plot
+    pdf.image(max_voltage_plot_path, x=x_pos, y=y_pos, w=width, h=height)
+
+    # reset vertical position of image input
+    y_pos = pdf.h / 1.9
+
+    # add line currents plot
+    pdf.image(max_line_plot_path, x=x_pos, y=y_pos, w=width, h=height)
+
+    pdf_title = 'PowerFlow_Report'
+    file_name = pdf_title + PDF_FILE_EXTENSION
+    file_path_name = os.path.join(get_pdf_export_path(), file_name)
+    pdf.output(file_path_name, 'F')
+
+
+def create_pdf_report_for_time_series(grid_node_data=dict(), grid_line_data=dict(), v_nom=0, s_nom=0):
+    """
+    method creates a pdf report with power flow results of time series data
+    :param grid_node_data: power flow results of grid nodes
+    :param grid_line_data: power flow results of grid lines
+    :param v_nom: reference nominal voltage
+    :param s_nom: reference nominal power
+    :return: none
+    """
     timeseries_current_plot_path = os.path.join(get_plot_export_path(), 'Time variant Current on lines.png')
     timeseries_voltage_plot_path = os.path.join(get_plot_export_path(), 'Time variant Bus voltages.png')
     min_voltage_plot_path = os.path.join(get_plot_export_path(), 'Bus Voltages at minimal Grid Load.png')

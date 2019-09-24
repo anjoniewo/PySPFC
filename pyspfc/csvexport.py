@@ -130,8 +130,8 @@ class CSVexport:
     def export_data_to_csv(self, file_name, data_dict):
         """
         exports data to csv file
-        :param file_name:
-        :param data_dict:
+        :param file_name: specified file_name
+        :param data_dict: data to write in csv file
         :return:
         """
         file_name = str(file_name + CSV_FILE_EXTENSION)

@@ -20,7 +20,7 @@ from .csvimport import CSVimport
 from .directories import reset_root_path
 from .electrical_schematic import create_network_schematic
 from .export_plots import Plotter
-from .export_results_to_pdf import create_pdf_report
+from .export_results_to_pdf import create_pdf_report_for_time_series, create_pdf_report_for_single_point
 from .powerflow.busadmittancematrix import BusAdmittanceMatrix
 from .gridelements.gridline import GridLine
 from .gridelements.gridnode import GridNode
@@ -344,7 +344,16 @@ class Grid:
             print("Number of grid nodes is significantly high. Readibility of PDF report might be bad.")
 
         settings = self.__settings
-        create_pdf_report(self.gridnode_results_for_pdf, self.gridline_results_for_pdf, settings.v_nom, settings.s_nom)
+
+        # when a time series with multiple time points was calculated
+        if len(self.timestamps) > 1:
+            create_pdf_report_for_time_series(self.gridnode_results_for_pdf, self.gridline_results_for_pdf,
+                                              settings.v_nom, settings.s_nom)
+
+        # if only one time point was calculated
+        else:
+            create_pdf_report_for_single_point(self.gridnode_results_for_pdf, self.gridline_results_for_pdf,
+                                               settings.v_nom, settings.s_nom)
 
     def get_worstcase_results(self):
         """
