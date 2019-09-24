@@ -1,17 +1,32 @@
+#   Copyright (C) 2019  Christian Klosterhalfen (TH Köln), Anjo Niewöhner (TH Köln)
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import os
 
-from pyspfc.csvexport import CSVexport, TIMESTAMP
-from pyspfc.csvimport import CSVimport
-from pyspfc.directories import reset_root_path
-from pyspfc.electrical_schematic import create_network_schematic
-from pyspfc.export_plots import Plotter
-from pyspfc.export_results_to_pdf import create_pdf_report
-from pyspfc.powerflow.busadmittancematrix import BusAdmittanceMatrix
-from pyspfc.gridelements.gridline import GridLine
-from pyspfc.gridelements.gridnode import GridNode
-from pyspfc.powerflow.jacobianmatrix import JacobianMatrix
-from pyspfc.powerflow.powerflow import PowerFlow
-from pyspfc.powerflow.powerflowreporter import LoadFlowReporter
+from .csvexport import CSVexport, TIMESTAMP
+from .csvimport import CSVimport
+from .directories import reset_root_path
+from .electrical_schematic import create_network_schematic
+from .export_plots import Plotter
+from .export_results_to_pdf import create_pdf_report_for_time_series, create_pdf_report_for_single_point
+from .powerflow.busadmittancematrix import BusAdmittanceMatrix
+from .gridelements.gridline import GridLine
+from .gridelements.gridnode import GridNode
+from .powerflow.jacobianmatrix import JacobianMatrix
+from .powerflow.powerflow import PowerFlow
+from .powerflow.powerflowreporter import LoadFlowReporter
 
 
 class Grid:
@@ -222,12 +237,12 @@ class Grid:
                     sum_of_p_min += generator.p_min
                     sum_of_q_max += generator.q_max
                     sum_of_q_min += generator.q_min
-                    sum_of_active_power_gen += generator.series_data[timestamp]['P']
-                    sum_of_reactive_power_gen += generator.series_data[timestamp]['Q']
+                    sum_of_active_power_gen += generator.p_q_series[timestamp]['P']
+                    sum_of_reactive_power_gen += generator.p_q_series[timestamp]['Q']
             if len(gridnode.loads):
                 for load in gridnode.loads:
-                    sum_of_active_power_load += load.series_data[timestamp]['P']
-                    sum_of_reactive_power_load += load.series_data[timestamp]['Q']
+                    sum_of_active_power_load += load.p_q_series[timestamp]['P']
+                    sum_of_reactive_power_load += load.p_q_series[timestamp]['Q']
 
             p_load_pu = sum_of_active_power_load / s_nom
             q_load_pu = sum_of_reactive_power_load / s_nom
@@ -329,7 +344,16 @@ class Grid:
             print("Number of grid nodes is significantly high. Readibility of PDF report might be bad.")
 
         settings = self.__settings
-        create_pdf_report(self.gridnode_results_for_pdf, self.gridline_results_for_pdf, settings.v_nom, settings.s_nom)
+
+        # when a time series with multiple time points was calculated
+        if len(self.timestamps) > 1:
+            create_pdf_report_for_time_series(self.gridnode_results_for_pdf, self.gridline_results_for_pdf,
+                                              settings.v_nom, settings.s_nom)
+
+        # if only one time point was calculated
+        else:
+            create_pdf_report_for_single_point(self.gridnode_results_for_pdf, self.gridline_results_for_pdf,
+                                               settings.v_nom, settings.s_nom)
 
     def get_worstcase_results(self):
         """

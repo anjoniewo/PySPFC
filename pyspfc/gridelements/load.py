@@ -1,28 +1,28 @@
-from pyspfc.gridelements.generator import Generator
+#   Copyright (C) 2019  Christian Klosterhalfen (TH Köln), Anjo Niewöhner (TH Köln)
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-class Load(Generator):
-	"""
-		class to model loads connected to a gridelements node
-	"""
-	
-	def __init__(self, name, node_i):
-		self.__name = name
-		self.__node_i = node_i
-		self.__p_q_series = None
-	
-	def __get_name(self):
-		return self.__name
-	
-	def __get_node_name(self):
-		return self.__node_i
+class Load:
+    """
+        class to model loads connected to a gridelements node
+    """
 
-	def __get_series_data(self):
-		return self.__p_q_series
-	
-	name = property(__get_name)
-	node = property(__get_node_name)
-	series_data = property(__get_series_data)
-	
-	def set_p_q_series(self, p_q_series):
-		self.__p_q_series = p_q_series
+    def __init__(self, name, node):
+        self.name = name
+        self.node = node
+        self.p_q_series = None
+
+    def set_p_q_series(self, p_q_series):
+        self.p_q_series = p_q_series

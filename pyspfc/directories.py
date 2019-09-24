@@ -42,7 +42,7 @@ def get_import_path():
     get the directory of import path
     :return: directory as a string
     """
-    return get_root_path() + OS_SLASH + 'csv_import' if WAS_ROOT_PATH_RESETED == False else get_root_path()
+    return get_root_path() + OS_SLASH + 'csv_import' if WAS_ROOT_PATH_RESETED is False else get_root_path()
 
 
 def get_export_path():
