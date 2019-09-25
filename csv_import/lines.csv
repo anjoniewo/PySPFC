@@ -1,4 +1,1 @@
-name;node_i;node_j;r_l;x_l;g_shunt_l;b_shunt_l;length
-L1;K1;K2;0;0.1;0;;1
-L2;K1;K3;0;0.1;0;;1
-L3;K2;K3;0;0.1;0;;1
+name;node_i;node_j;r_l;x_l;g_shunt_l;b_shunt_l;lengthL1;N1;N2;0.157;0.072;0;0;0.05L2;N2;N3;0.157;0.072;0;0;0.02L3;N3;N4;0.157;0.072;0;0;0.02L4;N4;N5;0.157;0.072;0;0;0.02L5;N5;N6;0.157;0.072;0;0;0.02
