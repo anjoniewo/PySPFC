@@ -46,8 +46,8 @@ class PDF(FPDF):
         # Line break
         self.ln(4)
 
-    def chapter_body(self, name):
-        txt = 'Schematic of the electrical grid'
+    def chapter_body(self, txt):
+        # txt = ''
 
         # Read text file
         # with open(name, 'rb') as fh:
@@ -79,7 +79,7 @@ def create_pdf_report_for_single_point(grid_node_data=dict(), grid_line_data=dic
     :return: none
     """
 
-    max_voltage_plot_path = os.path.join(get_plot_export_path(), 'Bus Voltages Magnitudes.png')
+    max_voltage_plot_path = os.path.join(get_plot_export_path(), 'Bus Voltage Magnitudes.png')
     max_line_plot_path = os.path.join(get_plot_export_path(), 'Current On Lines Magnitudes.png')
     network_schematic_path = os.path.join(get_schematic_export_path(), 'network_schematic.png')
 
@@ -89,7 +89,7 @@ def create_pdf_report_for_single_point(grid_node_data=dict(), grid_line_data=dic
     pdf.set_author('Christian Klosterhalfen, Anjo Niewöhner')
 
     # chapter 1 --------------------------------------------------------------------------------------------------------
-    pdf.print_chapter(1, title='Grid', name='', has_body=True, pdf=pdf)
+    pdf.print_chapter(1, title='Grid', name='Schematic of the electrical grid', has_body=True, pdf=pdf)
 
     # add network schematic
     x_pos = pdf.w / 5
@@ -179,7 +179,7 @@ def create_pdf_report_for_time_series(grid_node_data=dict(), grid_line_data=dict
     pdf.set_author('Christian Klosterhalfen, Anjo Niewöhner')
 
     # chapter 1
-    pdf.print_chapter(1, title='Grid', name='', has_body=True, pdf=pdf)
+    pdf.print_chapter(1, title='Grid', name='Schematic of the electrical grid', has_body=True, pdf=pdf)
 
     # add network schematic
     x_pos = pdf.w / 5
@@ -187,11 +187,11 @@ def create_pdf_report_for_time_series(grid_node_data=dict(), grid_line_data=dict
     width = pdf.w / 2
     height = 80
     pdf.image(network_schematic_path, x=x_pos, y=y_pos, w=width, h=height)
-    pdf.ln(70)
+    # pdf.ln(120)
 
-    # chapter 2
-    pdf.print_chapter(2, title='Stationary Load Flow Calculation Results', name='')
-    pdf.ln(7)
+    # chapter 2---------------------------------------------------------------------------------------------------------
+    pdf.print_chapter(2, title='Stationary Load Flow Calculation Results at minimal grid load', name='')
+    pdf.ln(2)
 
     # effective page width, or just epw
     epw = pdf.w - 2 * pdf.l_margin
@@ -201,6 +201,8 @@ def create_pdf_report_for_time_series(grid_node_data=dict(), grid_line_data=dict
     # add tables of minimal grid load penetration
     min_grid_node_data = convert_data_to_table_data(grid_node_data['max'])
     # ------------------------------------------------------------------------------------------------------------------
+    pdf.chapter_body("Minimal grid load at: " + grid_node_data['time_stamp_max'])
+    pdf.ln(5)
     table_label = 'Table of buses at minimal Grid Load - V_ref = ' + str(v_nom) + ' kV and S_ref = ' + str(
         int(s_nom / 1e3)) + ' MVA'
     add_table(pdf=pdf, table_label=table_label, tab_lab_height=epw, data=min_grid_node_data, width=col_width,
@@ -222,11 +224,20 @@ def create_pdf_report_for_time_series(grid_node_data=dict(), grid_line_data=dict
     pdf.cell(epw, text_height, str(table_legend), align='L')
     # ------------------------------------------------------------------------------------------------------------------
 
-    pdf.ln(14)
+    # chapter 2---------------------------------------------------------------------------------------------------------
+    pdf.print_chapter(2, title='Stationary Load Flow Calculation Results at maximal grid load', name='')
+    pdf.ln(2)
+
+    # effective page width, or just epw
+    epw = pdf.w - 2 * pdf.l_margin
+    col_width = epw / 11
+    text_height = pdf.font_size
 
     # add tables of maximal grid load penetration
     max_grid_node_data = convert_data_to_table_data(grid_node_data['min'])
     # ------------------------------------------------------------------------------------------------------------------
+    pdf.chapter_body("Maximal grid load at: " + grid_node_data['time_stamp_min'])
+    pdf.ln(5)
     table_label = 'Table of buses at maximal Grid Load - V_ref = ' + str(v_nom) + ' kV and S_ref = ' + str(
         int(s_nom / 1e3)) + ' MVA'
     add_table(pdf=pdf, table_label=table_label, tab_lab_height=epw, data=max_grid_node_data, width=col_width,
@@ -316,7 +327,7 @@ def convert_data_to_table_data(data, type='node', v_nom=0, s_nom=0):
     if not is_linedata:
         header = ['name', 'type', '|P_L|', '|P_G|', 'P', '|Q_L|', '|Q_G|', 'Q', '|U|', 'theta in °']
     elif is_linedata:
-        header = ['name', 'bus i', 'bus j', 'P_loss in W', '|I_ij| in A']
+        header = ['name', 'bus i', 'bus j', 'P_loss in kW', '|I_ij| in A']
 
         keys_to_delete = list()
         first_key = list(data.keys())[0]
@@ -344,7 +355,7 @@ def convert_data_to_table_data(data, type='node', v_nom=0, s_nom=0):
             elif sub_key == 'current_from_i_to_j':
                 if isinstance(sub_value, float):
                     rounded_value = round(float(sub_value * (s_nom / (v_nom * math.sqrt(3)))), 3)
-                    sub_value = 0 if abs(rounded_value) else rounded_value
+                    sub_value = 0 if abs(rounded_value) == 0 else rounded_value
                 sub_list.append(sub_value)
             else:
                 if isinstance(sub_value, float):

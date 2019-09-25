@@ -76,7 +76,7 @@ class Plotter:
                 grid_nodes.append(grid_node_name)
                 node_voltages.append(grid_node_results[grid_node_name]['v_magnitude'] * v_nom)
 
-            title = 'Bus Voltages Magnitudes'
+            title = 'Bus Voltage Magnitudes'
             x_label = 'Grid Nodes'
 
             self.create_voltage_plot(x_vals=grid_nodes, y_vals=node_voltages, title=title, x_axis_label=x_label,

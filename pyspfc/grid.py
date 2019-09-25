@@ -387,6 +387,10 @@ class Grid:
         min_max_gridnode_results = dict()
         min_max_gridline_results = dict()
 
+        min_max_gridnode_results['time_stamp_min'] = min_worstcase_timestamp
+        min_max_gridline_results['time_stamp_min'] = min_worstcase_timestamp
+        min_max_gridnode_results['time_stamp_max'] = max_worstcase_timestamp
+        min_max_gridline_results['time_stamp_min'] = max_worstcase_timestamp
         min_max_gridnode_results[min_worstcase] = self.gridnode_results[min_worstcase_timestamp]
         min_max_gridnode_results[max_worstcase] = self.gridnode_results[max_worstcase_timestamp]
         min_max_gridline_results[min_worstcase] = self.gridline_results[min_worstcase_timestamp]
