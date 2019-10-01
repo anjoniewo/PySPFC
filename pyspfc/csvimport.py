@@ -293,6 +293,7 @@ class ImportValidator:
         """
         self.check_grid_nodes_are_connected(csv_import.grid_nodes, csv_import.grid_lines)
         self.check_grid_nodes_have_loads_or_generators(csv_import.grid_nodes)
+        self.check_slack_in_settings_is_gridnode(csv_import.grid_nodes, csv_import.get_settings().slack)
 
     @staticmethod
     def check_grid_nodes_are_connected(grid_nodes, grid_lines):
@@ -326,6 +327,18 @@ class ImportValidator:
                 print('\nProgram was aborted. Following grid node has neither generators nor loads: ')
                 print(grid_node.name)
                 raise SystemExit(1)
+
+    @staticmethod
+    def check_slack_in_settings_is_gridnode(grid_nodes, slack_node_name):
+        """
+        method checks if every grid node has at least a generator or load element
+        :param grid_nodes: list of grid nodes
+        :return: none
+        """
+        if not slack_node_name in [grid_node.name for grid_node in grid_nodes]:
+            print('\nProgram was aborted. Slack node in "simulation_settings.csv" was not defined in "gridnodes.csv"')
+            print('Slack: ' + slack_node_name)
+            raise SystemExit(1)
 
     @staticmethod
     def validate_columns(filename, ref_columns, column_names):
