@@ -1,0 +1,4 @@
+name;node_i;node_j;r_l;x_l;g_shunt_l;b_shunt_l;length
+L12;N1;N2;0;0.1;0;;1
+L13;N1;N3;0;0.1;0;;1
+L23;N2;N3;0;0.1;0;;1

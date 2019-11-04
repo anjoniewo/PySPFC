@@ -1,0 +1,10 @@
+generators;generators.csv
+generators_p_series;generators_p_series.csv
+generators_q_series;generators_q_series.csv
+gridnodes;gridnodes.csv
+lines;lines.csv
+loads;loads.csv
+loads_p_series;loads_p_series.csv
+loads_q_series;loads_q_series.csv
+sim_settings;simulation_settings.csv
+transformers;transformers.csv
